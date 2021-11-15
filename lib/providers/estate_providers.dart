@@ -53,6 +53,13 @@ class EstateProvider extends ChangeNotifier {
     return null;
   }
 
+  Future fetchEstateById(estateId) async {
+    final url = "${baseUrl}api/estate/${estateId}/";
+    var extractedData = await getData(url);
+    var estate = EstateModel.fromJson(extractedData);
+    return estate;
+  }
+
   Future<void> fetchAllAndSetEstates() async {
     const url = "${baseUrl}api/estate/";
     Map<int, List<EstateModel>> estates = {};
@@ -65,6 +72,7 @@ class EstateProvider extends ChangeNotifier {
     //   print(error);
     // }
     // print(_estates);
+    print(_estates);
     notifyListeners();
   }
 
