@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dachaturizm/components/chips.dart';
 import 'package:dachaturizm/constants.dart';
@@ -5,6 +7,7 @@ import 'package:dachaturizm/models/estate_model.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 
 class DetailBuilder {
   final EstateModel detail;
@@ -302,7 +305,7 @@ class DetailBuilder {
                 elevation: 0,
                 padding: EdgeInsets.symmetric(vertical: 10),
                 minimumSize: Size(halfScreenButtonWidth, 50)),
-            onPressed: () {},
+            onPressed: () => UrlLauncher.launch("tel://+998995175347"),
             child: Text("Qo'ng'iroq qilish"),
           )
         ],

@@ -1,3 +1,4 @@
+import 'package:dachaturizm/screens/locale_helper.dart';
 import 'package:flutter/cupertino.dart';
 
 class EstateModel {
@@ -53,12 +54,14 @@ class EstateModel {
     this.isTop = false,
   });
 
-  static EstateModel fromJson(data) {
+  static Future<EstateModel> fromJson(data) async {
+    String locale = await getCurrentLocale();
+
     return EstateModel(
       id: data["id"],
-      title: data["translations"]["uz"]["title"],
-      description: data["translations"]["uz"]["description"],
-      priceType: data["price_type"]["translations"]["uz"]["title"],
+      title: data["translations"][locale]["title"],
+      description: data["translations"][locale]["description"],
+      priceType: data["price_type"]["translations"][locale]["title"],
       rating: data["rating"],
       views: data["views"],
       beds: data["beds"],
@@ -77,7 +80,7 @@ class EstateModel {
           .toList(),
       facilities: data["facilities"]
           .map<Facility>((item) => Facility(
-              id: item["id"], title: item["translations"]["uz"]["title"]))
+              id: item["id"], title: item["translations"][locale]["title"]))
           .toList(),
       userId: data["user"],
       typeId: data["estate_type"],

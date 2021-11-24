@@ -65,7 +65,7 @@ class EstateProvider extends ChangeNotifier {
     Map<int, List<EstateModel>> estates = {};
     // try {
     var extractedData = await getData(url);
-    estates = setData(extractedData, estates);
+    estates = await setData(extractedData, estates);
     estates = await checkNextPage(extractedData, estates);
     _estates = estates;
     // } catch (error) {
@@ -86,8 +86,8 @@ class EstateProvider extends ChangeNotifier {
     }
   }
 
-  Map<int, List<EstateModel>> setData(data, estates) {
-    data["results"].forEach((estate) {
+  Future<Map<int, List<EstateModel>>> setData(data, estates) async {
+    await data["results"].forEach((estate) async {
       int estate_type = estate["estate_type"];
       if (!estates.containsKey(estate_type)) {
         List<EstateModel> _list = [];
@@ -99,8 +99,8 @@ class EstateProvider extends ChangeNotifier {
             id: estate["photos"][i]["id"],
             photo: estate["photos"][i]["photo"]));
       }
-
-      estates[estate_type]?.add(EstateModel.fromJson(estate));
+      EstateModel object = await EstateModel.fromJson(estate);
+      estates[estate_type]?.add(object);
     });
 
     return {...estates};
@@ -110,7 +110,7 @@ class EstateProvider extends ChangeNotifier {
     var nextPageLink = data["links"]["next"];
     if (nextPageLink.toString().contains("page")) {
       var extractedData = await getData(nextPageLink);
-      estates = setData(extractedData, estates);
+      estates = await setData(extractedData, estates);
       return checkNextPage(extractedData, estates);
     } else {
       return {...estates};

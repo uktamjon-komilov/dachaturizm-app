@@ -6,6 +6,7 @@ import 'package:dachaturizm/screens/app/listing_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_locales/flutter_locales.dart';
 import 'package:from_css_color/from_css_color.dart';
 import 'package:provider/provider.dart';
 
@@ -35,7 +36,7 @@ class _EstateTypeListViewState extends State<EstateTypeListView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text1("Bo'limlar"),
+            Text1("types"),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -69,6 +70,18 @@ class EstateTypeItem extends StatelessWidget {
   final int screenHeight;
   final TypeModel item;
 
+  Widget networkImage() {
+    if (item.icon != "") {
+      return Image.network(
+        item.icon,
+        height: 70,
+        fit: BoxFit.fill,
+      );
+    } else {
+      return Container();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -98,11 +111,7 @@ class EstateTypeItem extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Image.network(
-                  item.icon,
-                  height: 70,
-                  fit: BoxFit.fill,
-                ),
+                networkImage(),
                 SizedBox(
                   height: 10,
                 ),

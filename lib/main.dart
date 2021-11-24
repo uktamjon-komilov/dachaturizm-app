@@ -1,20 +1,22 @@
 import 'package:dachaturizm/constants.dart';
-import 'package:dachaturizm/providers/estate_providers.dart';
-import 'package:dachaturizm/screens/app/chat_screen.dart';
-import 'package:dachaturizm/screens/app/create_estate_screen.dart';
+import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/screens/app/estate_detail_screen.dart';
-import 'package:dachaturizm/screens/app/listing_screen.dart';
 import 'package:dachaturizm/screens/app/home_screen.dart';
-import 'package:dachaturizm/screens/app/search_screen.dart';
-import 'package:dachaturizm/screens/app/user_screen.dart';
-import 'package:intl/date_symbol_data_local.dart';
+import 'package:dachaturizm/screens/app/listing_screen.dart';
+import 'package:dachaturizm/screens/app/navigational_app_screen.dart';
+import 'package:dachaturizm/screens/app/user/change_language.dart';
+import 'package:dachaturizm/screens/loading/choose_language_screen.dart';
+import 'package:dachaturizm/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_locales/flutter_locales.dart';
 
 import 'package:provider/provider.dart';
 import 'providers/type_provider.dart';
 
-void main() {
-  initializeDateFormatting().then((_) => runApp(const MyApp()));
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Locales.init(["en", "uz", "ru"]);
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
@@ -25,105 +27,57 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  int _currentIndex = 0;
-
-  final _screens = [
-    HomePageScreen(),
-    SearchPageScreen(),
-    EstateCreationPageScreen(),
-    ChatPageScreen(),
-    UserPageScreen()
-  ];
-
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider<EstateTypes>(
-          create: (ctx) => EstateTypes(),
-        ),
-        ChangeNotifierProvider<EstateProvider>(
-          create: (ctx) => EstateProvider(),
-        ),
-      ],
-      child: MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        debugShowCheckedModeBanner: false,
-        home: SafeArea(
-          child: Scaffold(
-            body: IndexedStack(
-              index: _currentIndex,
-              children: _screens,
+    return LocaleBuilder(
+      builder: (locale) => MultiProvider(
+        providers: [
+          ChangeNotifierProvider<EstateTypes>(
+            create: (ctx) => EstateTypes(),
+          ),
+          ChangeNotifierProvider<EstateProvider>(
+            create: (ctx) => EstateProvider(),
+          ),
+        ],
+        child: MaterialApp(
+          title: LocaleText("appbar_text").toString(),
+          localizationsDelegates: Locales.delegates,
+          supportedLocales: Locales.supportedLocales,
+          locale: locale,
+          theme: new ThemeData(
+            primarySwatch: Colors.grey,
+            textTheme: Theme.of(context).textTheme.apply(
+                  bodyColor: darkPurple,
+                  displayColor: darkPurple,
+                ),
+            primaryTextTheme: TextTheme(
+              headline6: TextStyle(color: Colors.white),
             ),
-            bottomNavigationBar: _buildBottomNavigation(),
+            appBarTheme: AppBarTheme(
+              titleTextStyle: TextStyle(
+                color: darkPurple,
+                fontSize: 24,
+                fontWeight: FontWeight.w600,
+              ),
+              centerTitle: true,
+              backgroundColor: Colors.white,
+              elevation: 0.2,
+            ),
           ),
+          debugShowCheckedModeBanner: false,
+          home: SplashScreen(),
+          routes: {
+            HomePageScreen.routeName: (context) => HomePageScreen(),
+            NavigationalAppScreen.routeName: (context) =>
+                NavigationalAppScreen(),
+            ChooseLangugageScreen.routeName: (context) =>
+                ChooseLangugageScreen(),
+            EstateListingScreen.routeName: (context) => EstateListingScreen(),
+            EstateDetailScreen.routeName: (context) => EstateDetailScreen(),
+            ChangeLanguage.routeName: (context) => ChangeLanguage(),
+          },
         ),
-        // initialRoute: "/on-boarding",
-        routes: {
-          EstateListingScreen.routeName: (context) => EstateListingScreen(),
-          EstateDetailScreen.routeName: (context) => EstateDetailScreen(),
-          // "/on-boarding": (context) => const OnBoardLoading(),
-          // "/auth-type": (context) => AuthType(),
-          // "/start-choose-lang": (context) => const LoadingChooseLangScreen(),
-          // "/home-page": (context) => const HomePageScreen(),
-        },
       ),
-    );
-  }
-
-  BottomNavigationBar _buildBottomNavigation() {
-    return BottomNavigationBar(
-      showSelectedLabels: false,
-      showUnselectedLabels: false,
-      type: BottomNavigationBarType.fixed,
-      currentIndex: _currentIndex,
-      onTap: (index) => setState(() {
-        _currentIndex = index;
-      }),
-      items: [
-        BottomNavigationBarItem(
-          icon: Icon(
-            _currentIndex == 0 ? Icons.home_rounded : Icons.home_outlined,
-            color: darkPurple,
-          ),
-          label: "Home",
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(
-            _currentIndex == 1 ? Icons.search_outlined : Icons.search,
-            color: darkPurple,
-          ),
-          label: "Search",
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(
-            _currentIndex == 2
-                ? Icons.add_circle_rounded
-                : Icons.add_circle_outline_rounded,
-            color: darkPurple,
-          ),
-          label: "Add",
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(
-            _currentIndex == 3 ? Icons.chat_rounded : Icons.chat_outlined,
-            color: darkPurple,
-          ),
-          label: "Chat",
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(
-            _currentIndex == 4
-                ? Icons.person_rounded
-                : Icons.person_outline_rounded,
-            color: darkPurple,
-          ),
-          label: "User",
-        ),
-      ],
     );
   }
 }

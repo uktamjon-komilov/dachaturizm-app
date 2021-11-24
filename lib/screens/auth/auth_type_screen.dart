@@ -49,8 +49,16 @@ class _AuthTypeState extends State<AuthType> {
                   child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  FluidBigButton("Ro'yhatdan o'tish"),
-                  FluidBigButton("Kirish"),
+                  FluidBigButton(
+                    Text("Ro'yhatdan o'tish"),
+                    onPress: () {},
+                  ),
+                  FluidBigButton(
+                    Text(
+                      "Kirish",
+                    ),
+                    onPress: () {},
+                  ),
                   SizedBox(
                     height: defaultPadding * 2,
                   ),

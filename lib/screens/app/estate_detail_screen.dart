@@ -1,15 +1,11 @@
+import 'dart:async';
+
 import 'package:dachaturizm/constants.dart';
-import 'package:dachaturizm/models/estate_model.dart';
-import 'package:dachaturizm/providers/estate_providers.dart';
+import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/screens/app/detail_builders.dart';
 import "package:flutter/material.dart";
-import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:provider/provider.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:intl/date_symbol_data_local.dart';
-import 'package:intl/intl.dart';
 
 class EstateDetailScreen extends StatefulWidget {
   const EstateDetailScreen({Key? key}) : super(key: key);
@@ -24,6 +20,7 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
   var isLoading = true;
   var _showCalendar = true;
   var detail;
+  var _detailBuilder;
 
   void showCalendar() {
     setState(() {
@@ -75,7 +72,7 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
       firstDay: DateTime.utc(now.year - 1, 1, 1),
       lastDay: DateTime.utc(now.year + 1, 12, 31),
       focusedDay: _selectedDay,
-      locale: "uz_UZ",
+      locale: "uz",
       headerStyle: HeaderStyle(
         formatButtonVisible: false,
         titleCentered: true,
@@ -84,8 +81,8 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
           fontSize: 16,
           fontWeight: FontWeight.w600,
         ),
-        titleTextFormatter: (date, locale) =>
-            "${DateFormat.y(locale).format(date)}, ${DateFormat.MMMM(locale).format(date)}",
+        // titleTextFormatter: (date, locale) =>
+        //     "${DateFormat.y(locale).format(date)}, ${DateFormat.MMMM(locale).format(date)}",
       ),
       calendarStyle: CalendarStyle(
         cellMargin: EdgeInsets.all(3),
@@ -117,8 +114,10 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
             .fetchEstateById(args["id"])
             .then((estate) => setState(() {
                   detail = estate;
-                  isLoading = false;
-                  print(detail);
+                  _detailBuilder = DetailBuilder(detail);
+                  Future.delayed(Duration(seconds: 1)).then((_) => setState(() {
+                        isLoading = false;
+                      }));
                 })));
 
     super.didChangeDependencies();
@@ -131,8 +130,6 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
 
     final halfScreenButtonWidth =
         (MediaQuery.of(context).size.width - 3 * defaultPadding) / 2;
-
-    final _detailBuilder = DetailBuilder(detail);
 
     return SafeArea(
       child: Scaffold(

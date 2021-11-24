@@ -4,10 +4,14 @@ import '../constants.dart';
 class FluidBigButton extends StatelessWidget {
   const FluidBigButton(
     this.text, {
+    required this.onPress,
     Key? key,
+    this.disabled = false,
   }) : super(key: key);
 
-  final String text;
+  final Widget text;
+  final VoidCallback onPress;
+  final bool disabled;
 
   @override
   Widget build(BuildContext context) {
@@ -16,11 +20,8 @@ class FluidBigButton extends StatelessWidget {
       child: SizedBox(
         width: double.infinity,
         child: ElevatedButton(
-          onPressed: () {},
-          child: Text(
-            text,
-            style: TextStyle(fontSize: 20),
-          ),
+          onPressed: disabled ? null : onPress,
+          child: text,
           style: ElevatedButton.styleFrom(
             primary: Color(0xFFF17C31),
             fixedSize: const Size(double.infinity, defaultPadding * 3),

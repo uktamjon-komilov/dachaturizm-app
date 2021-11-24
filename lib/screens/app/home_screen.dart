@@ -4,16 +4,21 @@ import 'package:dachaturizm/components/search_bar.dart';
 import 'package:dachaturizm/components/text1.dart';
 import 'package:dachaturizm/components/text_link.dart';
 import 'package:dachaturizm/models/type_model.dart';
-import 'package:dachaturizm/providers/estate_providers.dart';
+import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/type_provider.dart';
+import 'package:dachaturizm/screens/app/navigational_app_screen.dart';
+import 'package:dachaturizm/screens/locale_helper.dart';
 import 'package:dachaturizm/screens/widgets/type_row.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_locales/flutter_locales.dart';
 import 'package:provider/provider.dart';
 
 import '../../constants.dart';
 
 class HomePageScreen extends StatefulWidget {
   const HomePageScreen({Key? key}) : super(key: key);
+
+  static String routeName = "/home";
 
   @override
   State<HomePageScreen> createState() => _HomePageScreenState();
@@ -70,16 +75,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          "Dacha Turizm",
-          style: TextStyle(
-            color: darkPurple,
-            fontSize: 24,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        elevation: 0.2,
+        title: LocaleText("appbar_text"),
         actions: [
           IconButton(
             onPressed: () {},
