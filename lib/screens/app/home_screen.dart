@@ -4,8 +4,8 @@ import 'package:dachaturizm/components/search_bar.dart';
 import 'package:dachaturizm/components/text1.dart';
 import 'package:dachaturizm/components/text_link.dart';
 import 'package:dachaturizm/models/type_model.dart';
-import 'package:dachaturizm/providers/estate_provider.dart';
-import 'package:dachaturizm/providers/type_provider.dart';
+import 'package:dachaturizm/providers/estate.dart';
+import 'package:dachaturizm/providers/type.dart';
 import 'package:dachaturizm/screens/app/navigational_app_screen.dart';
 import 'package:dachaturizm/screens/locale_helper.dart';
 import 'package:dachaturizm/screens/widgets/type_row.dart';
@@ -132,7 +132,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text1("To'p ${type.title}"),
-                TextLinkButton("Barchasi", "/top")
+                TextLinkButton(Locales.string(context, "all"), () {})
               ],
             ),
           ),

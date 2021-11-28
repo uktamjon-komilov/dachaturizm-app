@@ -1,17 +1,21 @@
 import 'package:dachaturizm/constants.dart';
-import 'package:dachaturizm/providers/estate_provider.dart';
+import 'package:dachaturizm/providers/estate.dart';
 import 'package:dachaturizm/screens/app/estate_detail_screen.dart';
 import 'package:dachaturizm/screens/app/home_screen.dart';
 import 'package:dachaturizm/screens/app/listing_screen.dart';
 import 'package:dachaturizm/screens/app/navigational_app_screen.dart';
 import 'package:dachaturizm/screens/app/user/change_language.dart';
+import 'package:dachaturizm/screens/auth/create_profile_screen.dart';
+import 'package:dachaturizm/screens/auth/otp_confirmation_screen.dart';
+import 'package:dachaturizm/screens/auth/register_screen.dart';
+import 'package:dachaturizm/screens/auth/signup_screen.dart';
 import 'package:dachaturizm/screens/loading/choose_language_screen.dart';
 import 'package:dachaturizm/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 
 import 'package:provider/provider.dart';
-import 'providers/type_provider.dart';
+import 'providers/type.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -65,7 +69,7 @@ class _MyAppState extends State<MyApp> {
             ),
           ),
           debugShowCheckedModeBanner: false,
-          home: SplashScreen(),
+          home: CreateProfileScreen(),
           routes: {
             HomePageScreen.routeName: (context) => HomePageScreen(),
             NavigationalAppScreen.routeName: (context) =>

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_locales/flutter_locales.dart';
 import '../constants.dart';
 
 class FluidBigButton extends StatelessWidget {
@@ -9,7 +10,7 @@ class FluidBigButton extends StatelessWidget {
     this.disabled = false,
   }) : super(key: key);
 
-  final Widget text;
+  final String text;
   final VoidCallback onPress;
   final bool disabled;
 
@@ -21,7 +22,13 @@ class FluidBigButton extends StatelessWidget {
         width: double.infinity,
         child: ElevatedButton(
           onPressed: disabled ? null : onPress,
-          child: text,
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: 20,
+              color: Colors.white,
+            ),
+          ),
           style: ElevatedButton.styleFrom(
             primary: Color(0xFFF17C31),
             fixedSize: const Size(double.infinity, defaultPadding * 3),

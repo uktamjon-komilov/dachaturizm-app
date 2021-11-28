@@ -1,9 +1,9 @@
+import 'package:dachaturizm/components/fluid_big.dart';
+import 'package:dachaturizm/components/text_link.dart';
+import 'package:dachaturizm/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_locales/flutter_locales.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
-import '../../components/fluid_big.dart';
-import '../../components/text_link.dart';
-import '../../constants.dart';
 
 class AuthType extends StatefulWidget {
   const AuthType({Key? key}) : super(key: key);
@@ -50,19 +50,17 @@ class _AuthTypeState extends State<AuthType> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   FluidBigButton(
-                    Text("Ro'yhatdan o'tish"),
+                    Locales.string(context, "register"),
                     onPress: () {},
                   ),
                   FluidBigButton(
-                    Text(
-                      "Kirish",
-                    ),
+                    Locales.string(context, "log_in"),
                     onPress: () {},
                   ),
                   SizedBox(
                     height: defaultPadding * 2,
                   ),
-                  TextLinkButton("O'tkazib yuborish", "/home-page")
+                  TextLinkButton(Locales.string(context, "next"), () {})
                 ],
               )),
             ],

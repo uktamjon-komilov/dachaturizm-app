@@ -55,10 +55,7 @@ class _ChooseLangugageScreenState extends State<ChooseLangugageScreen> {
                   horizontal: defaultPadding * 2,
                 ),
                 child: FluidBigButton(
-                  LocaleText(
-                    "next",
-                    style: TextStyle(fontSize: 20),
-                  ),
+                  "next",
                   onPress: () async {
                     if (chosenLang == "") return;
                     changeLocale(context, chosenLang);
