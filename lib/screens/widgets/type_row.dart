@@ -25,7 +25,7 @@ class _EstateTypeListViewState extends State<EstateTypeListView> {
     final int screenWidth = queryData.size.width.toInt();
     final int screenHeight = queryData.size.height.toInt();
 
-    final estateTypesData = Provider.of<EstateTypes>(context);
+    final estateTypesData = Provider.of<EstateTypesProvider>(context);
     final estateTypes = estateTypesData.items;
 
     return Container(

@@ -1,14 +1,16 @@
 import 'package:dachaturizm/constants.dart';
+import 'package:dachaturizm/providers/auth.dart';
 import 'package:dachaturizm/providers/estate.dart';
 import 'package:dachaturizm/screens/app/estate_detail_screen.dart';
 import 'package:dachaturizm/screens/app/home_screen.dart';
 import 'package:dachaturizm/screens/app/listing_screen.dart';
 import 'package:dachaturizm/screens/app/navigational_app_screen.dart';
 import 'package:dachaturizm/screens/app/user/change_language.dart';
+import 'package:dachaturizm/screens/auth/auth_type_screen.dart';
 import 'package:dachaturizm/screens/auth/create_profile_screen.dart';
 import 'package:dachaturizm/screens/auth/otp_confirmation_screen.dart';
 import 'package:dachaturizm/screens/auth/register_screen.dart';
-import 'package:dachaturizm/screens/auth/signup_screen.dart';
+import 'package:dachaturizm/screens/auth/login_screen.dart';
 import 'package:dachaturizm/screens/loading/choose_language_screen.dart';
 import 'package:dachaturizm/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
@@ -36,8 +38,9 @@ class _MyAppState extends State<MyApp> {
     return LocaleBuilder(
       builder: (locale) => MultiProvider(
         providers: [
-          ChangeNotifierProvider<EstateTypes>(
-            create: (ctx) => EstateTypes(),
+          ChangeNotifierProvider<AuthProvider>(create: (ctx) => AuthProvider()),
+          ChangeNotifierProvider<EstateTypesProvider>(
+            create: (ctx) => EstateTypesProvider(),
           ),
           ChangeNotifierProvider<EstateProvider>(
             create: (ctx) => EstateProvider(),
@@ -69,8 +72,14 @@ class _MyAppState extends State<MyApp> {
             ),
           ),
           debugShowCheckedModeBanner: false,
-          home: CreateProfileScreen(),
+          home: SplashScreen(),
           routes: {
+            AuthTypeScreen.routeName: (context) => AuthTypeScreen(),
+            RegisterScreen.routeName: (context) => RegisterScreen(),
+            OTPConfirmationScreen.routeName: (context) =>
+                OTPConfirmationScreen(),
+            CreateProfileScreen.routeName: (context) => CreateProfileScreen(),
+            LoginScreen.routeName: (context) => LoginScreen(),
             HomePageScreen.routeName: (context) => HomePageScreen(),
             NavigationalAppScreen.routeName: (context) =>
                 NavigationalAppScreen(),

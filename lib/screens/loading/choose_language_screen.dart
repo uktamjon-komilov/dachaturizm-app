@@ -2,6 +2,7 @@ import 'package:dachaturizm/components/fluid_big.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/screens/app/home_screen.dart';
 import 'package:dachaturizm/screens/app/navigational_app_screen.dart';
+import 'package:dachaturizm/screens/auth/auth_type_screen.dart';
 import 'package:dachaturizm/screens/locale_helper.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_locales/flutter_locales.dart';
@@ -55,13 +56,13 @@ class _ChooseLangugageScreenState extends State<ChooseLangugageScreen> {
                   horizontal: defaultPadding * 2,
                 ),
                 child: FluidBigButton(
-                  "next",
+                  Locales.string(context, "next"),
                   onPress: () async {
                     if (chosenLang == "") return;
                     changeLocale(context, chosenLang);
                     setNotFirstTime();
-                    Navigator.pushNamed(
-                        context, NavigationalAppScreen.routeName);
+                    Navigator.pushReplacementNamed(
+                        context, AuthTypeScreen.routeName);
                   },
                   disabled: chosenLang == "",
                 ),

@@ -34,7 +34,9 @@ class _HomePageScreenState extends State<HomePageScreen> {
       _isLoading = true;
     });
     Future.delayed(Duration.zero).then((_) {
-      Provider.of<EstateTypes>(context, listen: false).fetchAndSetTypes().then(
+      Provider.of<EstateTypesProvider>(context, listen: false)
+          .fetchAndSetTypes()
+          .then(
             (_) => {
               Provider.of<EstateProvider>(context, listen: false)
                   .fetchAllAndSetEstates()
@@ -54,7 +56,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
       _isLoading = true;
     });
     Future.delayed(Duration.zero).then((_) {
-      Provider.of<EstateTypes>(context, listen: false)
+      Provider.of<EstateTypesProvider>(context, listen: false)
           .fetchAndSetTypes()
           .then((_) => {
                 Provider.of<EstateProvider>(context, listen: false)
@@ -104,7 +106,8 @@ class _HomePageScreenState extends State<HomePageScreen> {
                       child: Column(
                         children: [
                           EstateTypeListView(),
-                          ...Provider.of<EstateTypes>(context, listen: false)
+                          ...Provider.of<EstateTypesProvider>(context,
+                                  listen: false)
                               .items
                               .map((item) =>
                                   _buildEstateTypeBlock(screenWidth, item))

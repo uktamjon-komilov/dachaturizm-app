@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 
 import '../models/type_model.dart';
 
-class EstateTypes with ChangeNotifier {
+class EstateTypesProvider with ChangeNotifier {
   List<TypeModel> _items = [];
 
   List<TypeModel> get items {

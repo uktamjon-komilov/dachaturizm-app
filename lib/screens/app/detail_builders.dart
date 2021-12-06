@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dachaturizm/components/chips.dart';
 import 'package:dachaturizm/constants.dart';

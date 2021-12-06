@@ -18,7 +18,7 @@
     "restart_the_app": "O'zgarishlar kuchga kirishi uchun ilovani qayta ishga tushiring",
     "types": "Bo'limlar",
     "log_in": "Kirish",
-    "phone_number_hint": "Telefon raqamingizni kiriting (+998 ** *** ** **)",
+    "phone_number_hint": "+998 __ ___ __ __",
     "password_hint": "Parolingizni kiriting",
     "forgot_password?": "Parolni unutdingizmi?",
     "no_profile?": "Profilingiz yo'qmi?",
@@ -35,5 +35,11 @@
     "new_password_hint": "Yangi parol",
     "new_confirm_password_hint": "Parolni tasdiqlash",
     "i_agree_to_the_terms": "Foydalanish shartlariga roziman",
-    "terms_of_use": "Foydalanish shartlari"
+    "terms_of_use": "Foydalanish shartlari",
+    "skip": "O'tkazib yuborish",
+    "input_must_be": "maydoni to'ldirilishi shart",
+    "passwords_must_match": "Parollar o'xshash bo'lishi kerak",
+    "password_min_length_amount": "Parol kamida 8 ta belgidan iborat bo'lishi kerak",
+    "something_went_wrong_form_text": "Xatolik yuz berdi. Iltimos, yana bir bor urinib ko'ring.",
+    "user_already_exists_with_this_phone": "Bu telefon raqamiga ega foydalanuvchi allaqachon mavjud."
 }

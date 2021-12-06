@@ -1,5 +1,6 @@
 import 'package:dachaturizm/screens/app/home_screen.dart';
 import 'package:dachaturizm/screens/app/navigational_app_screen.dart';
+import 'package:dachaturizm/screens/auth/auth_type_screen.dart';
 import 'package:dachaturizm/screens/loading/choose_language_screen.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_locales/flutter_locales.dart';
@@ -24,7 +25,12 @@ class _SplashScreenState extends State<SplashScreen> {
     if (first_time != null && first_time == false) {
       String language = prefs.getString("language") as String;
       Locales.change(context, language);
-      return new Timer(_duration, navigationNavigationalScreen);
+      var noAuth = prefs.getBool("no-auth");
+      if (noAuth != null && noAuth == true) {
+        return new Timer(_duration, navigationNavigationalScreen);
+      } else {
+        return new Timer(_duration, navigationAuthTypeScreen);
+      }
     } else {
       return new Timer(_duration, navigationChooseLanguageScreen);
     }
@@ -32,6 +38,10 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void navigationNavigationalScreen() {
     Navigator.of(context).pushReplacementNamed(NavigationalAppScreen.routeName);
+  }
+
+  void navigationAuthTypeScreen() {
+    Navigator.of(context).pushReplacementNamed(AuthTypeScreen.routeName);
   }
 
   void navigationChooseLanguageScreen() {

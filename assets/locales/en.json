@@ -18,7 +18,7 @@
     "restart_the_app": "For the changes to take effect, please restart the app",
     "types": "Sections",
     "log_in": "Log In",
-    "phone_number_hint": "Enter your phone number (+998 ** *** ** **)",
+    "phone_number_hint": "+998 __ ___ __ __",
     "password_hint": "Enter your password",
     "forgot_password?": "Forgot your password?",
     "no_profile?": "No profile?",
@@ -35,5 +35,11 @@
     "new_password_hint": "New password",
     "new_confirm_password_hint": "Confirm password",
     "i_agree_to_the_terms": "I agree to the terms of the service",
-    "terms_of_use": "Terms of the use"
+    "terms_of_use": "Terms of the use",
+    "skip": "Skip this",
+    "input_must_be": "must be filled",
+    "passwords_must_match": "Passwords must be similar",
+    "password_min_length_amount": "Passwords must be at least 8 characters",
+    "something_went_wrong_form_text": "Something went wrong. Please, try again.",
+    "user_already_exists_with_this_phone": "User already exists with this phone number."
 }

@@ -1,8 +1,5 @@
-import 'dart:ffi';
-
 import 'package:dachaturizm/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_locales/flutter_locales.dart';
 
 class TextLinkButton extends StatelessWidget {
   const TextLinkButton(
@@ -26,7 +23,7 @@ class TextLinkButton extends StatelessWidget {
             bottom: BorderSide(color: darkPurple, width: 2),
           ),
         ),
-        child: LocaleText(
+        child: Text(
           text,
           style: TextStyle(fontSize: 16),
         ),

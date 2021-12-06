@@ -1,18 +1,23 @@
 import 'package:dachaturizm/components/fluid_big.dart';
 import 'package:dachaturizm/components/text_link.dart';
 import 'package:dachaturizm/constants.dart';
+import 'package:dachaturizm/screens/app/home_screen.dart';
+import 'package:dachaturizm/screens/auth/login_screen.dart';
+import 'package:dachaturizm/screens/auth/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class AuthType extends StatefulWidget {
-  const AuthType({Key? key}) : super(key: key);
+class AuthTypeScreen extends StatefulWidget {
+  const AuthTypeScreen({Key? key}) : super(key: key);
+
+  static String routeName = "/auth-type";
 
   @override
-  _AuthTypeState createState() => _AuthTypeState();
+  _AuthTypeScreenState createState() => _AuthTypeScreenState();
 }
 
-class _AuthTypeState extends State<AuthType> {
+class _AuthTypeScreenState extends State<AuthTypeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,16 +56,26 @@ class _AuthTypeState extends State<AuthType> {
                 children: [
                   FluidBigButton(
                     Locales.string(context, "register"),
-                    onPress: () {},
+                    onPress: () {
+                      Navigator.of(context).pushNamed(RegisterScreen.routeName);
+                    },
                   ),
                   FluidBigButton(
                     Locales.string(context, "log_in"),
-                    onPress: () {},
+                    onPress: () {
+                      Navigator.of(context).pushNamed(LoginScreen.routeName);
+                    },
                   ),
                   SizedBox(
                     height: defaultPadding * 2,
                   ),
-                  TextLinkButton(Locales.string(context, "next"), () {})
+                  TextLinkButton(Locales.string(context, "skip"), () async {
+                    SharedPreferences prefs =
+                        await SharedPreferences.getInstance();
+                    prefs.setBool("no-auth", true);
+                    Navigator.of(context)
+                        .pushReplacementNamed(HomePageScreen.routeName);
+                  })
                 ],
               )),
             ],

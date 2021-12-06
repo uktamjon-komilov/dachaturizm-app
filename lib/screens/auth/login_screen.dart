@@ -1,20 +1,23 @@
 import 'package:dachaturizm/components/fluid_big.dart';
 import 'package:dachaturizm/components/text_link.dart';
 import 'package:dachaturizm/constants.dart';
+import 'package:dachaturizm/screens/auth/register_screen.dart';
 import 'package:dachaturizm/screens/styles/input.dart';
 import "package:flutter/material.dart";
 import 'package:flutter/services.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
-class SignUpScreen extends StatefulWidget {
-  const SignUpScreen({Key? key}) : super(key: key);
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({Key? key}) : super(key: key);
+
+  static String routeName = "/login";
 
   @override
-  _SignUpScreenState createState() => _SignUpScreenState();
+  _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _SignUpScreenState extends State<SignUpScreen> {
+class _LoginScreenState extends State<LoginScreen> {
   bool _hidePassword = true;
   FocusNode _phoneFocusNode = FocusNode();
   FocusNode _passwordFocusNode = FocusNode();
@@ -114,7 +117,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     style: TextStyle(fontSize: 16),
                   ),
                   SizedBox(width: 10),
-                  TextLinkButton(Locales.string(context, "register"), () {}),
+                  TextLinkButton(Locales.string(context, "register"), () {
+                    Navigator.of(context)
+                        .pushReplacementNamed(RegisterScreen.routeName);
+                  }),
                 ],
               )
             ],
