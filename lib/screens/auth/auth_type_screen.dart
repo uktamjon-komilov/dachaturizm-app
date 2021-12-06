@@ -6,6 +6,7 @@ import 'package:dachaturizm/screens/auth/login_screen.dart';
 import 'package:dachaturizm/screens/auth/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthTypeScreen extends StatefulWidget {
@@ -20,11 +21,15 @@ class AuthTypeScreen extends StatefulWidget {
 class _AuthTypeScreenState extends State<AuthTypeScreen> {
   @override
   Widget build(BuildContext context) {
+    final value = ModalRoute.of(context)?.settings.arguments;
+    print(value);
+
     return Scaffold(
       body: SafeArea(
-        child: Padding(
+        child: Container(
           padding: const EdgeInsets.symmetric(horizontal: defaultPadding * 2),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Expanded(
                 child: Column(
@@ -51,33 +56,35 @@ class _AuthTypeScreenState extends State<AuthTypeScreen> {
                 ),
               ),
               Expanded(
-                  child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  FluidBigButton(
-                    Locales.string(context, "register"),
-                    onPress: () {
-                      Navigator.of(context).pushNamed(RegisterScreen.routeName);
-                    },
-                  ),
-                  FluidBigButton(
-                    Locales.string(context, "log_in"),
-                    onPress: () {
-                      Navigator.of(context).pushNamed(LoginScreen.routeName);
-                    },
-                  ),
-                  SizedBox(
-                    height: defaultPadding * 2,
-                  ),
-                  TextLinkButton(Locales.string(context, "skip"), () async {
-                    SharedPreferences prefs =
-                        await SharedPreferences.getInstance();
-                    prefs.setBool("no-auth", true);
-                    Navigator.of(context)
-                        .pushReplacementNamed(HomePageScreen.routeName);
-                  })
-                ],
-              )),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    FluidBigButton(
+                      Locales.string(context, "register"),
+                      onPress: () {
+                        Navigator.of(context)
+                            .pushNamed(RegisterScreen.routeName);
+                      },
+                    ),
+                    FluidBigButton(
+                      Locales.string(context, "log_in"),
+                      onPress: () {
+                        Navigator.of(context).pushNamed(LoginScreen.routeName);
+                      },
+                    ),
+                    SizedBox(
+                      height: defaultPadding * 2,
+                    ),
+                    TextLinkButton(Locales.string(context, "skip"), () async {
+                      SharedPreferences prefs =
+                          await SharedPreferences.getInstance();
+                      prefs.setBool("no-auth", true);
+                      Navigator.of(context)
+                          .pushReplacementNamed(HomePageScreen.routeName);
+                    })
+                  ],
+                ),
+              ),
             ],
           ),
         ),

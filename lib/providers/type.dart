@@ -20,15 +20,12 @@ class EstateTypesProvider with ChangeNotifier {
     final extractedData = json.decode(response.body);
     final List<TypeModel> types = [];
     extractedData.forEach((type) {
-      print(type["icon"].runtimeType);
       final icon;
       if (type["icon"].runtimeType == Null) {
         icon = "";
       } else {
         icon = baseUrl + type["icon"];
       }
-
-      print(icon);
 
       types.add(
         TypeModel(
@@ -41,7 +38,6 @@ class EstateTypesProvider with ChangeNotifier {
       );
     });
     _items = types;
-    print(_items);
     notifyListeners();
     // } catch (error) {
     //   print(error);

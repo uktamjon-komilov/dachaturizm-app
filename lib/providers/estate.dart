@@ -72,7 +72,6 @@ class EstateProvider extends ChangeNotifier {
     //   print(error);
     // }
     // print(_estates);
-    print(_estates);
     notifyListeners();
   }
 

@@ -3,10 +3,22 @@ import 'dart:convert';
 import 'package:dachaturizm/constants.dart';
 import 'package:flutter/material.dart';
 import "package:http/http.dart" as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthProvider extends ChangeNotifier {
   String _accessToken = "";
   int _userId = 0;
+
+  bool get isAuthenticated {
+    return token != null;
+  }
+
+  get token {
+    if (_accessToken != "") {
+      return _accessToken;
+    }
+    return null;
+  }
 
   Future<Map<String, dynamic>> checkUser(String phone) async {
     const url = "${baseUrl}api/sms/send-message/";
@@ -43,6 +55,27 @@ class AuthProvider extends ChangeNotifier {
         }));
     if (response.statusCode >= 200 || response.statusCode < 300) {
       return json.decode(response.body);
+    }
+    return {"status": false};
+  }
+
+  Future<Map<String, dynamic>> login(String phone, String password) async {
+    const url = "${baseUrl}api/token/";
+    final response = await http.post(Uri.parse(url),
+        headers: {"Content-type": "application/json"},
+        body: json.encode({"phone": phone, "password": password}));
+    if (response.statusCode >= 200 || response.statusCode < 300) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString("userData", response.body);
+      final data = json.decode(response.body);
+      // print(data);
+      if (data.containsKey("access")) {
+        _accessToken = data["access"] as String;
+        print(_accessToken);
+        // _userId = data["user_id"];
+        notifyListeners();
+        return data;
+      }
     }
     return {"status": false};
   }

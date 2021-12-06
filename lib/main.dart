@@ -38,12 +38,14 @@ class _MyAppState extends State<MyApp> {
     return LocaleBuilder(
       builder: (locale) => MultiProvider(
         providers: [
-          ChangeNotifierProvider<AuthProvider>(create: (ctx) => AuthProvider()),
-          ChangeNotifierProvider<EstateTypesProvider>(
-            create: (ctx) => EstateTypesProvider(),
+          ChangeNotifierProvider.value(
+            value: AuthProvider(),
           ),
-          ChangeNotifierProvider<EstateProvider>(
-            create: (ctx) => EstateProvider(),
+          ChangeNotifierProvider.value(
+            value: EstateTypesProvider(),
+          ),
+          ChangeNotifierProvider.value(
+            value: EstateProvider(),
           ),
         ],
         child: MaterialApp(

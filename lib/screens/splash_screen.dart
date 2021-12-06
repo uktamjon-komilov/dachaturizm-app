@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:dachaturizm/providers/auth.dart';
 import 'package:dachaturizm/screens/app/home_screen.dart';
 import 'package:dachaturizm/screens/app/navigational_app_screen.dart';
 import 'package:dachaturizm/screens/auth/auth_type_screen.dart';
@@ -17,22 +20,32 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   startTime() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    var first_time = prefs.getBool("first_time");
-
     var _duration = new Duration(seconds: 3);
 
-    if (first_time != null && first_time == false) {
-      String language = prefs.getString("language") as String;
-      Locales.change(context, language);
-      var noAuth = prefs.getBool("no-auth");
-      if (noAuth != null && noAuth == true) {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    final userData = prefs.getString("userData");
+    if (userData != null) {
+      final data = json.decode(userData);
+      print(data);
+      if (data.containsKey("access")) {
         return new Timer(_duration, navigationNavigationalScreen);
-      } else {
-        return new Timer(_duration, navigationAuthTypeScreen);
       }
-    } else {
+    }
+
+    var language = prefs.getString("language");
+
+    if (language == null || language == "") {
       return new Timer(_duration, navigationChooseLanguageScreen);
+    } else {
+      Locales.change(context, language);
+    }
+
+    var noAuth = prefs.getBool("noAuth");
+    if (noAuth != null && noAuth == true) {
+      return new Timer(_duration, navigationNavigationalScreen);
+    } else {
+      return new Timer(_duration, navigationAuthTypeScreen);
     }
   }
 

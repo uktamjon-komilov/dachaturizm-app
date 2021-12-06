@@ -1,12 +1,16 @@
 import 'package:dachaturizm/components/fluid_big.dart';
 import 'package:dachaturizm/components/text_link.dart';
 import 'package:dachaturizm/constants.dart';
+import 'package:dachaturizm/providers/auth.dart';
+import 'package:dachaturizm/screens/app/home_screen.dart';
+import 'package:dachaturizm/screens/app/navigational_app_screen.dart';
 import 'package:dachaturizm/screens/auth/register_screen.dart';
 import 'package:dachaturizm/screens/styles/input.dart';
 import "package:flutter/material.dart";
 import 'package:flutter/services.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -19,8 +23,12 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool _hidePassword = true;
+
   FocusNode _phoneFocusNode = FocusNode();
   FocusNode _passwordFocusNode = FocusNode();
+
+  final _phoneController = TextEditingController();
+  final _passwordController = TextEditingController();
 
   @override
   void didChangeDependencies() {
@@ -61,6 +69,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 height: 60,
               ),
               TextFormField(
+                focusNode: _phoneFocusNode,
+                controller: _phoneController,
                 inputFormatters: [
                   MaskTextInputFormatter(mask: "+998 ## ### ## ##")
                 ],
@@ -73,11 +83,16 @@ class _LoginScreenState extends State<LoginScreen> {
                   hintText: Locales.string(context, "phone_number_hint"),
                 ),
                 keyboardType: TextInputType.number,
+                onFieldSubmitted: (value) {
+                  FocusScope.of(context).requestFocus(_passwordFocusNode);
+                },
               ),
               SizedBox(
                 height: 20,
               ),
               TextField(
+                focusNode: _passwordFocusNode,
+                controller: _passwordController,
                 decoration: InputDecoration(
                   border: InputStyles.inputBorder(),
                   focusedBorder: InputStyles.focusBorder(),
@@ -106,7 +121,19 @@ class _LoginScreenState extends State<LoginScreen> {
               SizedBox(
                 height: 32,
               ),
-              FluidBigButton(Locales.string(context, "log_in"), onPress: () {}),
+              FluidBigButton(Locales.string(context, "log_in"), onPress: () {
+                String phone = _phoneController.text.replaceAll(" ", "");
+                String password = _passwordController.text;
+                Provider.of<AuthProvider>(context, listen: false)
+                    .login(phone, password)
+                    .then((value) {
+                  if (value.containsKey("status") && !value["status"]) {
+                    print("You cannot log in!");
+                  }
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                      NavigationalAppScreen.routeName, (route) => false);
+                });
+              }),
               SizedBox(
                 height: 24,
               ),
