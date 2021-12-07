@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:dachaturizm/providers/auth.dart';
+import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/screens/app/home_screen.dart';
 import 'package:dachaturizm/screens/app/navigational_app_screen.dart';
 import 'package:dachaturizm/screens/auth/auth_type_screen.dart';

@@ -3,11 +3,11 @@ import 'package:dachaturizm/components/horizontal_ad.dart';
 import 'package:dachaturizm/components/search_bar.dart';
 import 'package:dachaturizm/components/text1.dart';
 import 'package:dachaturizm/components/text_link.dart';
+import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/models/type_model.dart';
-import 'package:dachaturizm/providers/estate.dart';
-import 'package:dachaturizm/providers/type.dart';
-import 'package:dachaturizm/screens/app/navigational_app_screen.dart';
-import 'package:dachaturizm/screens/locale_helper.dart';
+import 'package:dachaturizm/providers/banner_provider.dart';
+import 'package:dachaturizm/providers/estate_provider.dart';
+import 'package:dachaturizm/providers/type_provider.dart';
 import 'package:dachaturizm/screens/widgets/type_row.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
@@ -30,24 +30,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
   @override
   void didChangeDependencies() {
-    setState(() {
-      _isLoading = true;
-    });
-    Future.delayed(Duration.zero).then((_) {
-      Provider.of<EstateTypesProvider>(context, listen: false)
-          .fetchAndSetTypes()
-          .then(
-            (_) => {
-              Provider.of<EstateProvider>(context, listen: false)
-                  .fetchAllAndSetEstates()
-                  .then(
-                    (_) => setState(() {
-                      _isLoading = false;
-                    }),
-                  ),
-            },
-          );
-    });
+    _refreshHomePage();
     super.didChangeDependencies();
   }
 
@@ -56,15 +39,23 @@ class _HomePageScreenState extends State<HomePageScreen> {
       _isLoading = true;
     });
     Future.delayed(Duration.zero).then((_) {
-      Provider.of<EstateTypesProvider>(context, listen: false)
-          .fetchAndSetTypes()
-          .then((_) => {
+      Provider.of<BannerProvider>(context, listen: false)
+          .getAndSetTopBanners()
+          .then((value) {
+        Provider.of<EstateTypesProvider>(context, listen: false)
+            .fetchAndSetTypes()
+            .then(
+              (_) => {
                 Provider.of<EstateProvider>(context, listen: false)
                     .fetchAllAndSetEstates()
-                    .then((_) => setState(() {
-                          _isLoading = false;
-                        }))
-              });
+                    .then(
+                      (_) => setState(() {
+                        _isLoading = false;
+                      }),
+                    ),
+              },
+            );
+      });
     });
   }
 
@@ -96,27 +87,42 @@ class _HomePageScreenState extends State<HomePageScreen> {
           : RefreshIndicator(
               onRefresh: _refreshHomePage,
               child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: defaultPadding, vertical: defaultPadding),
+                padding: const EdgeInsets.fromLTRB(
+                    defaultPadding, defaultPadding, defaultPadding, 0),
                 child: Column(
                   children: [
                     SearchBar(),
                     Expanded(
-                        child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          EstateTypeListView(),
-                          ...Provider.of<EstateTypesProvider>(context,
-                                  listen: false)
-                              .items
-                              .map((item) =>
-                                  _buildEstateTypeBlock(screenWidth, item))
-                              .toList(),
-                          // _buildEstateTypeBlock(screenWidth),
-                          // _buildEstateTypeBlock(screenWidth),
-                        ],
+                      child: SingleChildScrollView(
+                        physics: AlwaysScrollableScrollPhysics(),
+                        child: Column(
+                          children: [
+                            Container(
+                              height: 190,
+                              child: ListView(
+                                scrollDirection: Axis.horizontal,
+                                physics: AlwaysScrollableScrollPhysics(),
+                                children: [
+                                  ...Provider.of<BannerProvider>(context,
+                                          listen: false)
+                                      .topBanners
+                                      .map((banner) => _buildTopBannerItem(
+                                          banner, screenWidth))
+                                      .toList()
+                                ],
+                              ),
+                            ),
+                            EstateTypeListView(),
+                            ...Provider.of<EstateTypesProvider>(context,
+                                    listen: false)
+                                .items
+                                .map((item) =>
+                                    _buildEstateTypeBlock(screenWidth, item))
+                                .toList(),
+                          ],
+                        ),
                       ),
-                    )),
+                    ),
                   ],
                 ),
               ),
@@ -124,35 +130,52 @@ class _HomePageScreenState extends State<HomePageScreen> {
     );
   }
 
-  Container _buildEstateTypeBlock(int screenWidth, TypeModel type) {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 10),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget _buildTopBannerItem(EstateModel estate, int screenWidth) {
+    return Row(
+      children: [
+        HorizontalAd(
+          estate,
+          width: screenWidth * 0.8,
+        ),
+        SizedBox(
+          width: 10,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEstateTypeBlock(int screenWidth, TypeModel type) {
+    List topEstates = Provider.of<EstateProvider>(context, listen: false)
+        .getTopEstatesByType(type.id);
+
+    return (topEstates.length > 0)
+        ? Container(
+            padding: EdgeInsets.symmetric(vertical: 10),
+            child: Column(
               children: [
-                Text1("To'p ${type.title}"),
-                TextLinkButton(Locales.string(context, "all"), () {})
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text1(Locales.string(context, "top") +
+                          " ${type.title.toLowerCase()}"),
+                      TextLinkButton(Locales.string(context, "all"), () {})
+                    ],
+                  ),
+                ),
+                Wrap(
+                  children: [
+                    ...topEstates
+                        .map((estate) => EstateCard(
+                            screenWidth: screenWidth, estate: estate))
+                        .toList()
+                  ],
+                ),
+                // HorizontalAd()
               ],
             ),
-          ),
-          Wrap(
-            children: [
-              ...Provider.of<EstateProvider>(context, listen: false)
-                  .getTopEstatesByType(type.id)
-                  .map((estate) =>
-                      EstateCard(screenWidth: screenWidth, estate: estate))
-                  .toList()
-              // EstateCard(screenWidth: screenWidth),
-              // EstateCard(screenWidth: screenWidth),
-            ],
-          ),
-          HorizontalAd()
-        ],
-      ),
-    );
+          )
+        : Container();
   }
 }

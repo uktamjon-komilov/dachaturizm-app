@@ -38,6 +38,9 @@ class EstateProvider extends ChangeNotifier {
           topEstates.add(highestRatedEstate);
         }
       }
+      if (topEstates.length > 6) {
+        return topEstates.sublist(0, 6);
+      }
       return topEstates;
     }
     return [];
@@ -56,7 +59,7 @@ class EstateProvider extends ChangeNotifier {
   Future fetchEstateById(estateId) async {
     final url = "${baseUrl}api/estate/${estateId}/";
     var extractedData = await getData(url);
-    var estate = EstateModel.fromJson(extractedData);
+    var estate = await EstateModel.fromJson(extractedData);
     return estate;
   }
 

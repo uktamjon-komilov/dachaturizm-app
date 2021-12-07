@@ -41,5 +41,8 @@
     "passwords_must_match": "Пароли должны быть похожими",
     "password_min_length_amount": "Пароли должны состоять не менее чем из 8 символов.",
     "something_went_wrong_form_text": "Что-то пошло не так. Пожалуйста, попробуйте еще раз.",
-    "user_already_exists_with_this_phone": "Пользователь с этим номером телефона уже существует."
+    "user_already_exists_with_this_phone": "Пользователь с этим номером телефона уже существует.",
+    "search": "Поиск",
+    "top": "Топ",
+    "all": "Посмотреть все"
 }

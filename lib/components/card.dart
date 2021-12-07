@@ -43,8 +43,6 @@ class EstateCard extends StatelessWidget {
         elevation: 2,
         child: InkWell(
           onTap: () {
-            print("InkWell tapped!");
-            print(estate.id);
             Navigator.of(context).pushNamed(EstateDetailScreen.routeName,
                 arguments: {"id": estate.id, "typeId": estate.typeId});
           },
@@ -84,6 +82,7 @@ class EstateCard extends StatelessWidget {
                               maxLines: 2,
                             ),
                             RatingBar.builder(
+                              ignoreGestures: true,
                               initialRating: estate.rating,
                               minRating: 1,
                               direction: Axis.horizontal,

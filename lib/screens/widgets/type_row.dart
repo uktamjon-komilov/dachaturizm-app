@@ -1,7 +1,7 @@
 import 'package:dachaturizm/components/text1.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/models/type_model.dart';
-import 'package:dachaturizm/providers/type.dart';
+import 'package:dachaturizm/providers/type_provider.dart';
 import 'package:dachaturizm/screens/app/listing_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -36,7 +36,7 @@ class _EstateTypeListViewState extends State<EstateTypeListView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text1("types"),
+            Text1(Locales.string(context, "types")),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(

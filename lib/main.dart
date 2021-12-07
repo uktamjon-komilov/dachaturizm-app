@@ -1,6 +1,7 @@
 import 'package:dachaturizm/constants.dart';
-import 'package:dachaturizm/providers/auth.dart';
-import 'package:dachaturizm/providers/estate.dart';
+import 'package:dachaturizm/providers/auth_provider.dart';
+import 'package:dachaturizm/providers/banner_provider.dart';
+import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/screens/app/estate_detail_screen.dart';
 import 'package:dachaturizm/screens/app/home_screen.dart';
 import 'package:dachaturizm/screens/app/listing_screen.dart';
@@ -17,7 +18,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 
 import 'package:provider/provider.dart';
-import 'providers/type.dart';
+import 'providers/type_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,6 +41,9 @@ class _MyAppState extends State<MyApp> {
         providers: [
           ChangeNotifierProvider.value(
             value: AuthProvider(),
+          ),
+          ChangeNotifierProvider.value(
+            value: BannerProvider(),
           ),
           ChangeNotifierProvider.value(
             value: EstateTypesProvider(),

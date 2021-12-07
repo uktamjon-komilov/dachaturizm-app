@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:dachaturizm/constants.dart';
-import 'package:flutter_locales/flutter_locales.dart';
 
 class Text1 extends StatelessWidget {
   const Text1(
@@ -12,7 +11,7 @@ class Text1 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LocaleText(
+    return Text(
       text,
       style: TextStyle(
         color: darkPurple,

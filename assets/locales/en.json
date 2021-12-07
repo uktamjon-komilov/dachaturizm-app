@@ -41,5 +41,8 @@
     "passwords_must_match": "Passwords must be similar",
     "password_min_length_amount": "Passwords must be at least 8 characters",
     "something_went_wrong_form_text": "Something went wrong. Please, try again.",
-    "user_already_exists_with_this_phone": "User already exists with this phone number."
+    "user_already_exists_with_this_phone": "User already exists with this phone number.",
+    "search": "Search",
+    "top": "Top",
+    "all": "See all"
 }

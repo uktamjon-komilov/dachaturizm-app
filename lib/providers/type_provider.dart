@@ -17,26 +17,12 @@ class EstateTypesProvider with ChangeNotifier {
     const url = "${baseUrl}api/estate-types/";
     // try {
     final response = await http.get(Uri.parse(url));
-    final extractedData = json.decode(response.body);
+    final extractedData = json.decode(response.body) as List;
     final List<TypeModel> types = [];
-    extractedData.forEach((type) {
-      final icon;
-      if (type["icon"].runtimeType == Null) {
-        icon = "";
-      } else {
-        icon = baseUrl + type["icon"];
-      }
-
-      types.add(
-        TypeModel(
-            id: type["id"],
-            title: type["translations"]["uz"]["title"],
-            slug: type["slug"],
-            icon: icon,
-            backgroundColor: type["background_color"],
-            foregroundColor: type["foreground_color"]),
-      );
-    });
+    for (var i = 0; i < extractedData.length; i++) {
+      TypeModel typeObj = await TypeModel.fromJson(extractedData[i]);
+      types.add(typeObj);
+    }
     _items = types;
     notifyListeners();
     // } catch (error) {

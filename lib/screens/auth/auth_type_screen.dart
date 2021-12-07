@@ -78,7 +78,7 @@ class _AuthTypeScreenState extends State<AuthTypeScreen> {
                     TextLinkButton(Locales.string(context, "skip"), () async {
                       SharedPreferences prefs =
                           await SharedPreferences.getInstance();
-                      prefs.setBool("no-auth", true);
+                      prefs.setBool("noAuth", true);
                       Navigator.of(context)
                           .pushReplacementNamed(HomePageScreen.routeName);
                     })
