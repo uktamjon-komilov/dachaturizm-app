@@ -24,7 +24,6 @@ class EstateListingScreen extends StatefulWidget {
 class _EstateListingScreenState extends State<EstateListingScreen> {
   bool _isLoading = false;
   bool _isSearched = false;
-  // GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController _searchController = TextEditingController();
 
   @override
@@ -32,11 +31,6 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
     super.initState();
     _refreshAction();
   }
-  // @override
-  // void didChangeDependencies() {
-  //   _refreshAction();
-  //   super.didChangeDependencies();
-  // }
 
   Future<void> _refreshAction() async {
     setState(() {
@@ -78,46 +72,6 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
     setState(() {
       _isSearched = false;
     });
-  }
-
-  void _saveSearchTerm(String term) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    var searchedTerms = prefs.getString("searchedTerms");
-    if (searchedTerms != null && searchedTerms != "") {
-      List<String> data = json.decode(searchedTerms);
-      data.insert(0, term);
-      if (data.length > 3) {
-        data = data.sublist(0, 3);
-      }
-      searchedTerms = json.encode(data);
-      prefs.setString("searchedTerms", searchedTerms);
-    } else {
-      List<String> data = [term];
-      searchedTerms = json.encode(data);
-      prefs.setString("searchedTerms", searchedTerms);
-    }
-  }
-
-  void _removeSearchTerm(String term) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    var searchedTerms = prefs.getString("searchedTerms");
-    if (searchedTerms != null && searchedTerms != "") {
-      List<String> data = json.decode(searchedTerms);
-      data.remove(term);
-      searchedTerms = json.encode(data);
-      prefs.setString("searchedTerms", searchedTerms);
-    }
-  }
-
-  Future<List<String>> _getSearchedTerms() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    var searchedTerms = prefs.getString("searchedTerms");
-    if (searchedTerms != null && searchedTerms != "") {
-      List<String> data = json.decode(searchedTerms);
-      return data;
-    } else {
-      return [];
-    }
   }
 
   @override

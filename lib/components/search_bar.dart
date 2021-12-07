@@ -7,11 +7,13 @@ class SearchBar extends StatelessWidget {
     required this.controller,
     required this.onSubmit,
     required this.onChange,
+    this.autofocus = false,
   }) : super(key: key);
 
   final TextEditingController controller;
   final Function onSubmit;
   final Function onChange;
+  final bool autofocus;
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +25,7 @@ class SearchBar extends StatelessWidget {
       ),
       child: TextFormField(
         controller: controller,
+        autofocus: autofocus,
         onFieldSubmitted: (value) {
           onSubmit(value);
         },

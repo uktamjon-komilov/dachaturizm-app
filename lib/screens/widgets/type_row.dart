@@ -2,7 +2,7 @@ import 'package:dachaturizm/components/text1.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/models/type_model.dart';
 import 'package:dachaturizm/providers/type_provider.dart';
-import 'package:dachaturizm/screens/app/listing_screen.dart';
+import 'package:dachaturizm/screens/app/home/listing_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';

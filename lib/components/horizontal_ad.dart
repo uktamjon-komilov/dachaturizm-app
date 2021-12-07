@@ -1,6 +1,6 @@
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/models/estate_model.dart';
-import 'package:dachaturizm/screens/app/estate_detail_screen.dart';
+import 'package:dachaturizm/screens/app/estate/estate_detail_screen.dart';
 import "package:flutter/material.dart";
 
 class HorizontalAd extends StatelessWidget {

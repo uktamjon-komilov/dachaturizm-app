@@ -1,7 +1,5 @@
 import 'package:dachaturizm/components/fluid_big.dart';
 import 'package:dachaturizm/constants.dart';
-import 'package:dachaturizm/screens/app/home_screen.dart';
-import 'package:dachaturizm/screens/app/navigational_app_screen.dart';
 import 'package:dachaturizm/screens/auth/auth_type_screen.dart';
 import 'package:dachaturizm/helpers/locale_helper.dart';
 import "package:flutter/material.dart";

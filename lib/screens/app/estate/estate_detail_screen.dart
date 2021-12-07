@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
-import 'package:dachaturizm/screens/app/detail_builders.dart';
+import 'package:dachaturizm/screens/app/estate/detail_builders.dart';
 import "package:flutter/material.dart";
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';

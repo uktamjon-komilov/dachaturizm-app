@@ -1,9 +1,9 @@
 import 'package:dachaturizm/constants.dart';
-import 'package:dachaturizm/screens/app/chat_screen.dart';
-import 'package:dachaturizm/screens/app/create_estate_screen.dart';
-import 'package:dachaturizm/screens/app/home_screen.dart';
-import 'package:dachaturizm/screens/app/search_screen.dart';
-import 'package:dachaturizm/screens/app/user_screen.dart';
+import 'package:dachaturizm/screens/app/chat/chat_screen.dart';
+import 'package:dachaturizm/screens/app/estate/create_estate_screen.dart';
+import 'package:dachaturizm/screens/app/home/home_screen.dart';
+import 'package:dachaturizm/screens/app/search/search_screen.dart';
+import 'package:dachaturizm/screens/app/user/user_screen.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_locales/flutter_locales.dart';
 

@@ -1,13 +1,11 @@
 import 'package:dachaturizm/components/fluid_big.dart';
 import 'package:dachaturizm/components/text_link.dart';
 import 'package:dachaturizm/constants.dart';
-import 'package:dachaturizm/screens/app/home_screen.dart';
 import 'package:dachaturizm/screens/app/navigational_app_screen.dart';
 import 'package:dachaturizm/screens/auth/login_screen.dart';
 import 'package:dachaturizm/screens/auth/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthTypeScreen extends StatefulWidget {

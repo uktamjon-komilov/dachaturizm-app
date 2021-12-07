@@ -47,5 +47,6 @@
     "all": "See all",
     "top_estates": "Top estates",
     "simple_estates": "Simple estates",
-    "no_results": "We couldn't find any results"
+    "no_results": "We couldn't find any results",
+    "search_results": "Search results"
 }
