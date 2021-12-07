@@ -2,6 +2,7 @@ import 'package:dachaturizm/components/fluid_big.dart';
 import 'package:dachaturizm/components/text_link.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/screens/app/home_screen.dart';
+import 'package:dachaturizm/screens/app/navigational_app_screen.dart';
 import 'package:dachaturizm/screens/auth/login_screen.dart';
 import 'package:dachaturizm/screens/auth/register_screen.dart';
 import 'package:flutter/material.dart';
@@ -79,8 +80,8 @@ class _AuthTypeScreenState extends State<AuthTypeScreen> {
                       SharedPreferences prefs =
                           await SharedPreferences.getInstance();
                       prefs.setBool("noAuth", true);
-                      Navigator.of(context)
-                          .pushReplacementNamed(HomePageScreen.routeName);
+                      Navigator.of(context).pushReplacementNamed(
+                          NavigationalAppScreen.routeName);
                     })
                   ],
                 ),

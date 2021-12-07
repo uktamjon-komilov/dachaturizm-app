@@ -13,7 +13,7 @@ class EstateTypesProvider with ChangeNotifier {
     return [..._items];
   }
 
-  Future<void> fetchAndSetTypes() async {
+  Future<List<TypeModel>> fetchAndSetTypes() async {
     const url = "${baseUrl}api/estate-types/";
     // try {
     final response = await http.get(Uri.parse(url));
@@ -28,5 +28,6 @@ class EstateTypesProvider with ChangeNotifier {
     // } catch (error) {
     //   print(error);
     // }
+    return [..._items];
   }
 }

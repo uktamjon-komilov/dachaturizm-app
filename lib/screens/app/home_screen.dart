@@ -41,20 +41,24 @@ class _HomePageScreenState extends State<HomePageScreen> {
     Future.delayed(Duration.zero).then((_) {
       Provider.of<BannerProvider>(context, listen: false)
           .getAndSetTopBanners()
-          .then((value) {
+          .then((_) {
         Provider.of<EstateTypesProvider>(context, listen: false)
             .fetchAndSetTypes()
             .then(
-              (_) => {
-                Provider.of<EstateProvider>(context, listen: false)
-                    .fetchAllAndSetEstates()
-                    .then(
-                      (_) => setState(() {
-                        _isLoading = false;
-                      }),
-                    ),
-              },
-            );
+          (types) {
+            Provider.of<BannerProvider>(context, listen: false)
+                .getAndSetBanners(types)
+                .then((banners) {
+              Provider.of<EstateProvider>(context, listen: false)
+                  .fetchAllAndSetEstates()
+                  .then(
+                    (_) => setState(() {
+                      _isLoading = false;
+                    }),
+                  );
+            });
+          },
+        );
       });
     });
   }
@@ -97,20 +101,12 @@ class _HomePageScreenState extends State<HomePageScreen> {
                         physics: AlwaysScrollableScrollPhysics(),
                         child: Column(
                           children: [
-                            Container(
-                              height: 190,
-                              child: ListView(
-                                scrollDirection: Axis.horizontal,
-                                physics: AlwaysScrollableScrollPhysics(),
-                                children: [
-                                  ...Provider.of<BannerProvider>(context,
-                                          listen: false)
-                                      .topBanners
-                                      .map((banner) => _buildTopBannerItem(
-                                          banner, screenWidth))
-                                      .toList()
-                                ],
-                              ),
+                            _buildBannerBlock(
+                              context,
+                              screenWidth,
+                              Provider.of<BannerProvider>(context,
+                                      listen: false)
+                                  .topBanners,
                             ),
                             EstateTypeListView(),
                             ...Provider.of<EstateTypesProvider>(context,
@@ -130,7 +126,25 @@ class _HomePageScreenState extends State<HomePageScreen> {
     );
   }
 
-  Widget _buildTopBannerItem(EstateModel estate, int screenWidth) {
+  Container _buildBannerBlock(
+      BuildContext context, int screenWidth, List banners) {
+    if (banners.length > 0) print(banners[0].photo);
+
+    return Container(
+      height: 190,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        physics: AlwaysScrollableScrollPhysics(),
+        children: [
+          ...banners
+              .map((banner) => _buildBannerItem(banner, screenWidth))
+              .toList()
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBannerItem(EstateModel estate, int screenWidth) {
     return Row(
       children: [
         HorizontalAd(
@@ -147,8 +161,9 @@ class _HomePageScreenState extends State<HomePageScreen> {
   Widget _buildEstateTypeBlock(int screenWidth, TypeModel type) {
     List topEstates = Provider.of<EstateProvider>(context, listen: false)
         .getTopEstatesByType(type.id);
+    Map banners = Provider.of<BannerProvider>(context, listen: false).banners;
 
-    return (topEstates.length > 0)
+    return (topEstates.length > 0 || banners[type.id].length > 0)
         ? Container(
             padding: EdgeInsets.symmetric(vertical: 10),
             child: Column(
@@ -164,15 +179,23 @@ class _HomePageScreenState extends State<HomePageScreen> {
                     ],
                   ),
                 ),
-                Wrap(
-                  children: [
-                    ...topEstates
-                        .map((estate) => EstateCard(
-                            screenWidth: screenWidth, estate: estate))
-                        .toList()
-                  ],
-                ),
-                // HorizontalAd()
+                (topEstates.length > 0)
+                    ? Wrap(
+                        children: [
+                          ...topEstates
+                              .map((estate) => EstateCard(
+                                  screenWidth: screenWidth, estate: estate))
+                              .toList()
+                        ],
+                      )
+                    : Container(),
+                (banners[type.id].length > 0)
+                    ? _buildBannerBlock(
+                        context,
+                        screenWidth,
+                        banners[type.id],
+                      )
+                    : Container(),
               ],
             ),
           )

@@ -1,4 +1,5 @@
-import 'package:dachaturizm/screens/locale_helper.dart';
+import 'package:dachaturizm/helpers/locale_helper.dart';
+import 'package:dachaturizm/helpers/url_helper.dart';
 import 'package:flutter/cupertino.dart';
 
 class EstateModel {
@@ -73,10 +74,10 @@ class EstateModel {
       announcer: data["announcer"],
       phone: data["phone"],
       userAdsCount: data["user_ads_count"],
-      photo: data["photo"],
+      photo: fixMediaUrl(data["photo"]),
       photos: data["photos"]
-          .map<EstatePhotos>(
-              (item) => EstatePhotos(id: item["id"], photo: item["photo"]))
+          .map<EstatePhotos>((item) =>
+              EstatePhotos(id: item["id"], photo: fixMediaUrl(item["photo"])))
           .toList(),
       facilities: data["facilities"]
           .map<Facility>((item) => Facility(
@@ -85,6 +86,20 @@ class EstateModel {
       userId: data["user"],
       typeId: data["estate_type"],
       isTop: data["is_top"],
+    );
+  }
+
+  static Future<EstateModel> fromJsonAsBanner(data) async {
+    String locale = await getCurrentLocale();
+
+    return EstateModel(
+      id: data["id"],
+      title: data["translations"][locale]["title"],
+      description: data["translations"][locale]["description"],
+      priceType: data["price_type"]["translations"][locale]["title"],
+      weekdayPrice: data["weekday_price"],
+      weekendPrice: data["weekend_price"],
+      photo: fixMediaUrl(data["photo"]),
     );
   }
 }

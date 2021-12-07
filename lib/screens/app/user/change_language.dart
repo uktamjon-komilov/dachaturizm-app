@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:dachaturizm/screens/locale_helper.dart';
+import 'package:dachaturizm/helpers/locale_helper.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_locales/flutter_locales.dart';
 

@@ -1,5 +1,5 @@
 import 'package:dachaturizm/constants.dart';
-import 'package:dachaturizm/screens/locale_helper.dart';
+import 'package:dachaturizm/helpers/locale_helper.dart';
 
 class TypeModel {
   final int id;
