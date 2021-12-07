@@ -55,6 +55,10 @@ class EstateModel {
     this.isTop = false,
   });
 
+  dynamic getAttr(String key) => <String, dynamic>{
+        "isTop": this.isTop,
+      }[key];
+
   static Future<EstateModel> fromJson(data) async {
     String locale = await getCurrentLocale();
 

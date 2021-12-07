@@ -15,7 +15,7 @@ class Text1 extends StatelessWidget {
       text,
       style: TextStyle(
         color: darkPurple,
-        fontSize: 24,
+        fontSize: 20,
         fontWeight: FontWeight.w500,
       ),
     );

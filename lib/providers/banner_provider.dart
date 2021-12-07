@@ -44,7 +44,6 @@ class BannerProvider extends ChangeNotifier {
         List extractedData = json.decode(response.body);
         banners[types[i].id] = [];
         for (var j = 0; j < extractedData.length; j++) {
-          print(extractedData[j]);
           EstateModel banner =
               await EstateModel.fromJsonAsBanner(extractedData[j]["estate"]);
           banners[types[i].id]!.add(banner);

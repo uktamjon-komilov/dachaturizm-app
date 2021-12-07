@@ -31,6 +31,19 @@ class _NavigationalAppScreenState extends State<NavigationalAppScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+          title: LocaleText("appbar_text"),
+          actions: [
+            IconButton(
+              onPressed: () {},
+              icon: Icon(
+                Icons.favorite_border_outlined,
+                size: 30,
+                color: Colors.redAccent,
+              ),
+            )
+          ],
+        ),
         body: IndexedStack(
           index: _currentIndex,
           children: _screens,

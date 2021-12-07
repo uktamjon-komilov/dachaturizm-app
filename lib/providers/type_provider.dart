@@ -13,6 +13,16 @@ class EstateTypesProvider with ChangeNotifier {
     return [..._items];
   }
 
+  getType(id) {
+    var result = null;
+    for (var i = 0; i < _items.length; i++) {
+      if (_items[i].id == id) {
+        result = _items[i];
+      }
+    }
+    return result;
+  }
+
   Future<List<TypeModel>> fetchAndSetTypes() async {
     const url = "${baseUrl}api/estate-types/";
     // try {

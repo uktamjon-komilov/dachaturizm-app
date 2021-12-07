@@ -44,5 +44,8 @@
     "user_already_exists_with_this_phone": "Bu telefon raqamiga ega foydalanuvchi allaqachon mavjud.",
     "search": "Qidirish",
     "top": "To'p",
-    "all": "Barchasi"
+    "all": "Barchasi",
+    "top_estates": "Top e'lonlar",
+    "simple_estates": "Oddiy e'lonlar",
+    "no_results": "Hech qanday natija topa olmadik"
 }

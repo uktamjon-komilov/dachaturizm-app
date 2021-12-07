@@ -8,6 +8,7 @@ import 'package:dachaturizm/models/type_model.dart';
 import 'package:dachaturizm/providers/banner_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/type_provider.dart';
+import 'package:dachaturizm/screens/app/listing_screen.dart';
 import 'package:dachaturizm/screens/widgets/type_row.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
@@ -27,6 +28,7 @@ class HomePageScreen extends StatefulWidget {
 class _HomePageScreenState extends State<HomePageScreen> {
   var _isLoading = true;
   int _currentIndex = 0;
+  TextEditingController _searchController = TextEditingController();
 
   @override
   void didChangeDependencies() {
@@ -68,22 +70,8 @@ class _HomePageScreenState extends State<HomePageScreen> {
     MediaQueryData queryData;
     queryData = MediaQuery.of(context);
     final int screenWidth = queryData.size.width.toInt();
-    final int screenHeight = queryData.size.height.toInt();
 
     return Scaffold(
-      appBar: AppBar(
-        title: LocaleText("appbar_text"),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: Icon(
-              Icons.favorite_border_outlined,
-              size: 30,
-              color: Colors.redAccent,
-            ),
-          )
-        ],
-      ),
       body: _isLoading
           ? Center(
               child: CircularProgressIndicator(),
@@ -95,7 +83,11 @@ class _HomePageScreenState extends State<HomePageScreen> {
                     defaultPadding, defaultPadding, defaultPadding, 0),
                 child: Column(
                   children: [
-                    SearchBar(),
+                    SearchBar(
+                      controller: _searchController,
+                      onSubmit: (value) {},
+                      onChange: (value) {},
+                    ),
                     Expanded(
                       child: SingleChildScrollView(
                         physics: AlwaysScrollableScrollPhysics(),
@@ -128,7 +120,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
   Container _buildBannerBlock(
       BuildContext context, int screenWidth, List banners) {
-    if (banners.length > 0) print(banners[0].photo);
+    if (banners.length > 6) banners = banners.sublist(0, 6);
 
     return Container(
       height: 190,
@@ -160,7 +152,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
   Widget _buildEstateTypeBlock(int screenWidth, TypeModel type) {
     List topEstates = Provider.of<EstateProvider>(context, listen: false)
-        .getTopEstatesByType(type.id);
+        .getEstatesByType(type.id, top: true);
     Map banners = Provider.of<BannerProvider>(context, listen: false).banners;
 
     return (topEstates.length > 0 || banners[type.id].length > 0)
@@ -175,7 +167,11 @@ class _HomePageScreenState extends State<HomePageScreen> {
                     children: [
                       Text1(Locales.string(context, "top") +
                           " ${type.title.toLowerCase()}"),
-                      TextLinkButton(Locales.string(context, "all"), () {})
+                      TextLinkButton(Locales.string(context, "all"), () {
+                        Navigator.of(context).pushNamed(
+                            EstateListingScreen.routeName,
+                            arguments: type.id);
+                      })
                     ],
                   ),
                 ),

@@ -7,20 +7,36 @@ import 'package:http/http.dart' as http;
 
 class EstateProvider extends ChangeNotifier {
   Map<int, List<EstateModel>> _estates = {};
+  List<EstateModel> _searchedTopEstates = [];
+  List<EstateModel> _searchedSimpleEstates = [];
 
   Map get estates {
     return {..._estates};
   }
 
-  List getTopEstatesByType(typeId) {
+  List<EstateModel> get searchedTopEstates {
+    return [..._searchedTopEstates];
+  }
+
+  List<EstateModel> get searchedSimpleEstates {
+    return [..._searchedSimpleEstates];
+  }
+
+  List getEstatesByType(typeId, {top = false}) {
     if (_estates.containsKey(typeId)) {
-      List<EstateModel> topEstates = [];
+      List<EstateModel> chosenEstates = [];
       _estates[typeId]?.forEach((estate) {
-        if (estate.isTop) {
-          topEstates.add(estate);
+        if (top) {
+          if (estate.isTop) {
+            chosenEstates.add(estate);
+          }
+        } else {
+          if (!estate.isTop) {
+            chosenEstates.add(estate);
+          }
         }
       });
-      if (topEstates.length % 2 == 1) {
+      if (chosenEstates.length % 2 == 1) {
         var highestRatedEstate;
         double maxRating = 0.0;
 
@@ -33,15 +49,13 @@ class EstateProvider extends ChangeNotifier {
         }
 
         if (highestRatedEstate == null) {
-          topEstates.removeAt(topEstates.length - 1);
+          chosenEstates.removeAt(chosenEstates.length - 1);
         } else {
-          topEstates.add(highestRatedEstate);
+          chosenEstates.add(highestRatedEstate);
         }
       }
-      if (topEstates.length > 6) {
-        return topEstates.sublist(0, 6);
-      }
-      return topEstates;
+
+      return chosenEstates;
     }
     return [];
   }
@@ -117,5 +131,108 @@ class EstateProvider extends ChangeNotifier {
     } else {
       return {...estates};
     }
+  }
+
+  Future<List<EstateModel>> search(
+    String typeSlug,
+    String priority, {
+    String term = "",
+    String address = "",
+    String fromDate = "",
+    String toDate = "",
+    int people = -1,
+    double price = -1.0,
+    String facilityIds = "",
+  }) async {
+    List<EstateModel> searchedEstates = [];
+    String url = "${baseUrl}api/estate/${typeSlug}/${priority}/";
+    Map<String, dynamic> queryParams = {};
+    if (term != "") queryParams["term"] = term;
+    if (address != "") queryParams["address"] = address;
+    if (fromDate != "") queryParams["fromDate"] = fromDate;
+    if (toDate != "") queryParams["toDate"] = toDate;
+    if (people != -1) queryParams["people"] = people;
+    if (price != -1.0) queryParams["price"] = price;
+    if (facilityIds != "") queryParams["facility_ids"] = facilityIds;
+    final query = Uri(queryParameters: queryParams).query;
+    if (query != "") {
+      url = url + "?" + query;
+    }
+    print(url);
+    var response = await http.get(Uri.parse(url));
+    if (response.statusCode >= 200 || response.statusCode < 300) {
+      var extractedData = json.decode(response.body);
+      while (extractedData.containsKey("results") &&
+          extractedData.containsKey("links")) {
+        print(extractedData);
+        List results = extractedData["results"];
+        var next = extractedData["links"]["next"];
+        for (int i = 0; i < results.length; i++) {
+          EstateModel estate = await EstateModel.fromJson(results[i]);
+          searchedEstates.add(estate);
+        }
+        if (next != "" && next != null) {
+          response = await http.get(Uri.parse(url));
+          if (response.statusCode >= 200 || response.statusCode < 300) {
+            extractedData = json.decode(response.body);
+          }
+        } else
+          break;
+      }
+    }
+    return searchedEstates;
+  }
+
+  Future<void> searchTop(
+    String typeSlug, {
+    String term = "",
+    String address = "",
+    String fromDate = "",
+    String toDate = "",
+    int people = -1,
+    double price = -1.0,
+    String facilityIds = "",
+  }) async {
+    List<EstateModel> searchedTopEstates = await search(
+      typeSlug,
+      "top",
+      term: term,
+      address: address,
+      fromDate: fromDate,
+      toDate: toDate,
+      people: people,
+      price: price,
+      facilityIds: facilityIds,
+    );
+    _searchedTopEstates = searchedTopEstates;
+  }
+
+  Future<void> searchSimple(
+    String typeSlug, {
+    String term = "",
+    String address = "",
+    String fromDate = "",
+    String toDate = "",
+    int people = -1,
+    double price = -1.0,
+    String facilityIds = "",
+  }) async {
+    List<EstateModel> searchedSimpleEstates = await search(
+      typeSlug,
+      "simple",
+      term: term,
+      address: address,
+      fromDate: fromDate,
+      toDate: toDate,
+      people: people,
+      price: price,
+      facilityIds: facilityIds,
+    );
+    _searchedSimpleEstates = searchedSimpleEstates;
+  }
+
+  void unsetSearchedResults() {
+    _searchedTopEstates = [];
+    _searchedSimpleEstates = [];
   }
 }
