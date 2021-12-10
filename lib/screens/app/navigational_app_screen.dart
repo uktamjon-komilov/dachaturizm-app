@@ -1,4 +1,5 @@
 import 'package:dachaturizm/constants.dart';
+import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/screens/app/chat/chat_screen.dart';
 import 'package:dachaturizm/screens/app/estate/create_estate_screen.dart';
 import 'package:dachaturizm/screens/app/home/home_screen.dart';
@@ -6,6 +7,7 @@ import 'package:dachaturizm/screens/app/search/search_screen.dart';
 import 'package:dachaturizm/screens/app/user/user_screen.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_locales/flutter_locales.dart';
+import 'package:provider/provider.dart';
 
 class NavigationalAppScreen extends StatefulWidget {
   const NavigationalAppScreen({Key? key}) : super(key: key);
@@ -17,8 +19,6 @@ class NavigationalAppScreen extends StatefulWidget {
 }
 
 class _NavigationalAppScreenState extends State<NavigationalAppScreen> {
-  int _currentIndex = 0;
-
   final _screens = [
     HomePageScreen(),
     SearchPageScreen(),
@@ -44,9 +44,13 @@ class _NavigationalAppScreenState extends State<NavigationalAppScreen> {
             )
           ],
         ),
-        body: IndexedStack(
-          index: _currentIndex,
-          children: _screens,
+        body: Consumer<NavigationScreenProvider>(
+          builder: (context, navigator, _) {
+            return IndexedStack(
+              index: navigator.currentIndex,
+              children: _screens,
+            );
+          },
         ),
         bottomNavigationBar: _buildBottomNavigation(),
       ),
@@ -58,28 +62,37 @@ class _NavigationalAppScreenState extends State<NavigationalAppScreen> {
       showSelectedLabels: false,
       showUnselectedLabels: false,
       type: BottomNavigationBarType.fixed,
-      currentIndex: _currentIndex,
-      onTap: (index) => setState(() {
-        _currentIndex = index;
-      }),
+      currentIndex: Provider.of<NavigationScreenProvider>(context).currentIndex,
+      onTap: (index) {
+        if (index != 1) {
+          Provider.of<NavigationScreenProvider>(context, listen: false)
+              .clearData();
+        }
+        Provider.of<NavigationScreenProvider>(context, listen: false)
+            .changePageIndex(index);
+      },
       items: [
         BottomNavigationBarItem(
           icon: Icon(
-            _currentIndex == 0 ? Icons.home_rounded : Icons.home_outlined,
+            Provider.of<NavigationScreenProvider>(context).currentIndex == 0
+                ? Icons.home_rounded
+                : Icons.home_outlined,
             color: darkPurple,
           ),
           label: "Home",
         ),
         BottomNavigationBarItem(
           icon: Icon(
-            _currentIndex == 1 ? Icons.search_outlined : Icons.search,
+            Provider.of<NavigationScreenProvider>(context).currentIndex == 1
+                ? Icons.search_outlined
+                : Icons.search,
             color: darkPurple,
           ),
           label: "Search",
         ),
         BottomNavigationBarItem(
           icon: Icon(
-            _currentIndex == 2
+            Provider.of<NavigationScreenProvider>(context).currentIndex == 2
                 ? Icons.add_circle_rounded
                 : Icons.add_circle_outline_rounded,
             color: darkPurple,
@@ -88,14 +101,16 @@ class _NavigationalAppScreenState extends State<NavigationalAppScreen> {
         ),
         BottomNavigationBarItem(
           icon: Icon(
-            _currentIndex == 3 ? Icons.chat_rounded : Icons.chat_outlined,
+            Provider.of<NavigationScreenProvider>(context).currentIndex == 3
+                ? Icons.chat_rounded
+                : Icons.chat_outlined,
             color: darkPurple,
           ),
           label: "Chat",
         ),
         BottomNavigationBarItem(
           icon: Icon(
-            _currentIndex == 4
+            Provider.of<NavigationScreenProvider>(context).currentIndex == 4
                 ? Icons.person_rounded
                 : Icons.person_outline_rounded,
             color: darkPurple,

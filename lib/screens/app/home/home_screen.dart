@@ -8,12 +8,14 @@ import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/models/type_model.dart';
 import 'package:dachaturizm/providers/banner_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
+import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/providers/type_provider.dart';
 import 'package:dachaturizm/screens/app/home/listing_screen.dart';
 import 'package:dachaturizm/screens/widgets/type_row.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:provider/provider.dart';
+import 'package:sizer/sizer.dart';
 
 class HomePageScreen extends StatefulWidget {
   const HomePageScreen({Key? key}) : super(key: key);
@@ -26,7 +28,6 @@ class HomePageScreen extends StatefulWidget {
 
 class _HomePageScreenState extends State<HomePageScreen> {
   var _isLoading = true;
-  int _currentIndex = 0;
   TextEditingController _searchController = TextEditingController();
 
   @override
@@ -66,9 +67,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
   @override
   Widget build(BuildContext context) {
-    MediaQueryData queryData;
-    queryData = MediaQuery.of(context);
-    final int screenWidth = queryData.size.width.toInt();
+    FocusScope.of(context).requestFocus(FocusNode());
 
     return Scaffold(
       body: _isLoading
@@ -84,7 +83,16 @@ class _HomePageScreenState extends State<HomePageScreen> {
                   children: [
                     SearchBar(
                       controller: _searchController,
-                      onSubmit: (value) {},
+                      focusNode: FocusNode(),
+                      onSubmit: (value) {
+                        if (value != "") {
+                          String term = _searchController.text;
+                          _searchController.text = "";
+                          Provider.of<NavigationScreenProvider>(context,
+                                  listen: false)
+                              .visitSearchPage(term);
+                        }
+                      },
                       onChange: (value) {},
                     ),
                     Expanded(
@@ -94,7 +102,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
                           children: [
                             _buildBannerBlock(
                               context,
-                              screenWidth,
                               Provider.of<BannerProvider>(context,
                                       listen: false)
                                   .topBanners,
@@ -103,8 +110,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                             ...Provider.of<EstateTypesProvider>(context,
                                     listen: false)
                                 .items
-                                .map((item) =>
-                                    _buildEstateTypeBlock(screenWidth, item))
+                                .map((item) => _buildEstateTypeBlock(item))
                                 .toList(),
                           ],
                         ),
@@ -117,8 +123,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
     );
   }
 
-  Container _buildBannerBlock(
-      BuildContext context, int screenWidth, List banners) {
+  Container _buildBannerBlock(BuildContext context, List banners) {
     if (banners.length > 6) banners = banners.sublist(0, 6);
 
     return Container(
@@ -127,20 +132,18 @@ class _HomePageScreenState extends State<HomePageScreen> {
         scrollDirection: Axis.horizontal,
         physics: AlwaysScrollableScrollPhysics(),
         children: [
-          ...banners
-              .map((banner) => _buildBannerItem(banner, screenWidth))
-              .toList()
+          ...banners.map((banner) => _buildBannerItem(banner)).toList()
         ],
       ),
     );
   }
 
-  Widget _buildBannerItem(EstateModel estate, int screenWidth) {
+  Widget _buildBannerItem(EstateModel estate) {
     return Row(
       children: [
         HorizontalAd(
           estate,
-          width: screenWidth * 0.8,
+          width: 100.w * 0.8,
         ),
         SizedBox(
           width: 10,
@@ -149,7 +152,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
     );
   }
 
-  Widget _buildEstateTypeBlock(int screenWidth, TypeModel type) {
+  Widget _buildEstateTypeBlock(TypeModel type) {
     List topEstates = Provider.of<EstateProvider>(context, listen: false)
         .getEstatesByType(type.id, top: true);
     Map banners = Provider.of<BannerProvider>(context, listen: false).banners;
@@ -178,8 +181,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                     ? Wrap(
                         children: [
                           ...topEstates
-                              .map((estate) => EstateCard(
-                                  screenWidth: screenWidth, estate: estate))
+                              .map((estate) => EstateCard(estate: estate))
                               .toList()
                         ],
                       )
@@ -187,7 +189,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
                 (banners[type.id].length > 0)
                     ? _buildBannerBlock(
                         context,
-                        screenWidth,
                         banners[type.id],
                       )
                     : Container(),

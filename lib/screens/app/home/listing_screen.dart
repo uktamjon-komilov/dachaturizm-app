@@ -104,7 +104,6 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
           : RefreshIndicator(
               onRefresh: _refreshAction,
               child: Container(
-                // decoration: BoxDecoration(color: normalOrange),
                 height: (topEstates.length == 0 && simpleEstates.length == 0)
                     ? screenHeight - 4 * defaultPadding
                     : null,
@@ -127,6 +126,7 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
                       ),
                       SearchBar(
                         controller: _searchController,
+                        focusNode: FocusNode(),
                         onSubmit: (value) {
                           _search(
                               estateType != null ? estateType.slug : "dacha",
@@ -159,9 +159,8 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
                                     Wrap(
                                       children: [
                                         ...topEstates
-                                            .map((estate) => EstateCard(
-                                                screenWidth: screenWidth,
-                                                estate: estate))
+                                            .map((estate) =>
+                                                EstateCard(estate: estate))
                                             .toList()
                                       ],
                                     ),
@@ -181,9 +180,8 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
                                 Wrap(
                                   children: [
                                     ...simpleEstates
-                                        .map((estate) => EstateCard(
-                                            screenWidth: screenWidth,
-                                            estate: estate))
+                                        .map((estate) =>
+                                            EstateCard(estate: estate))
                                         .toList()
                                   ],
                                 ),

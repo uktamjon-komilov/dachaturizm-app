@@ -3,15 +3,14 @@ import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/screens/app/estate/estate_detail_screen.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:sizer/sizer.dart';
 
 class EstateCard extends StatelessWidget {
   const EstateCard({
     Key? key,
-    required this.screenWidth,
     required this.estate,
   }) : super(key: key);
 
-  final int screenWidth;
   final EstateModel estate;
 
   Widget _showTopIndicator() {
@@ -33,7 +32,7 @@ class EstateCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: (screenWidth - 2 * defaultPadding) / 2,
+      width: (100.w - 2 * defaultPadding) / 2,
       height: 250,
       child: Card(
         clipBehavior: Clip.antiAlias,

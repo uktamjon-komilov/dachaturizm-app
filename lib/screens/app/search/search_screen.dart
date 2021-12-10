@@ -6,10 +6,12 @@ import 'package:dachaturizm/components/text1.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
+import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sizer/sizer.dart';
 
 class SearchPageScreen extends StatefulWidget {
   const SearchPageScreen({Key? key}) : super(key: key);
@@ -22,6 +24,7 @@ class _SearchPageScreenState extends State<SearchPageScreen> {
   bool _isLoading = false;
   bool _isSearched = false;
   TextEditingController _searchController = TextEditingController();
+  FocusNode _searchFocusNode = FocusNode();
 
   void _saveSearchTerm(String term) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -64,6 +67,7 @@ class _SearchPageScreenState extends State<SearchPageScreen> {
   }
 
   Future<void> _search(value) async {
+    print(value);
     setState(() {
       _isLoading = true;
     });
@@ -77,11 +81,12 @@ class _SearchPageScreenState extends State<SearchPageScreen> {
     });
   }
 
-  void _unsearch() {
+  void _unsearch() async {
     Provider.of<EstateProvider>(context, listen: false).unsetSearchedResults();
     setState(() {
       _isSearched = false;
     });
+    FocusScope.of(context).requestFocus(_searchFocusNode);
   }
 
   Future<void> _refreshAction() async {
@@ -90,85 +95,121 @@ class _SearchPageScreenState extends State<SearchPageScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     List<EstateModel> allEstates =
         Provider.of<EstateProvider>(context, listen: false).searchedAllEstates;
+    Map<String, dynamic> data =
+        Provider.of<NavigationScreenProvider>(context).data;
+    String term = data.containsKey("search_term") ? data["search_term"] : "";
 
-    print(_isLoading);
-
-    MediaQueryData queryData;
-    queryData = MediaQuery.of(context);
-    final int screenWidth = queryData.size.width.toInt();
-    final int screenHeight = queryData.size.height.toInt();
+    if (term != "") {
+      Provider.of<NavigationScreenProvider>(context, listen: false).clearData();
+      _searchController.text = term;
+      _search(term);
+    }
 
     return Container(
-      // decoration: BoxDecoration(color: normalOrange),
-      height:
-          (allEstates.length == 0) ? screenHeight - 4 * defaultPadding : null,
+      height: (allEstates.length == 0) ? 100.w - 4 * defaultPadding : null,
       padding: EdgeInsets.symmetric(horizontal: defaultPadding),
-      child: SingleChildScrollView(
-        physics: AlwaysScrollableScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              height: defaultPadding,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            height: defaultPadding,
+          ),
+          Text(
+            Locales.string(context, "search"),
+            style: TextStyle(fontSize: 28, fontWeight: FontWeight.w700),
+          ),
+          ElevatedButton(
+            onPressed: () {},
+            child: Text("Filters"),
+            style: ElevatedButton.styleFrom(
+              elevation: 0,
+              primary: lightGrey,
             ),
-            Text(
-              Locales.string(context, "search"),
-              style: TextStyle(fontSize: 28, fontWeight: FontWeight.w700),
-            ),
-            SizedBox(
-              height: defaultPadding,
-            ),
-            SearchBar(
-              controller: _searchController,
-              autofocus: true,
-              onSubmit: (value) {
-                _search(value);
-              },
-              onChange: (value) {
-                if (value == "") {
-                  _refreshAction();
-                }
-              },
-            ),
-            _isLoading
-                ? Container(
-                    height: 100,
-                    child: Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                  )
-                : ((allEstates.length == 0)
-                    ? Container(
-                        height: 100,
-                        child: Center(
-                          child: Text(Locales.string(context, "no_results")),
-                        ),
-                      )
-                    : Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: defaultPadding / 2),
-                            child: Text1(
-                                Locales.string(context, "search_results")),
+          ),
+          SizedBox(
+            height: defaultPadding,
+          ),
+          _isLoading
+              ? Container()
+              : SearchBar(
+                  controller: _searchController,
+                  focusNode: _searchFocusNode,
+                  autofocus: true,
+                  onSubmit: (value) {
+                    _search(value);
+                  },
+                  onChange: (value) {
+                    Provider.of<NavigationScreenProvider>(context,
+                            listen: false)
+                        .clearData();
+                    if (value == "") {
+                      print("valueeee: " + value);
+                      _refreshAction();
+                    }
+                  },
+                ),
+          Expanded(
+            child: SingleChildScrollView(
+              physics: BouncingScrollPhysics(),
+              child: Column(
+                children: [
+                  _isLoading
+                      ? Container(
+                          height: 100,
+                          child: Center(
+                            child: CircularProgressIndicator(),
                           ),
-                          Wrap(
-                            children: [
-                              ...allEstates
-                                  .map((estate) => EstateCard(
-                                      screenWidth: screenWidth, estate: estate))
-                                  .toList()
-                            ],
-                          ),
-                        ],
-                      )),
-          ],
-        ),
+                        )
+                      : ((allEstates.length == 0)
+                          ? Container(
+                              height: 100,
+                              child: Center(
+                                child: Text(
+                                  Locales.string(context, "no_results"),
+                                ),
+                              ),
+                            )
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: defaultPadding / 2),
+                                  child: Text1(
+                                    Locales.string(context, "search_results"),
+                                  ),
+                                ),
+                                Wrap(
+                                  children: [
+                                    ...allEstates
+                                        .map((estate) =>
+                                            EstateCard(estate: estate))
+                                        .toList()
+                                  ],
+                                ),
+                              ],
+                            )),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _unsearch();
+    _searchController.dispose();
+    super.dispose();
   }
 }

@@ -2,10 +2,12 @@ import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/providers/banner_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
+import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/screens/app/estate/estate_detail_screen.dart';
 import 'package:dachaturizm/screens/app/home/home_screen.dart';
 import 'package:dachaturizm/screens/app/home/listing_screen.dart';
 import 'package:dachaturizm/screens/app/navigational_app_screen.dart';
+import 'package:dachaturizm/screens/app/search/filters_screen.dart';
 import 'package:dachaturizm/screens/app/user/change_language.dart';
 import 'package:dachaturizm/screens/auth/auth_type_screen.dart';
 import 'package:dachaturizm/screens/auth/create_profile_screen.dart';
@@ -18,6 +20,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 
 import 'package:provider/provider.dart';
+import 'package:sizer/sizer.dart';
 import 'providers/type_provider.dart';
 
 void main() async {
@@ -51,50 +54,55 @@ class _MyAppState extends State<MyApp> {
           ChangeNotifierProvider.value(
             value: EstateProvider(),
           ),
-        ],
-        child: MaterialApp(
-          title: LocaleText("appbar_text").toString(),
-          localizationsDelegates: Locales.delegates,
-          supportedLocales: Locales.supportedLocales,
-          locale: locale,
-          theme: new ThemeData(
-            primarySwatch: Colors.grey,
-            textTheme: Theme.of(context).textTheme.apply(
-                  bodyColor: darkPurple,
-                  displayColor: darkPurple,
-                ),
-            primaryTextTheme: TextTheme(
-              headline6: TextStyle(color: Colors.white),
-            ),
-            appBarTheme: AppBarTheme(
-              titleTextStyle: TextStyle(
-                color: darkPurple,
-                fontSize: 24,
-                fontWeight: FontWeight.w600,
-              ),
-              centerTitle: true,
-              backgroundColor: Colors.white,
-              elevation: 0.2,
-            ),
+          ChangeNotifierProvider.value(
+            value: NavigationScreenProvider(),
           ),
-          debugShowCheckedModeBanner: false,
-          home: SplashScreen(),
-          routes: {
-            AuthTypeScreen.routeName: (context) => AuthTypeScreen(),
-            RegisterScreen.routeName: (context) => RegisterScreen(),
-            OTPConfirmationScreen.routeName: (context) =>
-                OTPConfirmationScreen(),
-            CreateProfileScreen.routeName: (context) => CreateProfileScreen(),
-            LoginScreen.routeName: (context) => LoginScreen(),
-            HomePageScreen.routeName: (context) => HomePageScreen(),
-            NavigationalAppScreen.routeName: (context) =>
-                NavigationalAppScreen(),
-            ChooseLangugageScreen.routeName: (context) =>
-                ChooseLangugageScreen(),
-            EstateListingScreen.routeName: (context) => EstateListingScreen(),
-            EstateDetailScreen.routeName: (context) => EstateDetailScreen(),
-            ChangeLanguage.routeName: (context) => ChangeLanguage(),
-          },
+        ],
+        child: Sizer(
+          builder: (context, orientation, deviceType) => MaterialApp(
+            title: LocaleText("appbar_text").toString(),
+            localizationsDelegates: Locales.delegates,
+            supportedLocales: Locales.supportedLocales,
+            locale: locale,
+            theme: new ThemeData(
+              primarySwatch: Colors.grey,
+              textTheme: Theme.of(context).textTheme.apply(
+                    bodyColor: darkPurple,
+                    displayColor: darkPurple,
+                  ),
+              primaryTextTheme: TextTheme(
+                headline6: TextStyle(color: Colors.white),
+              ),
+              appBarTheme: AppBarTheme(
+                titleTextStyle: TextStyle(
+                  color: darkPurple,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w600,
+                ),
+                centerTitle: true,
+                backgroundColor: Colors.white,
+                elevation: 0.2,
+              ),
+            ),
+            debugShowCheckedModeBanner: false,
+            home: SearchFilersScreen(),
+            routes: {
+              AuthTypeScreen.routeName: (context) => AuthTypeScreen(),
+              RegisterScreen.routeName: (context) => RegisterScreen(),
+              OTPConfirmationScreen.routeName: (context) =>
+                  OTPConfirmationScreen(),
+              CreateProfileScreen.routeName: (context) => CreateProfileScreen(),
+              LoginScreen.routeName: (context) => LoginScreen(),
+              HomePageScreen.routeName: (context) => HomePageScreen(),
+              NavigationalAppScreen.routeName: (context) =>
+                  NavigationalAppScreen(),
+              ChooseLangugageScreen.routeName: (context) =>
+                  ChooseLangugageScreen(),
+              EstateListingScreen.routeName: (context) => EstateListingScreen(),
+              EstateDetailScreen.routeName: (context) => EstateDetailScreen(),
+              ChangeLanguage.routeName: (context) => ChangeLanguage(),
+            },
+          ),
         ),
       ),
     );
