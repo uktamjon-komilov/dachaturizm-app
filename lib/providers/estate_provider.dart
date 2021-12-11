@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/models/estate_model.dart';
+import 'package:dachaturizm/models/photo_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 
@@ -10,6 +11,13 @@ class EstateProvider extends ChangeNotifier {
   List<EstateModel> _searchedTopEstates = [];
   List<EstateModel> _searchedSimpleEstates = [];
   List<EstateModel> _searchedAllEstates = [];
+  Map<String, dynamic> _searchFilters = {
+    "region": "",
+    "priceType": 0,
+    "fromPrice": 0.0,
+    "toPrice": 0.0,
+    "facilities": []
+  };
 
   Map get estates {
     return {..._estates};
@@ -25,6 +33,18 @@ class EstateProvider extends ChangeNotifier {
 
   List<EstateModel> get searchedAllEstates {
     return [..._searchedAllEstates];
+  }
+
+  Map<String, dynamic> get searchFilters {
+    return {..._searchFilters};
+  }
+
+  bool get hasFilters {
+    return !(_searchFilters["region"] == "" &&
+        _searchFilters["priceType"] == 0 &&
+        _searchFilters["fromPrice"] == 0.0 &&
+        _searchFilters["toPrice"] == 0.0 &&
+        _searchFilters["facilities"].length == 0);
   }
 
   List getEstatesByType(typeId, {top = false}) {
@@ -273,5 +293,46 @@ class EstateProvider extends ChangeNotifier {
     _searchedTopEstates = [];
     _searchedSimpleEstates = [];
     _searchedAllEstates = [];
+  }
+
+  void setRegionFilter(String region) {
+    _searchFilters["region"] = region;
+    notifyListeners();
+  }
+
+  void setPriceType(int id) {
+    _searchFilters["priceType"] = id;
+    notifyListeners();
+  }
+
+  void setFromPriceFilter(String price) {
+    _searchFilters["fromPrice"] = double.parse(price);
+    notifyListeners();
+  }
+
+  void setToPriceFilter(String price) {
+    _searchFilters["toPrice"] = double.parse(price);
+    notifyListeners();
+  }
+
+  void addFacilityFilter(int id) {
+    if (_searchFilters["facilities"].indexOf(id) == -1)
+      _searchFilters["facilities"].add(id);
+    notifyListeners();
+  }
+
+  void removeFacilityFilter(int id) {
+    if (_searchFilters["facilities"].indexOf(id) == -1)
+      _searchFilters["facilities"].remove(id);
+    notifyListeners();
+  }
+
+  void clearSearchFilters() {
+    _searchFilters["region"] = "";
+    _searchFilters["priceType"] = 0;
+    _searchFilters["fromPrice"] = 0.0;
+    _searchFilters["toPrice"] = 0.0;
+    _searchFilters["facilities"] = [];
+    notifyListeners();
   }
 }

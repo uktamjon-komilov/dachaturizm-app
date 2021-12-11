@@ -2,6 +2,7 @@ import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/screens/app/user/change_language.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_locales/flutter_locales.dart';
+import 'package:sizer/sizer.dart';
 
 class UserPageScreen extends StatefulWidget {
   const UserPageScreen({Key? key}) : super(key: key);
@@ -13,8 +14,6 @@ class UserPageScreen extends StatefulWidget {
 class _UserPageScreenState extends State<UserPageScreen> {
   @override
   Widget build(BuildContext context) {
-    final Size size = MediaQuery.of(context).size;
-
     return Scaffold(
       appBar: AppBar(
         title: LocaleText("profile"),
@@ -26,7 +25,7 @@ class _UserPageScreenState extends State<UserPageScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildUserDetails(size),
+              _buildUserDetails(),
               Divider(),
               _buildProfileList(),
               Divider(),
@@ -93,7 +92,7 @@ class _UserPageScreenState extends State<UserPageScreen> {
     );
   }
 
-  Widget _buildUserDetails(Size size) {
+  Widget _buildUserDetails() {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: defaultPadding),
       width: double.infinity,
@@ -101,7 +100,7 @@ class _UserPageScreenState extends State<UserPageScreen> {
       child: Row(
         children: [
           CircleAvatar(
-            radius: size.width * 0.10,
+            radius: 100.w * 0.10,
             child: ClipOval(
               child: Image.asset(
                 "assets/images/user.jpg",

@@ -1,6 +1,7 @@
 import 'package:dachaturizm/helpers/locale_helper.dart';
 import 'package:dachaturizm/helpers/url_helper.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:dachaturizm/models/facility_model.dart';
+import 'package:dachaturizm/models/photo_model.dart';
 
 class EstateModel {
   final int id;
@@ -8,7 +9,7 @@ class EstateModel {
   final String description;
   final String priceType;
   final List<Map<String, dynamic>> bookedDays;
-  final List<Facility> facilities;
+  final List<FacilityModel> facilities;
   final double rating;
   final int views;
   final int userAdsCount;
@@ -84,7 +85,7 @@ class EstateModel {
               EstatePhotos(id: item["id"], photo: fixMediaUrl(item["photo"])))
           .toList(),
       facilities: data["facilities"]
-          .map<Facility>((item) => Facility(
+          .map<FacilityModel>((item) => FacilityModel(
               id: item["id"], title: item["translations"][locale]["title"]))
           .toList(),
       userId: data["user"],
@@ -106,18 +107,4 @@ class EstateModel {
       photo: fixMediaUrl(data["photo"]),
     );
   }
-}
-
-class EstatePhotos {
-  final int id;
-  final String photo;
-
-  EstatePhotos({required this.id, required this.photo});
-}
-
-class Facility {
-  final int id;
-  final String title;
-
-  Facility({required this.id, required this.title});
 }

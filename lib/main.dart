@@ -1,8 +1,11 @@
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/providers/banner_provider.dart';
+import 'package:dachaturizm/providers/currency_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
+import 'package:dachaturizm/providers/facility_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
+import 'package:dachaturizm/providers/region_provider.dart';
 import 'package:dachaturizm/screens/app/estate/estate_detail_screen.dart';
 import 'package:dachaturizm/screens/app/home/home_screen.dart';
 import 'package:dachaturizm/screens/app/home/listing_screen.dart';
@@ -57,6 +60,15 @@ class _MyAppState extends State<MyApp> {
           ChangeNotifierProvider.value(
             value: NavigationScreenProvider(),
           ),
+          ChangeNotifierProvider.value(
+            value: FacilityProvider(),
+          ),
+          ChangeNotifierProvider.value(
+            value: CurrencyProvider(),
+          ),
+          ChangeNotifierProvider.value(
+            value: RegionProvider(),
+          ),
         ],
         child: Sizer(
           builder: (context, orientation, deviceType) => MaterialApp(
@@ -85,7 +97,7 @@ class _MyAppState extends State<MyApp> {
               ),
             ),
             debugShowCheckedModeBanner: false,
-            home: SearchFilersScreen(),
+            home: SplashScreen(),
             routes: {
               AuthTypeScreen.routeName: (context) => AuthTypeScreen(),
               RegisterScreen.routeName: (context) => RegisterScreen(),
@@ -99,6 +111,7 @@ class _MyAppState extends State<MyApp> {
               ChooseLangugageScreen.routeName: (context) =>
                   ChooseLangugageScreen(),
               EstateListingScreen.routeName: (context) => EstateListingScreen(),
+              SearchFilersScreen.routeName: (context) => SearchFilersScreen(),
               EstateDetailScreen.routeName: (context) => EstateDetailScreen(),
               ChangeLanguage.routeName: (context) => ChangeLanguage(),
             },

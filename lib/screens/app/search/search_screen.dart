@@ -7,6 +7,7 @@ import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
+import 'package:dachaturizm/screens/app/search/filters_screen.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:provider/provider.dart';
@@ -67,6 +68,9 @@ class _SearchPageScreenState extends State<SearchPageScreen> {
   }
 
   Future<void> _search(value) async {
+    Map<String, dynamic> filters =
+        Provider.of<EstateProvider>(context, listen: false).searchFilters;
+    print(filters);
     print(value);
     setState(() {
       _isLoading = true;
@@ -107,6 +111,8 @@ class _SearchPageScreenState extends State<SearchPageScreen> {
         Provider.of<NavigationScreenProvider>(context).data;
     String term = data.containsKey("search_term") ? data["search_term"] : "";
 
+    bool hasFilters = Provider.of<EstateProvider>(context).hasFilters;
+
     if (term != "") {
       Provider.of<NavigationScreenProvider>(context, listen: false).clearData();
       _searchController.text = term;
@@ -122,17 +128,46 @@ class _SearchPageScreenState extends State<SearchPageScreen> {
           SizedBox(
             height: defaultPadding,
           ),
-          Text(
-            Locales.string(context, "search"),
-            style: TextStyle(fontSize: 28, fontWeight: FontWeight.w700),
-          ),
-          ElevatedButton(
-            onPressed: () {},
-            child: Text("Filters"),
-            style: ElevatedButton.styleFrom(
-              elevation: 0,
-              primary: lightGrey,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                Locales.string(context, "search"),
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.w700),
+              ),
+              Row(
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context)
+                          .pushNamed(SearchFilersScreen.routeName);
+                    },
+                    child: Text("Filters"),
+                    style: ElevatedButton.styleFrom(
+                      elevation: 0,
+                      primary: lightGrey,
+                    ),
+                  ),
+                  SizedBox(
+                    width: defaultPadding / 2,
+                  ),
+                  hasFilters
+                      ? ElevatedButton.icon(
+                          onPressed: () {
+                            Provider.of<EstateProvider>(context, listen: false)
+                                .clearSearchFilters();
+                          },
+                          label: Text("Clear"),
+                          icon: Icon(Icons.clear),
+                          style: ElevatedButton.styleFrom(
+                            elevation: 0,
+                            primary: lightGrey,
+                          ),
+                        )
+                      : Container(),
+                ],
+              ),
+            ],
           ),
           SizedBox(
             height: defaultPadding,
@@ -151,7 +186,6 @@ class _SearchPageScreenState extends State<SearchPageScreen> {
                             listen: false)
                         .clearData();
                     if (value == "") {
-                      print("valueeee: " + value);
                       _refreshAction();
                     }
                   },
