@@ -5,7 +5,7 @@ import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/screens/app/estate/detail_builders.dart';
 import "package:flutter/material.dart";
 import 'package:provider/provider.dart';
-import 'package:table_calendar/table_calendar.dart';
+import 'package:sizer/sizer.dart';
 
 class EstateDetailScreen extends StatefulWidget {
   const EstateDetailScreen({Key? key}) : super(key: key);
@@ -18,7 +18,7 @@ class EstateDetailScreen extends StatefulWidget {
 
 class _EstateDetailScreenState extends State<EstateDetailScreen> {
   var isLoading = true;
-  var _showCalendar = true;
+  var _showCalendar = false;
   var detail;
   var _detailBuilder;
 
@@ -63,51 +63,8 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
     );
   }
 
-  TableCalendar<dynamic> _buildCustomCalendar() {
-    DateTime now = DateTime.now();
-    DateTime _selectedDay = DateTime.now();
-    DateTime _focusedDay = DateTime.now();
-
-    return TableCalendar(
-      firstDay: DateTime.utc(now.year - 1, 1, 1),
-      lastDay: DateTime.utc(now.year + 1, 12, 31),
-      focusedDay: _selectedDay,
-      locale: "uz",
-      headerStyle: HeaderStyle(
-        formatButtonVisible: false,
-        titleCentered: true,
-        titleTextStyle: TextStyle(
-          color: darkPurple,
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-        ),
-        // titleTextFormatter: (date, locale) =>
-        //     "${DateFormat.y(locale).format(date)}, ${DateFormat.MMMM(locale).format(date)}",
-      ),
-      calendarStyle: CalendarStyle(
-        cellMargin: EdgeInsets.all(3),
-        selectedDecoration: BoxDecoration(
-          color: normalOrange,
-          borderRadius: BorderRadius.circular(5),
-        ),
-        todayDecoration: BoxDecoration(
-          color: lightPurple,
-          borderRadius: BorderRadius.circular(5),
-        ),
-        todayTextStyle: TextStyle(
-          color: Colors.white,
-        ),
-      ),
-      selectedDayPredicate: (day) {
-        return isSameDay(_selectedDay, day);
-      },
-      startingDayOfWeek: StartingDayOfWeek.monday,
-    );
-  }
-
   void didChangeDependencies() {
     final Map args = ModalRoute.of(context)?.settings.arguments as Map;
-    final int estateId = args["id"];
 
     Future.delayed(Duration.zero).then((_) =>
         Provider.of<EstateProvider>(context, listen: false)
@@ -128,8 +85,7 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
     final Map args = ModalRoute.of(context)?.settings.arguments as Map;
     final int estateId = args["id"];
 
-    final halfScreenButtonWidth =
-        (MediaQuery.of(context).size.width - 3 * defaultPadding) / 2;
+    final halfScreenButtonWidth = (100.w - 3 * defaultPadding) / 2;
 
     return SafeArea(
       child: Scaffold(
@@ -156,7 +112,7 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
                                 _detailBuilder.buildPriceRow(showCalendar),
                                 _detailBuilder.drawDivider(),
                                 _showCalendar
-                                    ? _buildCustomCalendar()
+                                    ? _detailBuilder.buildCustomCalendar()
                                     : SizedBox(),
                                 _detailBuilder.drawDivider(),
                                 _detailBuilder.buildDescription(),

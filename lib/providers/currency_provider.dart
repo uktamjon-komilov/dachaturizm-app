@@ -17,7 +17,7 @@ class CurrencyProvider extends ChangeNotifier {
     List<CurrencyModel> currencies = [];
     final response = await http.get(Uri.parse(url));
     if (response.statusCode >= 200 || response.statusCode < 300) {
-      var extractedData = json.decode(response.body);
+      var extractedData = json.decode(utf8.decode(response.bodyBytes));
       for (int i = 0; i < extractedData.length; i++) {
         CurrencyModel currency = await CurrencyModel.fromJson(extractedData[i]);
         currencies.add(currency);

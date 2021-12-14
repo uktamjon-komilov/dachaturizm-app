@@ -39,6 +39,7 @@ dependencies:
   flutter_svg: ^0.23.0+1
   flutter_image_slideshow: any
   cached_network_image: ^3.1.0+1
+  intl: ^0.17.0
   table_calendar: ^3.0.3
   url_launcher: ^6.0.12
   flutter_locales: ^2.0.0
@@ -47,6 +48,10 @@ dependencies:
   form_validator: ^1.0.1
   sizer: ^2.0.15
   equatable: ^2.0.3
+  image_picker: ^0.8.4+4
+  path: ^1.8.0
+  flutter_html: ^0.8.2
+  flutter_spinkit: ^5.1.0
 
 
 dev_dependencies:

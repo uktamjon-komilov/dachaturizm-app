@@ -1,10 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dachaturizm/components/chips.dart';
 import 'package:dachaturizm/constants.dart';
+import 'package:dachaturizm/models/booking_day.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:intl/intl.dart';
+import 'package:table_calendar/table_calendar.dart';
 import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 
 class DetailBuilder {
@@ -114,6 +117,54 @@ class DetailBuilder {
     );
   }
 
+  TableCalendar<dynamic> buildCustomCalendar() {
+    final Set<BookingDay> _selectedDays = Set<BookingDay>();
+    for (int i = 0; i < detail.bookedDays.length; i++) {
+      _selectedDays.add(detail.bookedDays[i]);
+      print(_selectedDays);
+    }
+
+    DateTime now = DateTime.now();
+    DateTime _focusedDay = DateTime.now();
+
+    return TableCalendar(
+      firstDay: now,
+      lastDay: DateTime.utc(now.year + 1, 12, 31),
+      focusedDay: _focusedDay,
+      locale: "uz",
+      headerStyle: HeaderStyle(
+        formatButtonVisible: false,
+        titleCentered: true,
+        titleTextStyle: TextStyle(
+          color: darkPurple,
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+        ),
+        titleTextFormatter: (date, locale) =>
+            "${DateFormat.y(locale).format(date)}, ${DateFormat.MMMM(locale).format(date)}",
+      ),
+      calendarStyle: CalendarStyle(
+        cellMargin: EdgeInsets.all(3),
+        selectedDecoration: BoxDecoration(
+          color: normalOrange,
+          borderRadius: BorderRadius.circular(5),
+        ),
+        todayDecoration: BoxDecoration(
+          color: lightPurple,
+          borderRadius: BorderRadius.circular(5),
+        ),
+        todayTextStyle: TextStyle(
+          color: Colors.white,
+        ),
+      ),
+      selectedDayPredicate: (day) {
+        return _selectedDays.contains(BookingDay.toObj(day));
+        // return true;
+      },
+      startingDayOfWeek: StartingDayOfWeek.monday,
+    );
+  }
+
   Row buildPriceRow(callback) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -128,7 +179,10 @@ class DetailBuilder {
         ),
         ElevatedButton(
           onPressed: callback,
-          child: Text("Kalendar"),
+          child: Text(
+            "Kalendar",
+            style: TextStyle(color: Colors.white),
+          ),
           style: ElevatedButton.styleFrom(
             primary: normalOrange,
             elevation: 0,

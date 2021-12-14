@@ -1,3 +1,4 @@
+import 'package:dachaturizm/components/small_button.dart';
 import 'package:dachaturizm/components/text1.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/models/currency_model.dart';
@@ -196,7 +197,7 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
       children: [
         ...currencies.map((currency) {
           int index = currencies.indexOf(currency);
-          return CurrencyButton(
+          return SmallButton(
             currency.title,
             enabled: index == indexZero || _currentCurrency == currency,
             onPressed: () {
@@ -213,7 +214,7 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
     );
   }
 
-  Wrap _buildFacilityList(List<FacilityModel> facilities) {
+  Widget _buildFacilityList(List<FacilityModel> facilities) {
     return Wrap(
       alignment: WrapAlignment.spaceBetween,
       children: [
@@ -287,40 +288,6 @@ class PriceInput extends StatelessWidget {
         ),
         keyboardType: TextInputType.number,
       ),
-    );
-  }
-}
-
-class CurrencyButton extends StatelessWidget {
-  const CurrencyButton(
-    this.text, {
-    Key? key,
-    this.enabled = false,
-    this.onPressed = null,
-  }) : super(key: key);
-
-  final String text;
-  final bool enabled;
-  final onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        primary: enabled ? normalOrange : disabledOrange,
-        minimumSize: Size(40, 25),
-        padding: EdgeInsets.all(0),
-        elevation: 0,
-        shadowColor: Colors.transparent,
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 12,
-        ),
-      ),
-      onPressed: onPressed,
     );
   }
 }

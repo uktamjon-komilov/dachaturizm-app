@@ -5,6 +5,7 @@ const lightPurple = Color(0xAA3B2F43);
 const normalOrange = Color(0xFFF17C31);
 const disabledOrange = Color(0xB2F17C31);
 const lightGrey = Color(0xFFEFF5FB);
+const lessNormalGrey = Color(0xFFF1F1F1);
 const normalGrey = Color(0xFF838589);
 const double defaultPadding = 20.0;
 const baseUrl = "http://45.129.170.153/";

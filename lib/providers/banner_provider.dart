@@ -22,7 +22,7 @@ class BannerProvider extends ChangeNotifier {
     final response = await http.get(Uri.parse(url));
     if (response.statusCode >= 200 || response.statusCode < 300) {
       _topBanners = [];
-      final extractedData = json.decode(response.body) as List;
+      final extractedData = json.decode(utf8.decode(response.bodyBytes)) as List;
       for (var i = 0; i < extractedData.length; i++) {
         final banner = await EstateModel.fromJson(extractedData[i]);
         _topBanners.add(banner);
@@ -41,7 +41,7 @@ class BannerProvider extends ChangeNotifier {
       final url = "${baseUrl}api/banners/${types[i].slug}/";
       final response = await http.get(Uri.parse(url));
       if (response.statusCode >= 200 || response.statusCode < 300) {
-        List extractedData = json.decode(response.body);
+        List extractedData = json.decode(utf8.decode(response.bodyBytes));
         banners[types[i].id] = [];
         for (var j = 0; j < extractedData.length; j++) {
           EstateModel banner =

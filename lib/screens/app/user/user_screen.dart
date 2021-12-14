@@ -15,10 +15,6 @@ class _UserPageScreenState extends State<UserPageScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: LocaleText("profile"),
-        centerTitle: true,
-      ),
       body: SingleChildScrollView(
         child: Container(
           // padding: const EdgeInsets.symmetric(horizontal: defaultPadding),

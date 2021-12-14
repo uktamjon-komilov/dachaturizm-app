@@ -27,7 +27,7 @@ class HomePageScreen extends StatefulWidget {
 }
 
 class _HomePageScreenState extends State<HomePageScreen> {
-  var _isLoading = true;
+  bool _isLoading = true;
   TextEditingController _searchController = TextEditingController();
 
   @override

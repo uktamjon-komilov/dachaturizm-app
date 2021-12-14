@@ -1,5 +1,6 @@
 import 'package:dachaturizm/helpers/locale_helper.dart';
 import 'package:dachaturizm/helpers/url_helper.dart';
+import 'package:dachaturizm/models/booking_day.dart';
 import 'package:dachaturizm/models/facility_model.dart';
 import 'package:dachaturizm/models/photo_model.dart';
 
@@ -8,7 +9,7 @@ class EstateModel {
   final String title;
   final String description;
   final String priceType;
-  final List<Map<String, dynamic>> bookedDays;
+  final List<BookingDay> bookedDays;
   final List<FacilityModel> facilities;
   final double rating;
   final int views;
@@ -87,6 +88,9 @@ class EstateModel {
       facilities: data["facilities"]
           .map<FacilityModel>((item) => FacilityModel(
               id: item["id"], title: item["translations"][locale]["title"]))
+          .toList(),
+      bookedDays: data["booked_days"]
+          .map<BookingDay>((date) => BookingDay.fromJson(date))
           .toList(),
       userId: data["user"],
       typeId: data["estate_type"],

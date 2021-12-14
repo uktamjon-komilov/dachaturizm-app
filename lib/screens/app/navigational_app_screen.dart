@@ -27,12 +27,23 @@ class _NavigationalAppScreenState extends State<NavigationalAppScreen> {
     UserPageScreen()
   ];
 
+  final List<String> appBarTitles = [
+    "homescreen_appbar_text",
+    "searchpagescreen_appbar_text",
+    "estatecreationscreen_appbar_text",
+    "chatpagescreen_appbar_text",
+    "userpagescreen_appbar_text",
+  ];
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: LocaleText("appbar_text"),
+          title: Consumer<NavigationScreenProvider>(
+              builder: (context, navigator, _) {
+            return LocaleText(appBarTitles[navigator.currentIndex]);
+          }),
           actions: [
             IconButton(
               onPressed: () {},

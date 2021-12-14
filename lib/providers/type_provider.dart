@@ -27,7 +27,7 @@ class EstateTypesProvider with ChangeNotifier {
     const url = "${baseUrl}api/estate-types/";
     // try {
     final response = await http.get(Uri.parse(url));
-    final extractedData = json.decode(response.body) as List;
+    final extractedData = json.decode(utf8.decode(response.bodyBytes)) as List;
     final List<TypeModel> types = [];
     for (var i = 0; i < extractedData.length; i++) {
       TypeModel typeObj = await TypeModel.fromJson(extractedData[i]);

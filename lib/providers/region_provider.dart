@@ -17,7 +17,7 @@ class RegionProvider extends ChangeNotifier {
     List<RegionModel> regions = [];
     final response = await http.get(Uri.parse(url));
     if (response.statusCode >= 200 || response.statusCode < 300) {
-      final extractedData = json.decode(response.body);
+      final extractedData = json.decode(utf8.decode(response.bodyBytes));
       for (int i = 0; i < extractedData.length; i++) {
         RegionModel region = await RegionModel.fromJson(extractedData[i]);
         regions.add(region);

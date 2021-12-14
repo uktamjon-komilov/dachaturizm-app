@@ -26,7 +26,7 @@ class AuthProvider extends ChangeNotifier {
         headers: {"Content-Type": "application/json"},
         body: json.encode({"phone": phone}));
     if (response.statusCode >= 200 || response.statusCode < 300) {
-      return json.decode(response.body);
+      return json.decode(utf8.decode(response.bodyBytes));
     }
     return {"status": false};
   }
@@ -37,7 +37,7 @@ class AuthProvider extends ChangeNotifier {
         headers: {"Content-type": "application/json"},
         body: json.encode({"phone": phone, "code": code}));
     if (response.statusCode >= 200 || response.statusCode < 300) {
-      return json.decode(response.body);
+      return json.decode(utf8.decode(response.bodyBytes));
     }
     return {"status": false};
   }
@@ -54,7 +54,7 @@ class AuthProvider extends ChangeNotifier {
           "last_name": lastName
         }));
     if (response.statusCode >= 200 || response.statusCode < 300) {
-      return json.decode(response.body);
+      return json.decode(utf8.decode(response.bodyBytes));
     }
     return {"status": false};
   }
@@ -66,8 +66,8 @@ class AuthProvider extends ChangeNotifier {
         body: json.encode({"phone": phone, "password": password}));
     if (response.statusCode >= 200 || response.statusCode < 300) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setString("userData", response.body);
-      final data = json.decode(response.body);
+      prefs.setString("userData", utf8.decode(response.bodyBytes));
+      final data = json.decode(utf8.decode(response.bodyBytes));
       // print(data);
       if (data.containsKey("access")) {
         _accessToken = data["access"] as String;
