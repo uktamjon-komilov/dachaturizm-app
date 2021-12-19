@@ -1,13 +1,15 @@
 import 'dart:convert';
 
 import 'package:dachaturizm/constants.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:http/http.dart' as http;
-
 import '../models/type_model.dart';
 
 class EstateTypesProvider with ChangeNotifier {
+  final Dio dio;
   List<TypeModel> _items = [];
+
+  EstateTypesProvider({required this.dio});
 
   List<TypeModel> get items {
     return [..._items];
@@ -26,8 +28,8 @@ class EstateTypesProvider with ChangeNotifier {
   Future<List<TypeModel>> fetchAndSetTypes() async {
     const url = "${baseUrl}api/estate-types/";
     // try {
-    final response = await http.get(Uri.parse(url));
-    final extractedData = json.decode(utf8.decode(response.bodyBytes)) as List;
+    final response = await dio.get(url);
+    final extractedData = response.data;
     final List<TypeModel> types = [];
     for (var i = 0; i < extractedData.length; i++) {
       TypeModel typeObj = await TypeModel.fromJson(extractedData[i]);

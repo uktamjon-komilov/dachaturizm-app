@@ -5,11 +5,13 @@ import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/helpers/locale_helper.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/models/photo_model.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 
 class EstateProvider extends ChangeNotifier {
+  final Dio dio;
+
   Map<int, List<EstateModel>> _estates = {};
   List<EstateModel> _searchedTopEstates = [];
   List<EstateModel> _searchedSimpleEstates = [];
@@ -21,6 +23,8 @@ class EstateProvider extends ChangeNotifier {
     "toPrice": 0.0,
     "facilities": []
   };
+
+  EstateProvider({required this.dio});
 
   Map get estates {
     return {..._estates};
@@ -122,8 +126,8 @@ class EstateProvider extends ChangeNotifier {
 
   Future getData(url) async {
     try {
-      final response = await http.get(Uri.parse(url));
-      final extractedData = json.decode(utf8.decode(response.bodyBytes));
+      final response = await dio.get(url);
+      final extractedData = response.data;
       return extractedData;
     } catch (error) {
       throw error;
@@ -169,9 +173,9 @@ class EstateProvider extends ChangeNotifier {
       url = url + "?" + query;
     }
     List<EstateModel> searchedEstates = [];
-    var response = await http.get(Uri.parse(url));
-    if (response.statusCode >= 200 || response.statusCode < 300) {
-      var extractedData = json.decode(utf8.decode(response.bodyBytes));
+    var response = await dio.get(url);
+    if (response.statusCode as int >= 200 || response.statusCode as int < 300) {
+      var extractedData = json.decode(utf8.decode(response.data));
       while (extractedData.containsKey("results")) {
         List results = extractedData["results"];
         for (int i = 0; i < results.length; i++) {
@@ -182,9 +186,10 @@ class EstateProvider extends ChangeNotifier {
         if (next == "" || next == null) {
           break;
         } else {
-          response = await http.get(Uri.parse(next));
-          if (response.statusCode >= 200 || response.statusCode < 300) {
-            extractedData = json.decode(utf8.decode(response.bodyBytes));
+          response = await dio.get(next);
+          if (response.statusCode as int >= 200 ||
+              response.statusCode as int < 300) {
+            extractedData = json.decode(utf8.decode(response.data));
           }
         }
       }
@@ -342,30 +347,15 @@ class EstateProvider extends ChangeNotifier {
   Future<Map<String, dynamic>> createEstate(Map<String, dynamic> data) async {
     const url = "${baseUrl}api/estate/";
     final locale = await getCurrentLocale();
-    final String accessToken =
-        "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjM5NDg4MTA4LCJqdGkiOiIwMmIxN2MyMzI3Nzg0MzhlODdjMjQ5ZDMzZTkwMjE0YyIsInVzZXJfaWQiOjExfQ.gV0X42eEEabg-9iS8MY2NVW2BbrnIyrO1xgLBVVwZbM";
 
-    http.MultipartRequest request =
-        http.MultipartRequest("POST", Uri.parse(url));
-
-    request.headers["Authorization"] = "Bearer ${accessToken}";
-
-    File photo = data["photo"];
-    var picture = http.MultipartFile.fromBytes(
-        "photo", (await photo.readAsBytes()).buffer.asUint8List(),
-        filename: "testimage.png");
-    request.files.add(picture);
+    Map<String, dynamic> tempData = {};
 
     int i = 0;
     while (data["photos"].length > 0) {
-      print(data["photos"]);
       if (data["photos"].length == i) break;
-      File photo = data["photos"][i];
-      var picture = http.MultipartFile.fromBytes(
-          "photo${i + 1}", (await photo.readAsBytes()).buffer.asUint8List(),
+      var photo = MultipartFile.fromFile(data["photos"][i].path,
           filename: "testimage.png");
-      request.files.add(picture);
-      i += 1;
+      tempData["photo${i + 1}"] = photo;
     }
 
     Map<String, dynamic> translations = {
@@ -387,29 +377,28 @@ class EstateProvider extends ChangeNotifier {
       "title": data["title"],
       "description": data["description"]
     };
-    request.fields["translations"] = json.encode(translations);
-    request.fields["estate_type"] = data["estate_type"];
-    request.fields["price_type"] = data["price_type"];
-    request.fields["beds"] = data["beds"];
-    request.fields["pool"] = data["pool"];
-    request.fields["people"] = data["people"];
-    request.fields["weekday_price"] = data["weekday_price"];
-    request.fields["weekend_price"] = data["weekend_price"];
-    request.fields["address"] = data["address"];
-    request.fields["longtitute"] = data["longtitute"];
-    request.fields["latitute"] = data["latitute"];
-    request.fields["announcer"] = data["announcer"];
-    request.fields["phone"] = data["phone"];
-    request.fields["is_published"] = data["is_published"];
 
-    request.fields["facilities"] = "[${data['facilities'].join(',')}]";
-    request.fields["booked_days"] = "[${data['booked_days'].join(',')}]";
+    tempData["translations"] = json.encode(translations);
+    tempData["estate_type"] = data["estate_type"];
+    tempData["price_type"] = data["price_type"];
+    tempData["beds"] = data["beds"];
+    tempData["pool"] = data["pool"];
+    tempData["people"] = data["people"];
+    tempData["weekday_price"] = data["weekday_price"];
+    tempData["weekend_price"] = data["weekend_price"];
+    tempData["address"] = data["address"];
+    tempData["longtitute"] = data["longtitute"];
+    tempData["latitute"] = data["latitute"];
+    tempData["announcer"] = data["announcer"];
+    tempData["phone"] = data["phone"];
+    tempData["is_published"] = data["is_published"];
+    tempData["facilities"] = "[${data['facilities'].join(',')}]";
+    tempData["booked_days"] = "[${data['booked_days'].join(',')}]";
 
-    print(request.fields);
+    FormData formData = FormData.fromMap(tempData);
+    var response = await dio.post(url, data: formData);
 
-    var response = await http.Response.fromStream(await request.send());
-
-    print(response.body);
+    print(response.data);
     return {"statusCode": response.statusCode};
   }
 }

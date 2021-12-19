@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 
 class NavigationScreenProvider extends ChangeNotifier {
-  int _currentIndex = 2;
+  int _currentIndex = 0;
   Map<String, dynamic> _data = {};
 
   int get currentIndex {

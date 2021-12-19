@@ -2,12 +2,16 @@ import "dart:convert";
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/models/type_model.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
-import "package:http/http.dart" as http;
 
 class BannerProvider extends ChangeNotifier {
+  final Dio dio;
+
   List<EstateModel> _topBanners = [];
   Map<int, List<EstateModel>> _banners = {};
+
+  BannerProvider({required this.dio});
 
   List<EstateModel> get topBanners {
     return [..._topBanners];
@@ -19,10 +23,10 @@ class BannerProvider extends ChangeNotifier {
 
   Future<List<EstateModel>> getAndSetTopBanners() async {
     const url = "${baseUrl}api/estate/topbanners/";
-    final response = await http.get(Uri.parse(url));
-    if (response.statusCode >= 200 || response.statusCode < 300) {
+    final response = await dio.get(url);
+    if (response.statusCode as int >= 200 || response.statusCode as int < 300) {
       _topBanners = [];
-      final extractedData = json.decode(utf8.decode(response.bodyBytes)) as List;
+      final extractedData = response.data;
       for (var i = 0; i < extractedData.length; i++) {
         final banner = await EstateModel.fromJson(extractedData[i]);
         _topBanners.add(banner);
@@ -39,9 +43,10 @@ class BannerProvider extends ChangeNotifier {
     Map<int, List<EstateModel>> banners = {};
     for (var i = 0; i < types.length; i++) {
       final url = "${baseUrl}api/banners/${types[i].slug}/";
-      final response = await http.get(Uri.parse(url));
-      if (response.statusCode >= 200 || response.statusCode < 300) {
-        List extractedData = json.decode(utf8.decode(response.bodyBytes));
+      final response = await dio.get(url);
+      if (response.statusCode as int >= 200 ||
+          response.statusCode as int < 300) {
+        List extractedData = response.data;
         banners[types[i].id] = [];
         for (var j = 0; j < extractedData.length; j++) {
           EstateModel banner =

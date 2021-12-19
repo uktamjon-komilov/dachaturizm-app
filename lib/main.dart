@@ -19,6 +19,8 @@ import 'package:dachaturizm/screens/auth/register_screen.dart';
 import 'package:dachaturizm/screens/auth/login_screen.dart';
 import 'package:dachaturizm/screens/loading/choose_language_screen.dart';
 import 'package:dachaturizm/screens/splash_screen.dart';
+import 'package:dio/dio.dart';
+import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 
@@ -40,6 +42,23 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  Dio dio = Dio();
+
+  @override
+  void initState() {
+    super.initState();
+    dio.interceptors.add(
+      RetryInterceptor(
+        dio: dio,
+        retries: 100,
+        retryDelays: List.generate(
+          100,
+          (index) => Duration(seconds: 2),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return LocaleBuilder(
@@ -49,19 +68,19 @@ class _MyAppState extends State<MyApp> {
             value: AuthProvider(),
           ),
           ChangeNotifierProvider.value(
-            value: BannerProvider(),
+            value: BannerProvider(dio: dio),
           ),
           ChangeNotifierProvider.value(
-            value: EstateTypesProvider(),
+            value: EstateTypesProvider(dio: dio),
           ),
           ChangeNotifierProvider.value(
-            value: EstateProvider(),
+            value: EstateProvider(dio: dio),
           ),
           ChangeNotifierProvider.value(
             value: NavigationScreenProvider(),
           ),
           ChangeNotifierProvider.value(
-            value: FacilityProvider(),
+            value: FacilityProvider(dio: dio),
           ),
           ChangeNotifierProvider.value(
             value: CurrencyProvider(),

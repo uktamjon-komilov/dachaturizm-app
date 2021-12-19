@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_locales/flutter_locales.dart';
 import '../constants.dart';
 
 class FluidBigButton extends StatelessWidget {
