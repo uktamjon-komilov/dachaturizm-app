@@ -28,33 +28,35 @@ class _EstateTypeListViewState extends State<EstateTypeListView> {
     final estateTypesData = Provider.of<EstateTypesProvider>(context);
     final estateTypes = estateTypesData.items;
 
-    return Container(
-      height: (2 * screenHeight / 9),
-      width: double.infinity,
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: defaultPadding / 2),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text1(Locales.string(context, "types")),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: (estateTypes
-                    .map(
-                      (estateType) => EstateTypeItem(
-                        screenWidth: screenWidth,
-                        screenHeight: screenHeight,
-                        item: estateType,
-                      ),
-                    )
-                    .toList()),
+    return estateTypes.length == 0
+        ? Container()
+        : Container(
+            height: (2 * screenHeight / 9),
+            width: double.infinity,
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: defaultPadding / 2),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text1(Locales.string(context, "types")),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: (estateTypes
+                          .map(
+                            (estateType) => EstateTypeItem(
+                              screenWidth: screenWidth,
+                              screenHeight: screenHeight,
+                              item: estateType,
+                            ),
+                          )
+                          .toList()),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
-    );
+          );
   }
 }
 

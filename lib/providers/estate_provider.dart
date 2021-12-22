@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/helpers/locale_helper.dart';
@@ -7,7 +6,6 @@ import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/models/photo_model.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:http/http.dart' as http;
 
 class EstateProvider with ChangeNotifier {
   final Dio dio;
@@ -80,7 +78,8 @@ class EstateProvider with ChangeNotifier {
           }
         }
 
-        if (highestRatedEstate == null) {
+        if (chosenEstates.length == 1) {
+        } else if (highestRatedEstate == null) {
           chosenEstates.removeAt(chosenEstates.length - 1);
         } else {
           chosenEstates.add(highestRatedEstate);

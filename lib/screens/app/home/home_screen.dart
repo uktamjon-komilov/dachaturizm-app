@@ -11,7 +11,7 @@ import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/providers/type_provider.dart';
 import 'package:dachaturizm/screens/app/home/listing_screen.dart';
-import 'package:dachaturizm/screens/widgets/type_row.dart';
+import 'package:dachaturizm/components/type_row.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:provider/provider.dart';
@@ -124,16 +124,18 @@ class _HomePageScreenState extends State<HomePageScreen> {
   Container _buildBannerBlock(BuildContext context, List banners) {
     if (banners.length > 6) banners = banners.sublist(0, 6);
 
-    return Container(
-      height: 190,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        physics: AlwaysScrollableScrollPhysics(),
-        children: [
-          ...banners.map((banner) => _buildBannerItem(banner)).toList()
-        ],
-      ),
-    );
+    return banners.length == 0
+        ? Container()
+        : Container(
+            height: 190,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              physics: AlwaysScrollableScrollPhysics(),
+              children: [
+                ...banners.map((banner) => _buildBannerItem(banner)).toList()
+              ],
+            ),
+          );
   }
 
   Widget _buildBannerItem(EstateModel estate) {
@@ -169,19 +171,24 @@ class _HomePageScreenState extends State<HomePageScreen> {
                           " ${type.title.toLowerCase()}"),
                       TextLinkButton(Locales.string(context, "all"), () {
                         Navigator.of(context).pushNamed(
-                            EstateListingScreen.routeName,
-                            arguments: type.id);
+                          EstateListingScreen.routeName,
+                          arguments: type.id,
+                        );
                       })
                     ],
                   ),
                 ),
                 (topEstates.length > 0)
-                    ? Wrap(
-                        children: [
-                          ...topEstates
-                              .map((estate) => EstateCard(estate: estate))
-                              .toList()
-                        ],
+                    ? Container(
+                        width: 100.w,
+                        child: Wrap(
+                          alignment: WrapAlignment.start,
+                          children: [
+                            ...topEstates
+                                .map((estate) => EstateCard(estate: estate))
+                                .toList(),
+                          ],
+                        ),
                       )
                     : Container(),
                 (banners[type.id].length > 0)

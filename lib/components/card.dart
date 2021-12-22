@@ -31,6 +31,8 @@ class EstateCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(estate);
+
     return Container(
       width: (100.w - 2 * defaultPadding) / 2,
       height: 250,

@@ -145,11 +145,10 @@ class DetailBuilder {
     );
   }
 
-  TableCalendar<dynamic> buildCustomCalendar() {
+  TableCalendar<dynamic> buildCustomCalendar(context) {
     final Set<BookingDay> _selectedDays = Set<BookingDay>();
     for (int i = 0; i < detail.bookedDays.length; i++) {
       _selectedDays.add(detail.bookedDays[i]);
-      print(_selectedDays);
     }
 
     DateTime now = DateTime.now();
@@ -159,7 +158,7 @@ class DetailBuilder {
       firstDay: now,
       lastDay: DateTime.utc(now.year + 1, 12, 31),
       focusedDay: _focusedDay,
-      locale: "uz",
+      locale: Locales.currentLocale(context).toString(),
       headerStyle: HeaderStyle(
         formatButtonVisible: false,
         titleCentered: true,

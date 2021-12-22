@@ -144,7 +144,8 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
                                     context, showCalendar),
                                 _detailBuilder.drawDivider(),
                                 _showCalendar
-                                    ? _detailBuilder.buildCustomCalendar()
+                                    ? _detailBuilder
+                                        .buildCustomCalendar(context)
                                     : SizedBox(),
                                 _detailBuilder.drawDivider(),
                                 _detailBuilder.buildDescription(context),
