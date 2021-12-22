@@ -36,39 +36,6 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
     zoom: 14.0,
   );
 
-  Future _getLocation() async {
-    Location location = new Location();
-
-    bool _serviceEnabled;
-    PermissionStatus _permissionGranted;
-    LocationData _locationData;
-
-    _serviceEnabled = await location.serviceEnabled();
-    if (!_serviceEnabled) {
-      _serviceEnabled = await location.requestService();
-      if (!_serviceEnabled) {
-        return;
-      }
-    }
-
-    _permissionGranted = await location.hasPermission();
-    if (_permissionGranted == PermissionStatus.denied) {
-      _permissionGranted = await location.requestPermission();
-      if (_permissionGranted != PermissionStatus.granted) {
-        return;
-      }
-      return await location.getLocation();
-    }
-
-    _locationData = await location.getLocation();
-    return _locationData;
-  }
-
-  Future<void> _goToMyPosition(myPosition) async {
-    final GoogleMapController controller = await _controller.future;
-    controller.animateCamera(CameraUpdate.newCameraPosition(myPosition));
-  }
-
   @override
   Widget build(BuildContext context) {
     return WillPopScope(

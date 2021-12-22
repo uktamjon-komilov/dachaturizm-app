@@ -33,6 +33,7 @@ class NavigationScreenProvider with ChangeNotifier {
     _data = {
       "search_term": term,
     };
+    notifyListeners();
     changePageIndex(1);
   }
 

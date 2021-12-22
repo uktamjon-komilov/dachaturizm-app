@@ -1,11 +1,18 @@
 import 'dart:async';
 
 import 'package:dachaturizm/constants.dart';
+import 'package:dachaturizm/helpers/get_my_location.dart';
+import 'package:dachaturizm/models/estate_model.dart';
+import 'package:dachaturizm/models/type_model.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
+import 'package:dachaturizm/providers/type_provider.dart';
 import 'package:dachaturizm/screens/app/estate/detail_builders.dart';
 import "package:flutter/material.dart";
+import 'package:flutter_locales/flutter_locales.dart';
+import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
+import 'package:share/share.dart';
 
 class EstateDetailScreen extends StatefulWidget {
   const EstateDetailScreen({Key? key}) : super(key: key);
@@ -21,6 +28,7 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
   var _showCalendar = false;
   var detail;
   var _detailBuilder;
+  var _location;
 
   void showCalendar() {
     setState(() {
@@ -28,7 +36,18 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
     });
   }
 
-  PreferredSizeWidget _buildAppBar() {
+  PreferredSizeWidget _buildAppBar(EstateModel estate) {
+    String share_url = "https://dachaturizm.uz/";
+    String share_title = "Look I have discovered something!";
+    try {
+      List<TypeModel> items =
+          Provider.of<EstateTypesProvider>(context, listen: false).items;
+      TypeModel type = items.where((item) => item.id == estate.typeId).first;
+      share_url = "https://dachaturizm.uz/estate/${type.slug}/${estate.id}/";
+    } catch (e) {
+      share_url = "https://dachaturizm.uz/";
+    }
+
     return AppBar(
       elevation: 0.5,
       backgroundColor: Colors.white,
@@ -36,7 +55,7 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
         color: darkPurple,
       ),
       title: Text(
-        "Tavsif",
+        Locales.string(context, "detail"),
         style: TextStyle(color: darkPurple),
       ),
       centerTitle: true,
@@ -48,7 +67,12 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
       ),
       actions: [
         IconButton(
-          onPressed: () {},
+          onPressed: () {
+            Share.share(
+              share_url,
+              subject: share_title,
+            );
+          },
           icon: Icon(
             Icons.send_rounded,
           ),
@@ -66,16 +90,22 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
   void didChangeDependencies() {
     final Map args = ModalRoute.of(context)?.settings.arguments as Map;
 
-    Future.delayed(Duration.zero).then((_) =>
+    Future.delayed(Duration.zero).then((_) {
+      getLocation().then((location) {
+        _location = location;
         Provider.of<EstateProvider>(context, listen: false)
             .fetchEstateById(args["id"])
-            .then((estate) => setState(() {
-                  detail = estate;
-                  _detailBuilder = DetailBuilder(detail);
-                  Future.delayed(Duration(seconds: 1)).then((_) => setState(() {
-                        isLoading = false;
-                      }));
-                })));
+            .then((estate) {
+          setState(() {
+            detail = estate;
+            _detailBuilder = DetailBuilder(detail);
+            Future.delayed(Duration(seconds: 1)).then((_) => setState(() {
+                  isLoading = false;
+                }));
+          });
+        });
+      });
+    });
 
     super.didChangeDependencies();
   }
@@ -89,7 +119,7 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
 
     return SafeArea(
       child: Scaffold(
-        appBar: _buildAppBar(),
+        appBar: _buildAppBar(detail),
         body: isLoading
             ? Center(
                 child: CircularProgressIndicator(),
@@ -103,33 +133,25 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
                           _detailBuilder.buildSlideShow(),
                           Padding(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: defaultPadding),
+                              horizontal: defaultPadding,
+                            ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 _detailBuilder.buildTitle(),
-                                _detailBuilder.buildRatingRow(),
-                                _detailBuilder.buildPriceRow(showCalendar),
+                                _detailBuilder.buildRatingRow(context),
+                                _detailBuilder.buildPriceRow(
+                                    context, showCalendar),
                                 _detailBuilder.drawDivider(),
                                 _showCalendar
                                     ? _detailBuilder.buildCustomCalendar()
                                     : SizedBox(),
                                 _detailBuilder.drawDivider(),
-                                _detailBuilder.buildDescription(),
-                                _detailBuilder.buildAddressBox(),
+                                _detailBuilder.buildDescription(context),
+                                _detailBuilder.buildAddressBox(
+                                    context, _location),
                                 _detailBuilder.buildChips(),
-                                _detailBuilder.buildAnnouncerBox(),
-                                Divider(
-                                  color: lightGrey,
-                                  thickness: 1,
-                                ),
-                                Center(
-                                  child:
-                                      Text("Detail Screen for ID: ${estateId}"),
-                                ),
-                                SizedBox(
-                                  height: 400,
-                                ),
+                                _detailBuilder.buildAnnouncerBox(context),
                               ],
                             ),
                           ),
@@ -137,7 +159,7 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
                       ),
                     ),
                   ),
-                  _detailBuilder.buildContactBox(halfScreenButtonWidth)
+                  _detailBuilder.buildContactBox(context, halfScreenButtonWidth)
                 ],
               ),
       ),

@@ -21,7 +21,6 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:flutter_spinkit/src/fading_circle.dart';
 
 class EstateCreationPageScreen extends StatefulWidget {
   const EstateCreationPageScreen({Key? key}) : super(key: key);

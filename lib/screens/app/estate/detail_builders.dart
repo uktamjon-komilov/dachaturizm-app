@@ -1,10 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dachaturizm/components/chips.dart';
 import 'package:dachaturizm/constants.dart';
+import 'package:dachaturizm/helpers/calculate_distance.dart';
+import 'package:dachaturizm/helpers/url_helper.dart';
 import 'package:dachaturizm/models/booking_day.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
+import 'package:flutter_locales/flutter_locales.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -15,85 +18,110 @@ class DetailBuilder {
 
   DetailBuilder(this.detail);
 
-  Wrap buildChips() {
-    return Wrap(
-      spacing: 10,
-      runSpacing: 10,
-      children: [
-        ...detail.facilities.map((item) => Chips(item.title)).toList(),
-      ],
-    );
-  }
-
-  Container buildAddressBox() {
-    return Container(
-      padding: EdgeInsets.all(10),
-      margin: EdgeInsets.symmetric(vertical: 20),
-      height: 100,
-      decoration: BoxDecoration(
-        color: lightGrey,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+  Widget buildChips() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: defaultPadding / 2),
+      child: Wrap(
+        spacing: 10,
+        runSpacing: 10,
         children: [
-          Expanded(
-            flex: 2,
-            child: Icon(Icons.share_location_rounded, size: 25),
-          ),
-          Expanded(
-            flex: 9,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  detail.address,
-                  style: TextStyle(
-                      fontSize: 12,
-                      height: 1.33,
-                      fontWeight: FontWeight.w600,
-                      color: darkPurple),
-                ),
-                Text(
-                  "Sizdan 30 km uzoqlikda",
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w400,
-                    color: darkPurple,
-                  ),
-                )
-              ],
-            ),
-          ),
-          Expanded(
-            flex: 10,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Image.network(
-                  "https://www.google.com/maps/d/u/0/thumbnail?mid=1gCp14XBdnEqKjRPIYCzR6MU9oMo&hl=en",
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-          )
+          ...detail.facilities.map((item) => Chips(item.title)).toList(),
         ],
       ),
     );
   }
 
-  Column buildDescription() {
+  Widget buildAddressBox(context, location) {
+    var distance = 0.0;
+    if (location != null) {
+      distance = calculateDistance(detail.latitute, detail.longtitute,
+          location.latitude, location.longitude);
+    }
+
+    return (detail.longtitute == 0.0 && detail.latitute == 0.0)
+        ? Container()
+        : Container(
+            padding: EdgeInsets.all(10),
+            margin: EdgeInsets.symmetric(vertical: 20),
+            height: 100,
+            decoration: BoxDecoration(
+              color: lightGrey,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: Icon(Icons.share_location_rounded, size: 25),
+                ),
+                Expanded(
+                  flex: 9,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        detail.address,
+                        style: TextStyle(
+                            fontSize: 12,
+                            height: 1.33,
+                            fontWeight: FontWeight.w600,
+                            color: darkPurple),
+                      ),
+                      (location == null || distance == 0.0)
+                          ? Container()
+                          : Text(
+                              "${Locales.string(context, 'km_from_you_1')} ${distance} ${Locales.string(context, 'km_from_you_2')}",
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w400,
+                                color: darkPurple,
+                              ),
+                            )
+                    ],
+                  ),
+                ),
+                Expanded(
+                  flex: 10,
+                  child: GestureDetector(
+                    onTap: () {
+                      UrlLauncher.launch(
+                          "https://www.google.com/maps/search/?api=1&query=${detail.longtitute},${detail.latitute}");
+                    },
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Image.network(
+                          "https://www.google.com/maps/d/u/0/thumbnail?mid=1gCp14XBdnEqKjRPIYCzR6MU9oMo&hl=en",
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+              ],
+            ),
+          );
+  }
+
+  Column buildDescription(context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          "Tavsif",
-          style: TextStyle(
-              fontSize: 16, color: darkPurple, fontWeight: FontWeight.w600),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              Locales.string(context, "detail"),
+              style: TextStyle(
+                  fontSize: 16, color: darkPurple, fontWeight: FontWeight.w600),
+            ),
+            Text("ID: #${detail.id}"),
+          ],
         ),
         SizedBox(
           height: 10,
@@ -165,7 +193,7 @@ class DetailBuilder {
     );
   }
 
-  Row buildPriceRow(callback) {
+  Row buildPriceRow(context, callback) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -180,7 +208,7 @@ class DetailBuilder {
         ElevatedButton(
           onPressed: callback,
           child: Text(
-            "Kalendar",
+            Locales.string(context, "calendar"),
             style: TextStyle(color: Colors.white),
           ),
           style: ElevatedButton.styleFrom(
@@ -192,12 +220,13 @@ class DetailBuilder {
     );
   }
 
-  Padding buildRatingRow() {
+  Padding buildRatingRow(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
         children: [
           RatingBar.builder(
+            ignoreGestures: true,
             initialRating: detail.rating,
             minRating: 1,
             direction: Axis.horizontal,
@@ -208,14 +237,12 @@ class DetailBuilder {
               Icons.star,
               color: Colors.amber,
             ),
-            onRatingUpdate: (rating) {
-              print(rating);
-            },
+            onRatingUpdate: (rating) {},
           ),
           SizedBox(
             width: 10,
           ),
-          Text("${detail.rating} Ovoz")
+          Text("${detail.rating} ${Locales.string(context, 'reviews')}")
         ],
       ),
     );
@@ -253,13 +280,13 @@ class DetailBuilder {
         onPageChanged: (value) {
           print('Page changed: $value');
         },
-        autoPlayInterval: 3000,
+        // autoPlayInterval: 3000,
         isLoop: true,
       ),
     );
   }
 
-  Container buildAnnouncerBox() {
+  Container buildAnnouncerBox(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(10),
       margin: EdgeInsets.symmetric(vertical: 20),
@@ -273,9 +300,9 @@ class DetailBuilder {
           CircleAvatar(
             radius: 23,
             child: ClipOval(
-              child: Image.network(
-                "https://www.biography.com/.image/ar_1:1%2Cc_fill%2Ccs_srgb%2Cfl_progressive%2Cq_auto:good%2Cw_1200/MTc5ODc1NTM4NjMyOTc2Mzcz/gettyimages-693134468.jpg",
-              ),
+              child: detail.userPhoto != ""
+                  ? Image.network(fixMediaUrl(detail.userPhoto))
+                  : Image.asset("assets/images/user.png"),
             ),
           ),
           SizedBox(
@@ -286,7 +313,7 @@ class DetailBuilder {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                "Ali Rahmatullayev",
+                detail.announcer,
                 style: TextStyle(
                   color: darkPurple,
                   fontSize: 14,
@@ -297,7 +324,7 @@ class DetailBuilder {
                 height: 3,
               ),
               Text(
-                "${detail.userAdsCount}ta e’lon mavjud",
+                "${detail.userAdsCount} ${Locales.string(context, 'ads_count')}",
                 style: TextStyle(
                   color: darkPurple,
                   fontSize: 12,
@@ -321,7 +348,7 @@ class DetailBuilder {
     );
   }
 
-  Container buildContactBox(double halfScreenButtonWidth) {
+  Container buildContactBox(context, double halfScreenButtonWidth) {
     return Container(
       height: 70,
       padding: EdgeInsets.symmetric(
@@ -344,7 +371,7 @@ class DetailBuilder {
                 padding: EdgeInsets.symmetric(vertical: 10),
                 minimumSize: Size(halfScreenButtonWidth, 50),
               ),
-              child: Text("Xabar yuborish"),
+              child: Text(Locales.string(context, "messaging_with_announcer")),
             ),
           ),
           SizedBox(
@@ -355,10 +382,11 @@ class DetailBuilder {
                 primary: normalOrange,
                 onPrimary: Colors.white,
                 elevation: 0,
+                shadowColor: Colors.transparent,
                 padding: EdgeInsets.symmetric(vertical: 10),
                 minimumSize: Size(halfScreenButtonWidth, 50)),
-            onPressed: () => UrlLauncher.launch("tel://+998995175347"),
-            child: Text("Qo'ng'iroq qilish"),
+            onPressed: () => UrlLauncher.launch("tel://${detail.phone}"),
+            child: Text(Locales.string(context, "direct_call")),
           )
         ],
       ),

@@ -52,5 +52,13 @@
     "top_estates": "Top estates",
     "simple_estates": "Simple estates",
     "no_results": "We couldn't find any results",
-    "search_results": "Search results"
+    "search_results": "Search results",
+    "reviews": "Reviews",
+    "ads_count": "ads",
+    "detail": "Detail",
+    "calendar": "Calendar",
+    "messaging_with_announcer": "Send a message",
+    "direct_call": "Make a call",
+    "km_from_you_1": "",
+    "km_from_you_2": "km away from you"
 }

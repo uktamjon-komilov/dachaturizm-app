@@ -23,7 +23,6 @@ class SearchPageScreen extends StatefulWidget {
 
 class _SearchPageScreenState extends State<SearchPageScreen> {
   bool _isLoading = false;
-  bool _isSearched = false;
   TextEditingController _searchController = TextEditingController();
   FocusNode _searchFocusNode = FocusNode();
 
@@ -70,8 +69,6 @@ class _SearchPageScreenState extends State<SearchPageScreen> {
   Future<void> _search(value) async {
     Map<String, dynamic> filters =
         Provider.of<EstateProvider>(context, listen: false).searchFilters;
-    print(filters);
-    print(value);
     setState(() {
       _isLoading = true;
     });
@@ -80,16 +77,12 @@ class _SearchPageScreenState extends State<SearchPageScreen> {
         .then((_) {
       setState(() {
         _isLoading = false;
-        _isSearched = true;
       });
     });
   }
 
   void _unsearch() async {
     Provider.of<EstateProvider>(context, listen: false).unsetSearchedResults();
-    setState(() {
-      _isSearched = false;
-    });
     FocusScope.of(context).requestFocus(_searchFocusNode);
   }
 
@@ -103,11 +96,12 @@ class _SearchPageScreenState extends State<SearchPageScreen> {
     List<EstateModel> allEstates =
         Provider.of<EstateProvider>(context, listen: false).searchedAllEstates;
     Map<String, dynamic> data =
-        Provider.of<NavigationScreenProvider>(context, listen: false).data;
+        Provider.of<NavigationScreenProvider>(context).data;
     String term = data.containsKey("search_term") ? data["search_term"] : "";
 
     bool hasFilters =
         Provider.of<EstateProvider>(context, listen: false).hasFilters;
+
 
     if (term != "") {
       Provider.of<NavigationScreenProvider>(context, listen: false).clearData();

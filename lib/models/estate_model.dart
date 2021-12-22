@@ -14,6 +14,7 @@ class EstateModel {
   final double rating;
   final int views;
   final int userAdsCount;
+  final String userPhoto;
   final String photo;
   final List<EstatePhotos> photos;
   final int beds;
@@ -46,6 +47,7 @@ class EstateModel {
     this.announcer = "",
     this.phone = "",
     this.userAdsCount = 0,
+    this.userPhoto = "",
     this.photo = "",
     this.userId = 0,
     this.typeId = 0,
@@ -76,10 +78,13 @@ class EstateModel {
       people: data["people"],
       weekdayPrice: data["weekday_price"],
       weekendPrice: data["weekend_price"],
+      longtitute: data["longtitute"],
+      latitute: data["latitute"],
       address: data["address"],
       announcer: data["announcer"],
       phone: data["phone"],
       userAdsCount: data["user_ads_count"],
+      userPhoto: data["user_photo"] ?? "",
       photo: fixMediaUrl(data["photo"]),
       photos: data["photos"]
           .map<EstatePhotos>((item) =>

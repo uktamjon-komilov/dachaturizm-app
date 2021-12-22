@@ -52,5 +52,13 @@
     "top_estates": "Топ объявления",
     "simple_estates": "Простые объявления",
     "no_results": "Мы не смогли найти никаких результатов",
-    "search_results": "Результаты поиска"
+    "search_results": "Результаты поиска",
+    "reviews": "Отзывы",
+    "ads_count": "объявления",
+    "detail": "Описание",
+    "calendar": "Календарь",
+    "messaging_with_announcer": "Отправить сообщение",
+    "direct_call": "Позвонить",
+    "km_from_you_1": "",
+    "km_from_you_2": "км от вас"
 }
