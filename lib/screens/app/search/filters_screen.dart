@@ -26,6 +26,7 @@ class SearchFilersScreen extends StatefulWidget {
 
 class _SearchFilersScreenState extends State<SearchFilersScreen> {
   bool _isLoading = true;
+  bool _isInit = false;
   Map<int, bool> _checks = {};
   CurrencyModel _currentCurrency = CurrencyModel(id: 0, title: "UZS");
   int indexZero = 0;
@@ -61,9 +62,12 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
   }
 
   @override
-  void didChangeDependencies() {
-    _fetchAll();
-    super.didChangeDependencies();
+  void initState() {
+    if (!_isInit) {
+      _fetchAll();
+      _isInit = true;
+    }
+    super.initState();
   }
 
   @override
@@ -83,8 +87,6 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
           (regions.firstWhere((region) => region.title == filters["region"]).id)
               .toString();
     }
-
-    print(filters);
 
     return SafeArea(
       child: Scaffold(

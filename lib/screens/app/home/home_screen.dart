@@ -29,46 +29,45 @@ class HomePageScreen extends StatefulWidget {
 class _HomePageScreenState extends State<HomePageScreen> {
   bool _isLoading = true;
   TextEditingController _searchController = TextEditingController();
+  FocusNode _searchFocusNode = FocusNode();
 
   @override
-  void didChangeDependencies() {
-    _refreshHomePage();
-    super.didChangeDependencies();
+  void initState() {
+    Future.delayed(Duration.zero).then((_) {
+      _refreshHomePage();
+    });
+    super.initState();
   }
 
   Future<void> _refreshHomePage() async {
     setState(() {
       _isLoading = true;
     });
-    Future.delayed(Duration.zero).then((_) {
-      Provider.of<BannerProvider>(context, listen: false)
-          .getAndSetTopBanners()
-          .then((_) {
-        Provider.of<EstateTypesProvider>(context, listen: false)
-            .fetchAndSetTypes()
-            .then(
-          (types) {
-            Provider.of<BannerProvider>(context, listen: false)
-                .getAndSetBanners(types)
-                .then((banners) {
-              Provider.of<EstateProvider>(context, listen: false)
-                  .fetchAllAndSetEstates()
-                  .then(
-                    (_) => setState(() {
-                      _isLoading = false;
-                    }),
-                  );
+    Provider.of<BannerProvider>(context, listen: false)
+        .getAndSetTopBanners()
+        .then((_) {
+      Provider.of<EstateTypesProvider>(context, listen: false)
+          .fetchAndSetTypes()
+          .then(
+        (types) {
+          Provider.of<BannerProvider>(context, listen: false)
+              .getAndSetBanners(types)
+              .then((banners) {
+            Provider.of<EstateProvider>(context, listen: false)
+                .fetchAllAndSetEstates()
+                .then((_) {
+              setState(() {
+                _isLoading = false;
+              });
             });
-          },
-        );
-      });
+          });
+        },
+      );
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    FocusScope.of(context).requestFocus(FocusNode());
-
     return Scaffold(
       body: _isLoading
           ? Center(
@@ -83,7 +82,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
                   children: [
                     SearchBar(
                       controller: _searchController,
-                      focusNode: FocusNode(),
                       onSubmit: (value) {
                         if (value != "") {
                           String term = _searchController.text;

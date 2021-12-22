@@ -31,12 +31,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void didChangeDependencies() {
-    _phoneFocusNode.addListener(() {
-      setState(() {});
-    });
-    _passwordFocusNode.addListener(() {
-      setState(() {});
-    });
+    // _phoneFocusNode.addListener(() {
+    //   setState(() {});
+    // });
+    // _passwordFocusNode.addListener(() {
+    //   setState(() {});
+    // });
     super.didChangeDependencies();
   }
 
@@ -44,6 +44,8 @@ class _LoginScreenState extends State<LoginScreen> {
   void dispose() {
     _phoneFocusNode.dispose();
     _passwordFocusNode.dispose();
+    _phoneController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
@@ -53,103 +55,105 @@ class _LoginScreenState extends State<LoginScreen> {
       child: Scaffold(
         body: Padding(
           padding: const EdgeInsets.all(defaultPadding),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              LocaleText(
-                "log_in",
-                style: TextStyle(
-                  fontSize: 25,
-                  color: normalOrange,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              SizedBox(
-                height: 60,
-              ),
-              TextFormField(
-                focusNode: _phoneFocusNode,
-                controller: _phoneController,
-                inputFormatters: [
-                  MaskTextInputFormatter(mask: "+998 ## ### ## ##")
-                ],
-                decoration: InputDecoration(
-                  border: InputStyles.inputBorder(),
-                  focusedBorder: InputStyles.focusBorder(),
-                  prefixIcon: Icon(
-                    Icons.phone_outlined,
+          child: Form(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                LocaleText(
+                  "log_in",
+                  style: TextStyle(
+                    fontSize: 25,
+                    color: normalOrange,
+                    fontWeight: FontWeight.w700,
                   ),
-                  hintText: Locales.string(context, "phone_number_hint"),
                 ),
-                keyboardType: TextInputType.number,
-                onFieldSubmitted: (value) {
-                  FocusScope.of(context).requestFocus(_passwordFocusNode);
-                },
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              TextField(
-                focusNode: _passwordFocusNode,
-                controller: _passwordController,
-                decoration: InputDecoration(
-                  border: InputStyles.inputBorder(),
-                  focusedBorder: InputStyles.focusBorder(),
-                  prefixIcon: Icon(
-                    Icons.lock,
-                  ),
-                  hintText: Locales.string(context, "password_hint"),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      Icons.remove_red_eye,
+                SizedBox(
+                  height: 60,
+                ),
+                TextFormField(
+                  focusNode: _phoneFocusNode,
+                  controller: _phoneController,
+                  inputFormatters: [
+                    MaskTextInputFormatter(mask: "+998 ## ### ## ##")
+                  ],
+                  decoration: InputDecoration(
+                    border: InputStyles.inputBorder(),
+                    focusedBorder: InputStyles.focusBorder(),
+                    prefixIcon: Icon(
+                      Icons.phone_outlined,
                     ),
-                    onPressed: () {
-                      setState(() {
-                        _hidePassword = !_hidePassword;
-                      });
-                    },
+                    hintText: Locales.string(context, "phone_number_hint"),
                   ),
+                  keyboardType: TextInputType.number,
+                  onFieldSubmitted: (value) {
+                    FocusScope.of(context).requestFocus(_passwordFocusNode);
+                  },
                 ),
-                obscureText: _hidePassword,
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              TextLinkButton(
-                  Locales.string(context, "forgot_password?"), () {}),
-              SizedBox(
-                height: 32,
-              ),
-              FluidBigButton(Locales.string(context, "log_in"), onPress: () {
-                String phone = _phoneController.text.replaceAll(" ", "");
-                String password = _passwordController.text;
-                Provider.of<AuthProvider>(context, listen: false)
-                    .login(phone, password)
-                    .then((value) {
-                  if (value.containsKey("status") && !value["status"]) {
-                    print("You cannot log in!");
-                  }
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                      NavigationalAppScreen.routeName, (route) => false);
-                });
-              }),
-              SizedBox(
-                height: 24,
-              ),
-              Wrap(
-                children: [
-                  LocaleText(
-                    "no_profile?",
-                    style: TextStyle(fontSize: 16),
+                SizedBox(
+                  height: 20,
+                ),
+                TextField(
+                  focusNode: _passwordFocusNode,
+                  controller: _passwordController,
+                  decoration: InputDecoration(
+                    border: InputStyles.inputBorder(),
+                    focusedBorder: InputStyles.focusBorder(),
+                    prefixIcon: Icon(
+                      Icons.lock,
+                    ),
+                    hintText: Locales.string(context, "password_hint"),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        Icons.remove_red_eye,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _hidePassword = !_hidePassword;
+                        });
+                      },
+                    ),
                   ),
-                  SizedBox(width: 10),
-                  TextLinkButton(Locales.string(context, "register"), () {
-                    Navigator.of(context)
-                        .pushReplacementNamed(RegisterScreen.routeName);
-                  }),
-                ],
-              )
-            ],
+                  obscureText: _hidePassword,
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                TextLinkButton(
+                    Locales.string(context, "forgot_password?"), () {}),
+                SizedBox(
+                  height: 32,
+                ),
+                FluidBigButton(Locales.string(context, "log_in"), onPress: () {
+                  String phone = _phoneController.text.replaceAll(" ", "");
+                  String password = _passwordController.text;
+                  Provider.of<AuthProvider>(context, listen: false)
+                      .login(phone, password)
+                      .then((value) {
+                    if (value.containsKey("status") && !value["status"]) {
+                      print("You cannot log in!");
+                    }
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                        NavigationalAppScreen.routeName, (route) => false);
+                  });
+                }),
+                SizedBox(
+                  height: 24,
+                ),
+                Wrap(
+                  children: [
+                    LocaleText(
+                      "no_profile?",
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    SizedBox(width: 10),
+                    TextLinkButton(Locales.string(context, "register"), () {
+                      Navigator.of(context)
+                          .pushReplacementNamed(RegisterScreen.routeName);
+                    }),
+                  ],
+                )
+              ],
+            ),
           ),
         ),
       ),

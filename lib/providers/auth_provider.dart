@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import "package:http/http.dart" as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-class AuthProvider extends ChangeNotifier {
+class AuthProvider with ChangeNotifier {
   String _accessToken = "";
   int _userId = 0;
 

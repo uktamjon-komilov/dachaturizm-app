@@ -125,5 +125,11 @@
 		<string>
 			Microphone Usage Description
 		</string>
+		<key>
+			UIBackgroundModes
+		</key>
+		<string>
+			location
+		</string>
 	</dict>
 </plist>

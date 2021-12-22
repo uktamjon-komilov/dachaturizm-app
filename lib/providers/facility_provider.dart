@@ -6,7 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import "package:http/http.dart" as http;
 
-class FacilityProvider extends ChangeNotifier {
+class FacilityProvider with ChangeNotifier {
   final Dio dio;
   List<FacilityModel> _facilities = [];
 

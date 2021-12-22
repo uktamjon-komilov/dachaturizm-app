@@ -1,11 +1,11 @@
-import "dart:convert";
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/models/type_model.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
+import "package:http/http.dart" as http;
 
-class BannerProvider extends ChangeNotifier {
+class BannerProvider with ChangeNotifier {
   final Dio dio;
 
   List<EstateModel> _topBanners = [];
@@ -34,7 +34,7 @@ class BannerProvider extends ChangeNotifier {
     } else {
       _topBanners = [];
     }
-    notifyListeners();
+    // notifyListeners();
     return _topBanners;
   }
 

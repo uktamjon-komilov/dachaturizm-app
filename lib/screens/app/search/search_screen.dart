@@ -99,19 +99,15 @@ class _SearchPageScreenState extends State<SearchPageScreen> {
   }
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     List<EstateModel> allEstates =
         Provider.of<EstateProvider>(context, listen: false).searchedAllEstates;
     Map<String, dynamic> data =
-        Provider.of<NavigationScreenProvider>(context).data;
+        Provider.of<NavigationScreenProvider>(context, listen: false).data;
     String term = data.containsKey("search_term") ? data["search_term"] : "";
 
-    bool hasFilters = Provider.of<EstateProvider>(context).hasFilters;
+    bool hasFilters =
+        Provider.of<EstateProvider>(context, listen: false).hasFilters;
 
     if (term != "") {
       Provider.of<NavigationScreenProvider>(context, listen: false).clearData();

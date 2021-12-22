@@ -12,6 +12,7 @@ import 'package:dachaturizm/providers/currency_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/facility_provider.dart';
 import 'package:dachaturizm/providers/type_provider.dart';
+import 'package:dachaturizm/screens/app/estate/location_picker_screen.dart';
 import 'package:flutter/cupertino.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_locales/flutter_locales.dart';
@@ -60,6 +61,9 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
   TextEditingController _weekendPriceController = TextEditingController();
   int _currentCurrencyId = 0;
   List<int> _facilities = [];
+  double _longtitude = 0.0;
+  double _latitute = 0.0;
+  String _locationName = "";
 
   List<String> get _bookedDays {
     return _selectedDays.map((day) => day.date).toList();
@@ -255,23 +259,88 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     );
   }
 
-  ClipRRect _buildLocationPicker() {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: Container(
-        width: 100.w,
-        height: 150,
-        child: ColorFiltered(
-          colorFilter: ColorFilter.mode(
-            Colors.black.withOpacity(0.2),
-            BlendMode.darken,
-          ),
-          child: Image.asset(
-            "assets/images/default_map_placeholder.png",
-            fit: BoxFit.cover,
-          ),
-        ),
-      ),
+  _showGoogleMap(BuildContext context) async {
+    final data = await Navigator.push(context,
+        MaterialPageRoute(builder: (context) => LocationPickerScreen()));
+    print(data);
+    setState(() {
+      _longtitude = data["position"].longitude;
+      _latitute = data["position"].latitude;
+      if (data["street"] != "" &&
+          data["subAdministrativeArea"] != "" &&
+          data["administrativeArea"] != "" &&
+          data["country"] != "") {
+        _locationName = data["street"] +
+            ", " +
+            data["subAdministrativeArea"] +
+            ", " +
+            data["administrativeArea"] +
+            ", " +
+            data["country"];
+        _addressController.text = _locationName;
+      } else {
+        _locationName = "";
+        _addressController.text = "";
+      }
+    });
+  }
+
+  Widget _buildLocationPicker() {
+    return GestureDetector(
+      onTap: () async {
+        _showGoogleMap(context);
+      },
+      child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: Stack(
+            children: [
+              Container(
+                width: 100.w,
+                height: 150,
+                child: ColorFiltered(
+                  colorFilter: ColorFilter.mode(
+                    Colors.black.withOpacity(0.4),
+                    BlendMode.darken,
+                  ),
+                  child: Image.asset(
+                    "assets/images/default_map_placeholder.png",
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+              Positioned(
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: defaultPadding),
+                  height: 150,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          _locationName,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        _locationName == ""
+                            ? "Please, tap to show your location on the map"
+                            : "Please, tap to change your location",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          )),
     );
   }
 

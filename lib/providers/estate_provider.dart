@@ -9,7 +9,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 
-class EstateProvider extends ChangeNotifier {
+class EstateProvider with ChangeNotifier {
   final Dio dio;
 
   Map<int, List<EstateModel>> _estates = {};
@@ -121,7 +121,6 @@ class EstateProvider extends ChangeNotifier {
     //   print(error);
     // }
     // print(_estates);
-    notifyListeners();
   }
 
   Future getData(url) async {
@@ -175,7 +174,7 @@ class EstateProvider extends ChangeNotifier {
     List<EstateModel> searchedEstates = [];
     var response = await dio.get(url);
     if (response.statusCode as int >= 200 || response.statusCode as int < 300) {
-      var extractedData = json.decode(utf8.decode(response.data));
+      var extractedData = response.data;
       while (extractedData.containsKey("results")) {
         List results = extractedData["results"];
         for (int i = 0; i < results.length; i++) {
@@ -189,7 +188,7 @@ class EstateProvider extends ChangeNotifier {
           response = await dio.get(next);
           if (response.statusCode as int >= 200 ||
               response.statusCode as int < 300) {
-            extractedData = json.decode(utf8.decode(response.data));
+            extractedData = response.data;
           }
         }
       }
@@ -398,7 +397,7 @@ class EstateProvider extends ChangeNotifier {
     FormData formData = FormData.fromMap(tempData);
     var response = await dio.post(url, data: formData);
 
-    print(response.data);
+    // print(response.data);
     return {"statusCode": response.statusCode};
   }
 }

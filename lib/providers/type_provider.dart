@@ -36,7 +36,6 @@ class EstateTypesProvider with ChangeNotifier {
       types.add(typeObj);
     }
     _items = types;
-    notifyListeners();
     // } catch (error) {
     //   print(error);
     // }

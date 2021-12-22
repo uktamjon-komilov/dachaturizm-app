@@ -2,11 +2,15 @@ import 'dart:convert';
 
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/models/currency_model.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import "package:http/http.dart" as http;
 
-class CurrencyProvider extends ChangeNotifier {
+class CurrencyProvider with ChangeNotifier {
+  final Dio dio;
   List<CurrencyModel> _currencies = [];
+
+  CurrencyProvider({required this.dio});
 
   List<CurrencyModel> get currencies {
     return [..._currencies];
@@ -15,13 +19,12 @@ class CurrencyProvider extends ChangeNotifier {
   Future<List<CurrencyModel>> fetchAndSetCurrencies() async {
     const url = "${baseUrl}api/currencies/";
     List<CurrencyModel> currencies = [];
-    final response = await http.get(Uri.parse(url));
-    if (response.statusCode >= 200 || response.statusCode < 300) {
-      var extractedData = json.decode(utf8.decode(response.bodyBytes));
+    final response = await dio.get(url);
+    if (response.statusCode as int >= 200 || response.statusCode as int < 300) {
+      var extractedData = response.data;
       for (int i = 0; i < extractedData.length; i++) {
         CurrencyModel currency = await CurrencyModel.fromJson(extractedData[i]);
         currencies.add(currency);
-        print(extractedData[i]);
       }
     }
     _currencies = currencies;

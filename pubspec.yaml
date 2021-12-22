@@ -55,6 +55,10 @@ dependencies:
   dio: ^4.0.4
   dio_smart_retry: ^1.1.0
   connectivity: ^3.0.6
+  google_maps_flutter: ^2.1.1
+  geolocator: ^8.0.1
+  location: ^4.3.0
+  geocoding: ^2.0.1
 
 
 dev_dependencies:

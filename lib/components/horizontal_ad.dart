@@ -17,8 +17,6 @@ class HorizontalAd extends StatelessWidget {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
 
-    print(estate);
-
     return GestureDetector(
       onTap: () {
         Navigator.of(context).pushNamed(EstateDetailScreen.routeName,

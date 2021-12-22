@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sizer/sizer.dart';
 
 class EstateListingScreen extends StatefulWidget {
   const EstateListingScreen({Key? key}) : super(key: key);
@@ -28,25 +29,25 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
 
   @override
   void initState() {
+    Future.delayed(Duration.zero).then((_) {
+      _refreshAction();
+    });
     super.initState();
-    _refreshAction();
   }
 
   Future<void> _refreshAction() async {
     setState(() {
       _isLoading = true;
     });
-    Future.delayed(Duration.zero).then((_) {
-      Provider.of<EstateProvider>(context, listen: false)
-          .fetchAllAndSetEstates()
-          .then((value) {
-        setState(() {
-          _isLoading = false;
-        });
+    Provider.of<EstateProvider>(context, listen: false)
+        .fetchAllAndSetEstates()
+        .then((value) {
+      setState(() {
+        _isLoading = false;
       });
     });
     _searchController.text = "";
-    _unsearch();
+    // _unsearch();
   }
 
   Future<void> _search(slug, value) async {
@@ -76,18 +77,14 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    MediaQueryData queryData;
-    queryData = MediaQuery.of(context);
-    final int screenWidth = queryData.size.width.toInt();
-    final int screenHeight = queryData.size.height.toInt();
-
     final int estateTypeId = ModalRoute.of(context)!.settings.arguments as int;
     final List topEstates = _isSearched
-        ? Provider.of<EstateProvider>(context).searchedTopEstates
+        ? Provider.of<EstateProvider>(context, listen: false).searchedTopEstates
         : Provider.of<EstateProvider>(context, listen: false)
             .getEstatesByType(estateTypeId, top: true);
     final List simpleEstates = _isSearched
-        ? Provider.of<EstateProvider>(context).searchedSimpleEstates
+        ? Provider.of<EstateProvider>(context, listen: false)
+            .searchedSimpleEstates
         : Provider.of<EstateProvider>(context, listen: false)
             .getEstatesByType(estateTypeId);
     final estateType = Provider.of<EstateTypesProvider>(context, listen: false)
@@ -105,7 +102,7 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
               onRefresh: _refreshAction,
               child: Container(
                 height: (topEstates.length == 0 && simpleEstates.length == 0)
-                    ? screenHeight - 4 * defaultPadding
+                    ? 100.h - 4 * defaultPadding
                     : null,
                 padding: EdgeInsets.symmetric(horizontal: defaultPadding),
                 child: SingleChildScrollView(

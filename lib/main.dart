@@ -7,6 +7,7 @@ import 'package:dachaturizm/providers/facility_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/providers/region_provider.dart';
 import 'package:dachaturizm/screens/app/estate/estate_detail_screen.dart';
+import 'package:dachaturizm/screens/app/estate/location_picker_screen.dart';
 import 'package:dachaturizm/screens/app/home/home_screen.dart';
 import 'package:dachaturizm/screens/app/home/listing_screen.dart';
 import 'package:dachaturizm/screens/app/navigational_app_screen.dart';
@@ -83,7 +84,7 @@ class _MyAppState extends State<MyApp> {
             value: FacilityProvider(dio: dio),
           ),
           ChangeNotifierProvider.value(
-            value: CurrencyProvider(),
+            value: CurrencyProvider(dio: dio),
           ),
           ChangeNotifierProvider.value(
             value: RegionProvider(),
@@ -123,6 +124,8 @@ class _MyAppState extends State<MyApp> {
               OTPConfirmationScreen.routeName: (context) =>
                   OTPConfirmationScreen(),
               CreateProfileScreen.routeName: (context) => CreateProfileScreen(),
+              LocationPickerScreen.routeName: (context) =>
+                  LocationPickerScreen(),
               LoginScreen.routeName: (context) => LoginScreen(),
               HomePageScreen.routeName: (context) => HomePageScreen(),
               NavigationalAppScreen.routeName: (context) =>

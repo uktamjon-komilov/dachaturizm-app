@@ -5,7 +5,7 @@ import 'package:dachaturizm/models/region_model.dart';
 import 'package:flutter/material.dart';
 import "package:http/http.dart" as http;
 
-class RegionProvider extends ChangeNotifier {
+class RegionProvider with ChangeNotifier {
   List<RegionModel> _regions = [];
 
   List<RegionModel> get regions {

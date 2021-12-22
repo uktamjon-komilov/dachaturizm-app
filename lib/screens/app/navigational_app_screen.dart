@@ -5,20 +5,14 @@ import 'package:dachaturizm/screens/app/estate/create_estate_screen.dart';
 import 'package:dachaturizm/screens/app/home/home_screen.dart';
 import 'package:dachaturizm/screens/app/search/search_screen.dart';
 import 'package:dachaturizm/screens/app/user/user_screen.dart';
+import 'package:dachaturizm/screens/auth/login_screen.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:provider/provider.dart';
 
-class NavigationalAppScreen extends StatefulWidget {
-  const NavigationalAppScreen({Key? key}) : super(key: key);
-
+class NavigationalAppScreen extends StatelessWidget {
   static String routeName = "/navigational-app";
 
-  @override
-  _NavigationalAppScreenState createState() => _NavigationalAppScreenState();
-}
-
-class _NavigationalAppScreenState extends State<NavigationalAppScreen> {
   final _screens = [
     HomePageScreen(),
     SearchPageScreen(),
@@ -63,12 +57,12 @@ class _NavigationalAppScreenState extends State<NavigationalAppScreen> {
             );
           },
         ),
-        bottomNavigationBar: _buildBottomNavigation(),
+        bottomNavigationBar: _buildBottomNavigation(context),
       ),
     );
   }
 
-  BottomNavigationBar _buildBottomNavigation() {
+  Widget _buildBottomNavigation(BuildContext context) {
     return BottomNavigationBar(
       showSelectedLabels: false,
       showUnselectedLabels: false,
@@ -80,7 +74,12 @@ class _NavigationalAppScreenState extends State<NavigationalAppScreen> {
               .clearData();
         }
         Provider.of<NavigationScreenProvider>(context, listen: false)
-            .changePageIndex(index);
+            .changePageIndex(index, () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => LoginScreen()),
+          );
+        });
       },
       items: [
         BottomNavigationBarItem(
