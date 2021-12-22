@@ -105,8 +105,9 @@ class _HomePageScreenState extends State<HomePageScreen> {
                                   .topBanners,
                             ),
                             EstateTypeListView(),
-                            ...Provider.of<EstateTypesProvider>(context,
-                                    listen: false)
+                            ...Provider.of<EstateTypesProvider>(
+                              context,
+                            )
                                 .items
                                 .map((item) => _buildEstateTypeBlock(item))
                                 .toList(),

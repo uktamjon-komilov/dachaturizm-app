@@ -85,7 +85,6 @@ class EstateProvider with ChangeNotifier {
           chosenEstates.add(highestRatedEstate);
         }
       }
-
       return chosenEstates;
     }
     return [];

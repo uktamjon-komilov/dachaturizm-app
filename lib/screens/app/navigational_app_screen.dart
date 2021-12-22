@@ -1,4 +1,5 @@
 import 'package:dachaturizm/constants.dart';
+import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/screens/app/chat/chat_screen.dart';
 import 'package:dachaturizm/screens/app/estate/create_estate_screen.dart';
@@ -10,9 +11,14 @@ import "package:flutter/material.dart";
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:provider/provider.dart';
 
-class NavigationalAppScreen extends StatelessWidget {
+class NavigationalAppScreen extends StatefulWidget {
   static String routeName = "/navigational-app";
 
+  @override
+  State<NavigationalAppScreen> createState() => _NavigationalAppScreenState();
+}
+
+class _NavigationalAppScreenState extends State<NavigationalAppScreen> {
   final _screens = [
     HomePageScreen(),
     SearchPageScreen(),
@@ -28,6 +34,14 @@ class NavigationalAppScreen extends StatelessWidget {
     "chatpagescreen_appbar_text",
     "userpagescreen_appbar_text",
   ];
+
+  @override
+  void initState() {
+    Future.delayed(Duration.zero).then((_) {
+      Provider.of<AuthProvider>(context).getAccessToken();
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -34,7 +34,6 @@ class BannerProvider with ChangeNotifier {
     } else {
       _topBanners = [];
     }
-    // notifyListeners();
     return _topBanners;
   }
 

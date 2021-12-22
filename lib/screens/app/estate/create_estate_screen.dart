@@ -261,7 +261,6 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
   _showGoogleMap(BuildContext context) async {
     final data = await Navigator.push(context,
         MaterialPageRoute(builder: (context) => LocationPickerScreen()));
-    print(data);
     setState(() {
       _longtitude = data["position"].longitude;
       _latitute = data["position"].latitude;

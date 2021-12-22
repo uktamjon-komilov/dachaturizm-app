@@ -13,6 +13,7 @@ import 'package:dachaturizm/screens/app/home/listing_screen.dart';
 import 'package:dachaturizm/screens/app/navigational_app_screen.dart';
 import 'package:dachaturizm/screens/app/search/filters_screen.dart';
 import 'package:dachaturizm/screens/app/user/change_language.dart';
+import 'package:dachaturizm/screens/app/user/my_announcements_screen.dart';
 import 'package:dachaturizm/screens/auth/auth_type_screen.dart';
 import 'package:dachaturizm/screens/auth/create_profile_screen.dart';
 import 'package:dachaturizm/screens/auth/otp_confirmation_screen.dart';
@@ -66,7 +67,7 @@ class _MyAppState extends State<MyApp> {
       builder: (locale) => MultiProvider(
         providers: [
           ChangeNotifierProvider.value(
-            value: AuthProvider(),
+            value: AuthProvider(dio: dio),
           ),
           ChangeNotifierProvider.value(
             value: BannerProvider(dio: dio),
@@ -135,6 +136,7 @@ class _MyAppState extends State<MyApp> {
               EstateListingScreen.routeName: (context) => EstateListingScreen(),
               SearchFilersScreen.routeName: (context) => SearchFilersScreen(),
               EstateDetailScreen.routeName: (context) => EstateDetailScreen(),
+              MyAnnouncements.routeName: (context) => MyAnnouncements(),
               ChangeLanguage.routeName: (context) => ChangeLanguage(),
             },
           ),

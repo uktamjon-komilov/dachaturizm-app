@@ -1,7 +1,13 @@
 import 'package:dachaturizm/constants.dart';
+import 'package:dachaturizm/helpers/url_helper.dart';
+import 'package:dachaturizm/models/user_model.dart';
+import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/screens/app/user/change_language.dart';
+import 'package:dachaturizm/screens/app/user/my_announcements_screen.dart';
+import 'package:dachaturizm/screens/auth/login_screen.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_locales/flutter_locales.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 class UserPageScreen extends StatefulWidget {
@@ -12,24 +18,15 @@ class UserPageScreen extends StatefulWidget {
 }
 
 class _UserPageScreenState extends State<UserPageScreen> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Container(
-          // padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildUserDetails(),
-              Divider(),
-              _buildProfileList(),
-              Divider(),
-            ],
-          ),
-        ),
-      ),
-    );
+  Future callWithAuth(Function? callback) async {
+    final access = await Provider.of<AuthProvider>(context, listen: false)
+        .getAccessToken();
+    if (access != "") {
+      if (callback != null) callback();
+    } else {
+      await Provider.of<AuthProvider>(context, listen: false).logout();
+      Navigator.of(context).pushNamed(LoginScreen.routeName);
+    }
   }
 
   Column _buildProfileList() {
@@ -46,37 +43,56 @@ class _UserPageScreenState extends State<UserPageScreen> {
         ProfileListItem(
           title: "my_estates",
           icon: Icon(Icons.notes),
-          callback: () {},
+          callback: () async {
+            callWithAuth(() {
+              Navigator.of(context).pushNamed(MyAnnouncements.routeName);
+            });
+          },
         ),
         ProfileListItem(
           title: "my_favourites",
           icon: Icon(Icons.favorite_outline_rounded),
-          callback: () {},
+          callback: () {
+            callWithAuth(() {
+              Navigator.of(context).pushNamed(MyAnnouncements.routeName);
+            });
+          },
         ),
         ProfileListItem(
           title: "my_account_balance",
           icon: Icon(Icons.account_balance_wallet_rounded),
-          callback: () {},
+          callback: () {
+            callWithAuth(() {
+              Navigator.of(context).pushNamed(MyAnnouncements.routeName);
+            });
+          },
         ),
         ProfileListItem(
           title: "messages",
           icon: Icon(Icons.chat_bubble_outline_rounded),
-          callback: () {},
-        ),
-        ProfileListItem(
-          title: "profile_logout",
-          icon: Icon(Icons.logout_rounded),
-          callback: () {},
+          callback: () {
+            callWithAuth(() {
+              Navigator.of(context).pushNamed(MyAnnouncements.routeName);
+            });
+          },
         ),
         ProfileListItem(
           title: "edit_profile",
           icon: Icon(Icons.person_rounded),
-          callback: () {},
+          callback: () {
+            callWithAuth(() {
+              Navigator.of(context).pushNamed(MyAnnouncements.routeName);
+            });
+          },
         ),
         ProfileListItem(
           title: "change_password",
           icon: Icon(Icons.lock),
-          callback: () {},
+          callback: () {
+            callWithAuth(() {
+              Navigator.of(context).pushNamed(MyAnnouncements.routeName);
+            });
+          },
         ),
         ProfileListItem(
           title: "change_language",
@@ -84,96 +100,178 @@ class _UserPageScreenState extends State<UserPageScreen> {
           callback: () =>
               Navigator.of(context).pushNamed(ChangeLanguage.routeName),
         ),
+        ProfileListItem(
+          title: "profile_logout",
+          icon: Icon(Icons.logout_rounded),
+          callback: () {
+            callWithAuth(() async {
+              await Provider.of<AuthProvider>(context, listen: false).logout();
+              final loginScreen = LoginScreen();
+              Map result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => loginScreen,
+                  settings: RouteSettings(
+                    arguments: {"relogin": true},
+                  ),
+                ),
+              ) as Map;
+              Future.delayed(Duration.zero).then((_) {
+                _refreshUser();
+              });
+            });
+          },
+        ),
       ],
     );
   }
 
-  Widget _buildUserDetails() {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: defaultPadding),
-      width: double.infinity,
-      height: 140,
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 100.w * 0.10,
-            child: ClipOval(
-              child: Image.asset(
-                "assets/images/user.jpg",
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          SizedBox(
-            width: 10,
-          ),
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Text(
-                    "Sardor Rahmatullayev",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
+  Widget _buildUserDetails(UserModel user) {
+    return user == null
+        ? Container()
+        : Container(
+            padding: EdgeInsets.symmetric(horizontal: defaultPadding),
+            width: double.infinity,
+            height: 140,
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 100.w * 0.10,
+                  child: ClipOval(
+                    child: (user.photo == null)
+                        ? Image.asset(
+                            "assets/images/user.jpg",
+                            fit: BoxFit.cover,
+                          )
+                        : Image.network(
+                            fixMediaUrl(user.photo),
+                          ),
+                  ),
+                ),
+                SizedBox(
+                  width: 10,
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Text(
+                          "${user.firstName} ${user.lastName}",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [Text(user.phone), Text("ID: 0000000")],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            LocaleText("your_balance"),
+                            Text("${user.balance} UZS")
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            OutlinedButton(
+                              onPressed: () {},
+                              style: OutlinedButton.styleFrom(
+                                primary: normalOrange,
+                                side: BorderSide(
+                                  color: normalOrange,
+                                ),
+                              ),
+                              child: LocaleText(
+                                "edit_profile",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {},
+                              style: ElevatedButton.styleFrom(
+                                primary: normalOrange,
+                                elevation: 0,
+                              ),
+                              child: LocaleText(
+                                "fill_balance",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            )
+                          ],
+                        )
+                      ],
                     ),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text("+998 (97) 781 11 44"),
-                      Text("ID: 0000000")
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      LocaleText("your_balance"),
-                      Text("5.775.000 UZS")
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      OutlinedButton(
-                        onPressed: () {},
-                        style: OutlinedButton.styleFrom(
-                          primary: normalOrange,
-                          side: BorderSide(
-                            color: normalOrange,
-                          ),
-                        ),
-                        child: LocaleText(
-                          "edit_profile",
-                          style: TextStyle(
-                            fontSize: 12,
-                          ),
-                        ),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          primary: normalOrange,
-                          elevation: 0,
-                        ),
-                        child: LocaleText(
-                          "fill_balance",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                          ),
-                        ),
-                      )
-                    ],
-                  )
-                ],
-              ),
+                ),
+              ],
             ),
+          );
+  }
+
+  UserModel? _user;
+  bool _userLoading = false;
+
+  Future _refreshUser() async {
+    setState(() {
+      _userLoading = true;
+    });
+    Provider.of<AuthProvider>(context, listen: false)
+        .getUserData()
+        .then((value) {
+      try {
+        setState(() {
+          _userLoading = false;
+        });
+        if (!value.containsKey("status")) {}
+      } catch (e) {
+        setState(() {
+          _userLoading = false;
+          _user = value;
+        });
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    Future.delayed(Duration.zero).then((_) {
+      _refreshUser();
+    });
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Container(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _userLoading
+                  ? Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : _buildUserDetails(
+                      Provider.of<AuthProvider>(context, listen: false).user
+                          as UserModel),
+              Divider(),
+              _buildProfileList(),
+              Divider(),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -199,7 +297,6 @@ class ProfileListItem extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(20),
         onTap: () {
-          print("Hi");
           callback();
         },
         child: Container(

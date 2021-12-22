@@ -102,7 +102,6 @@ class _SearchPageScreenState extends State<SearchPageScreen> {
     bool hasFilters =
         Provider.of<EstateProvider>(context, listen: false).hasFilters;
 
-
     if (term != "") {
       Provider.of<NavigationScreenProvider>(context, listen: false).clearData();
       _searchController.text = term;
@@ -232,7 +231,7 @@ class _SearchPageScreenState extends State<SearchPageScreen> {
 
   @override
   void dispose() {
-    _unsearch();
+    // _unsearch();
     _searchController.dispose();
     super.dispose();
   }

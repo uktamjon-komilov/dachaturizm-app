@@ -22,6 +22,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool _hidePassword = true;
+  bool _wrongCredentials = false;
 
   FocusNode _phoneFocusNode = FocusNode();
   FocusNode _passwordFocusNode = FocusNode();
@@ -31,12 +32,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void didChangeDependencies() {
-    // _phoneFocusNode.addListener(() {
-    //   setState(() {});
-    // });
-    // _passwordFocusNode.addListener(() {
-    //   setState(() {});
-    // });
     super.didChangeDependencies();
   }
 
@@ -51,6 +46,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Map data = ModalRoute.of(context)?.settings.arguments as Map;
+    bool relogin = false;
+    if (data != null) {
+      relogin = data.containsKey("relogin") && data["relogin"];
+    }
+
     return SafeArea(
       child: Scaffold(
         body: Padding(
@@ -88,6 +89,13 @@ class _LoginScreenState extends State<LoginScreen> {
                   onFieldSubmitted: (value) {
                     FocusScope.of(context).requestFocus(_passwordFocusNode);
                   },
+                  onChanged: (value) {
+                    if (_wrongCredentials) {
+                      setState(() {
+                        _wrongCredentials = false;
+                      });
+                    }
+                  },
                 ),
                 SizedBox(
                   height: 20,
@@ -114,7 +122,25 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   obscureText: _hidePassword,
+                  onChanged: (value) {
+                    if (_wrongCredentials) {
+                      setState(() {
+                        _wrongCredentials = false;
+                      });
+                    }
+                  },
                 ),
+                SizedBox(
+                  height: 20,
+                ),
+                _wrongCredentials
+                    ? LocaleText(
+                        "wrong_login_and_password",
+                        style: TextStyle(
+                          color: Colors.red,
+                        ),
+                      )
+                    : Container(),
                 SizedBox(
                   height: 20,
                 ),
@@ -130,10 +156,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       .login(phone, password)
                       .then((value) {
                     if (value.containsKey("status") && !value["status"]) {
-                      print("You cannot log in!");
+                      setState(() {
+                        _wrongCredentials = true;
+                      });
+                    } else {
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                        NavigationalAppScreen.routeName,
+                        (route) => false,
+                        arguments: {"relogin": relogin},
+                      );
                     }
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                        NavigationalAppScreen.routeName, (route) => false);
                   });
                 }),
                 SizedBox(
