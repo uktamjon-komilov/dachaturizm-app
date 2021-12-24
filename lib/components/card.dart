@@ -1,17 +1,42 @@
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/models/estate_model.dart';
+import 'package:dachaturizm/providers/auth_provider.dart';
+import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/screens/app/estate/estate_detail_screen.dart';
+import 'package:dachaturizm/screens/auth/login_screen.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
-class EstateCard extends StatelessWidget {
+class EstateCard extends StatefulWidget {
   const EstateCard({
     Key? key,
     required this.estate,
   }) : super(key: key);
 
   final EstateModel estate;
+
+  @override
+  State<EstateCard> createState() => _EstateCardState();
+}
+
+class _EstateCardState extends State<EstateCard> {
+  bool _isLiked = false;
+
+  _showLoginScreen() async {
+    await Navigator.of(context).pushNamed(LoginScreen.routeName);
+  }
+
+  Future callWithAuth([Function? callback]) async {
+    final access = await Provider.of<AuthProvider>(context, listen: false)
+        .getAccessToken();
+    if (access != "") {
+      if (callback != null) callback();
+    } else {
+      await _showLoginScreen();
+    }
+  }
 
   Widget _showTopIndicator() {
     return Positioned(
@@ -30,9 +55,17 @@ class EstateCard extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
-    print(estate);
+  void initState() {
+    super.initState();
+    Future.delayed(Duration.zero).then((_) {
+      setState(() {
+        _isLiked = widget.estate.isLiked;
+      });
+    });
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Container(
       width: (100.w - 2 * defaultPadding) / 2,
       height: 250,
@@ -45,7 +78,10 @@ class EstateCard extends StatelessWidget {
         child: InkWell(
           onTap: () {
             Navigator.of(context).pushNamed(EstateDetailScreen.routeName,
-                arguments: {"id": estate.id, "typeId": estate.typeId});
+                arguments: {
+                  "id": widget.estate.id,
+                  "typeId": widget.estate.typeId
+                });
           },
           child: Column(
             children: [
@@ -55,10 +91,10 @@ class EstateCard extends StatelessWidget {
                     height: 130,
                     fit: BoxFit.fill,
                     image: NetworkImage(
-                      estate.photo,
+                      widget.estate.photo,
                     ),
                   ),
-                  estate.isTop ? _showTopIndicator() : SizedBox.shrink()
+                  widget.estate.isTop ? _showTopIndicator() : SizedBox.shrink()
                 ],
               ),
               Expanded(
@@ -74,7 +110,7 @@ class EstateCard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              estate.title,
+                              widget.estate.title,
                               style: TextStyle(
                                 color: darkPurple,
                                 fontSize: 14,
@@ -84,7 +120,7 @@ class EstateCard extends StatelessWidget {
                             ),
                             RatingBar.builder(
                               ignoreGestures: true,
-                              initialRating: estate.rating,
+                              initialRating: widget.estate.rating,
                               minRating: 1,
                               direction: Axis.horizontal,
                               allowHalfRating: true,
@@ -99,12 +135,13 @@ class EstateCard extends StatelessWidget {
                               },
                             ),
                             Text(
-                              "${estate.weekdayPrice.toInt()} ${estate.priceType}",
+                              "${widget.estate.weekdayPrice.toInt()} ${widget.estate.priceType}",
                               style: TextStyle(
-                                  color: darkPurple,
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.bold,
-                                  overflow: TextOverflow.ellipsis),
+                                color: darkPurple,
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             )
                           ],
                         ),
@@ -116,9 +153,33 @@ class EstateCard extends StatelessWidget {
                         children: [
                           IconButton(
                             iconSize: 20,
-                            onPressed: () {},
+                            onPressed: () async {
+                              bool original = _isLiked;
+
+                              await callWithAuth(() async {
+                                setState(() {
+                                  _isLiked = !_isLiked;
+                                });
+                                Provider.of<EstateProvider>(context,
+                                        listen: false)
+                                    .toggleWishlist(widget.estate.id, original)
+                                    .then((value) {
+                                  if (value == null) {
+                                    setState(() {
+                                      _isLiked = !_isLiked;
+                                    });
+                                  } else {
+                                    setState(() {
+                                      _isLiked = value;
+                                    });
+                                  }
+                                });
+                              });
+                            },
                             icon: Icon(
-                              Icons.favorite_border_outlined,
+                              _isLiked
+                                  ? Icons.favorite
+                                  : Icons.favorite_border_outlined,
                               color: Colors.red,
                             ),
                           ),

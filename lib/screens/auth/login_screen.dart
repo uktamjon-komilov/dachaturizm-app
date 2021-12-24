@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -143,17 +144,21 @@ class _LoginScreenState extends State<LoginScreen> {
                 SizedBox(
                   height: 32,
                 ),
-                FluidBigButton(Locales.string(context, "log_in"), onPress: () {
+                FluidBigButton(Locales.string(context, "log_in"),
+                    onPress: () async {
                   String phone = _phoneController.text.replaceAll(" ", "");
                   String password = _passwordController.text;
                   Provider.of<AuthProvider>(context, listen: false)
                       .login(phone, password)
-                      .then((value) {
+                      .then((value) async {
                     if (value.containsKey("status")) {
                       setState(() {
                         _wrongCredentials = true;
                       });
                     } else {
+                      SharedPreferences prefs =
+                          await SharedPreferences.getInstance();
+                      prefs.setBool("noAuth", true);
                       Navigator.of(context)
                         ..pop()
                         ..pushReplacementNamed(NavigationalAppScreen.routeName);

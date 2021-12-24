@@ -124,8 +124,12 @@ class EstateProvider with ChangeNotifier {
   }
 
   Future getData(url) async {
+    Map<String, String> headers = {"Content-type": "application/json"};
+    String access = await auth.getAccessToken();
+    if (access != "") headers["Authorization"] = "Bearer ${access}";
+
     try {
-      final response = await dio.get(url);
+      final response = await dio.get(url, options: Options(headers: headers));
       final extractedData = response.data;
       return extractedData;
     } catch (error) {
@@ -445,5 +449,27 @@ class EstateProvider with ChangeNotifier {
       print(e);
     }
     return false;
+  }
+
+  Future toggleWishlist(int id, bool value) async {
+    String url = "";
+    if (value)
+      url = "${baseUrl}api/wishlist/remove-from-wishlist/";
+    else
+      url = "${baseUrl}api/wishlist/add-to-wishlist/";
+    String access = await auth.getAccessToken();
+    Map<String, String> headers = {
+      "Content-type": "application/json",
+      "Authorization": "Bearer ${access}"
+    };
+    try {
+      final response = await dio.post(url,
+          data: {"estate": id}, options: Options(headers: headers));
+      if (response.statusCode as int >= 200 ||
+          response.statusCode as int < 300) {
+        return !value;
+      }
+    } catch (e) {}
+    return null;
   }
 }

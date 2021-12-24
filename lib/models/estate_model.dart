@@ -32,36 +32,37 @@ class EstateModel {
   final bool isTop;
   final DateTime? created;
   final DateTime? updated;
+  final bool isLiked;
 
-  EstateModel({
-    this.title = "",
-    this.id = 0,
-    this.description = "",
-    this.priceType = "",
-    this.rating = 0.0,
-    this.views = 0,
-    this.beds = 0,
-    this.pool = 0,
-    this.people = 0,
-    this.weekdayPrice = 0.0,
-    this.weekendPrice = 0.0,
-    this.address = "",
-    this.announcer = "",
-    this.phone = "",
-    this.userAdsCount = 0,
-    this.userPhoto = "",
-    this.photo = "",
-    this.userId = 0,
-    this.typeId = 0,
-    this.longtitute = 0.0,
-    this.latitute = 0.0,
-    this.photos = const [],
-    this.bookedDays = const [],
-    this.facilities = const [],
-    this.isTop = false,
-    this.created,
-    this.updated,
-  });
+  EstateModel(
+      {this.title = "",
+      this.id = 0,
+      this.description = "",
+      this.priceType = "",
+      this.rating = 0.0,
+      this.views = 0,
+      this.beds = 0,
+      this.pool = 0,
+      this.people = 0,
+      this.weekdayPrice = 0.0,
+      this.weekendPrice = 0.0,
+      this.address = "",
+      this.announcer = "",
+      this.phone = "",
+      this.userAdsCount = 0,
+      this.userPhoto = "",
+      this.photo = "",
+      this.userId = 0,
+      this.typeId = 0,
+      this.longtitute = 0.0,
+      this.latitute = 0.0,
+      this.photos = const [],
+      this.bookedDays = const [],
+      this.facilities = const [],
+      this.isTop = false,
+      this.created,
+      this.updated,
+      this.isLiked = false});
 
   dynamic getAttr(String key) => <String, dynamic>{
         "isTop": this.isTop,
@@ -71,42 +72,42 @@ class EstateModel {
     String locale = await getCurrentLocale();
 
     return EstateModel(
-      id: data["id"],
-      title: data["translations"][locale]["title"],
-      description: data["translations"][locale]["description"],
-      priceType: data["price_type"]["translations"][locale]["title"],
-      rating: data["rating"],
-      views: data["views"],
-      beds: data["beds"],
-      pool: data["pool"],
-      people: data["people"],
-      weekdayPrice: data["weekday_price"],
-      weekendPrice: data["weekend_price"],
-      longtitute: data["longtitute"],
-      latitute: data["latitute"],
-      address: data["address"],
-      announcer: data["announcer"],
-      phone: data["phone"],
-      userAdsCount: data["user_ads_count"],
-      userPhoto: data["user_photo"] ?? "",
-      photo: fixMediaUrl(data["photo"]),
-      photos: data["photos"]
-          .map<EstatePhotos>((item) =>
-              EstatePhotos(id: item["id"], photo: fixMediaUrl(item["photo"])))
-          .toList(),
-      facilities: data["facilities"]
-          .map<FacilityModel>((item) => FacilityModel(
-              id: item["id"], title: item["translations"][locale]["title"]))
-          .toList(),
-      bookedDays: data["booked_days"]
-          .map<BookingDay>((date) => BookingDay.fromJson(date))
-          .toList(),
-      userId: data["user"],
-      typeId: data["estate_type"],
-      isTop: data["is_top"],
-      created: DateTime.parse(data["created_at"].toString().substring(0, 10)),
-      updated: DateTime.parse(data["updated_at"].toString().substring(0, 10)),
-    );
+        id: data["id"],
+        title: data["translations"][locale]["title"],
+        description: data["translations"][locale]["description"],
+        priceType: data["price_type"]["translations"][locale]["title"],
+        rating: data["rating"],
+        views: data["views"],
+        beds: data["beds"],
+        pool: data["pool"],
+        people: data["people"],
+        weekdayPrice: data["weekday_price"],
+        weekendPrice: data["weekend_price"],
+        longtitute: data["longtitute"],
+        latitute: data["latitute"],
+        address: data["address"],
+        announcer: data["announcer"],
+        phone: data["phone"],
+        userAdsCount: data["user_ads_count"],
+        userPhoto: data["user_photo"] ?? "",
+        photo: fixMediaUrl(data["photo"]),
+        photos: data["photos"]
+            .map<EstatePhotos>((item) =>
+                EstatePhotos(id: item["id"], photo: fixMediaUrl(item["photo"])))
+            .toList(),
+        facilities: data["facilities"]
+            .map<FacilityModel>((item) => FacilityModel(
+                id: item["id"], title: item["translations"][locale]["title"]))
+            .toList(),
+        bookedDays: data["booked_days"]
+            .map<BookingDay>((date) => BookingDay.fromJson(date))
+            .toList(),
+        userId: data["user"],
+        typeId: data["estate_type"],
+        isTop: data["is_top"],
+        created: DateTime.parse(data["created_at"].toString().substring(0, 10)),
+        updated: DateTime.parse(data["updated_at"].toString().substring(0, 10)),
+        isLiked: data["is_liked"]);
   }
 
   static Future<EstateModel> fromJsonAsBanner(data) async {

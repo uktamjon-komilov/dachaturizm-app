@@ -20,7 +20,7 @@ class UserPageScreen extends StatefulWidget {
 }
 
 class _UserPageScreenState extends State<UserPageScreen> {
-  showLoginScreen() async {
+  _showLoginScreen() async {
     final loginScreen = LoginScreen();
     Map result = await Navigator.push(
       context,
@@ -42,7 +42,7 @@ class _UserPageScreenState extends State<UserPageScreen> {
     if (access != "") {
       if (callback != null) callback();
     } else {
-      await showLoginScreen();
+      await _showLoginScreen();
     }
   }
 
@@ -110,7 +110,9 @@ class _UserPageScreenState extends State<UserPageScreen> {
                 icon: Icon(Icons.logout_rounded),
                 callback: () {
                   callWithAuth(() async {
-                    await showLoginScreen();
+                    await Provider.of<AuthProvider>(context, listen: false)
+                        .logout();
+                    await _showLoginScreen();
                   });
                 },
               ),
