@@ -18,14 +18,13 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   startTime() async {
-    var _duration = new Duration(seconds: 3);
+    var _duration = new Duration(seconds: 1);
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     final userData = prefs.getString("userData");
     if (userData != null) {
       final data = json.decode(userData);
-      print(data);
       if (data.containsKey("access")) {
         return new Timer(_duration, navigationNavigationalScreen);
       }
@@ -62,7 +61,9 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    startTime();
+    Future.delayed(Duration.zero).then((_) {
+      startTime();
+    });
   }
 
   @override

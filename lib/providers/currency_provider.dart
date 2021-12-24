@@ -1,10 +1,8 @@
-import 'dart:convert';
-
 import 'package:dachaturizm/constants.dart';
+import 'package:dachaturizm/models/ads_plan.dart';
 import 'package:dachaturizm/models/currency_model.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import "package:http/http.dart" as http;
 
 class CurrencyProvider with ChangeNotifier {
   final Dio dio;
@@ -30,5 +28,18 @@ class CurrencyProvider with ChangeNotifier {
     _currencies = currencies;
     notifyListeners();
     return [..._currencies];
+  }
+
+  Future<List<AdPlan>> fetchAdPlans() async {
+    const url = "${baseUrl}api/advertising-plans/";
+    List<AdPlan> plans = [];
+    final response = await dio.get(url);
+    if (response.statusCode as int >= 200 || response.statusCode as int < 300) {
+      await response.data.forEach((item) async {
+        AdPlan plan = await AdPlan.fromJson(item);
+        plans.add(plan);
+      });
+    }
+    return plans;
   }
 }

@@ -25,6 +25,7 @@ class NavigationScreenProvider with ChangeNotifier {
       notifyListeners();
     } else {
       callback != null ? callback() : null;
+      notifyListeners();
     }
     if (index == 0) clearData();
   }

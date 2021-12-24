@@ -2,7 +2,9 @@ import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/helpers/url_helper.dart';
 import 'package:dachaturizm/models/user_model.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
+import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/screens/app/user/change_language.dart';
+import 'package:dachaturizm/screens/app/user/edit_profile_screen.dart';
 import 'package:dachaturizm/screens/app/user/my_announcements_screen.dart';
 import 'package:dachaturizm/screens/auth/login_screen.dart';
 import "package:flutter/material.dart";
@@ -18,14 +20,29 @@ class UserPageScreen extends StatefulWidget {
 }
 
 class _UserPageScreenState extends State<UserPageScreen> {
-  Future callWithAuth(Function? callback) async {
+  showLoginScreen() async {
+    final loginScreen = LoginScreen();
+    Map result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => loginScreen,
+        settings: RouteSettings(
+          arguments: {"relogin": true},
+        ),
+      ),
+    ) as Map;
+    Future.delayed(Duration.zero).then((_) {
+      _refreshUser();
+    });
+  }
+
+  Future callWithAuth([Function? callback]) async {
     final access = await Provider.of<AuthProvider>(context, listen: false)
         .getAccessToken();
     if (access != "") {
       if (callback != null) callback();
     } else {
-      await Provider.of<AuthProvider>(context, listen: false).logout();
-      Navigator.of(context).pushNamed(LoginScreen.routeName);
+      await showLoginScreen();
     }
   }
 
@@ -33,34 +50,19 @@ class _UserPageScreenState extends State<UserPageScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: defaultPadding),
-          child: LocaleText(
-            "my_profile",
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-          ),
-        ),
         ProfileListItem(
           title: "my_estates",
           icon: Icon(Icons.notes),
           callback: () async {
-            callWithAuth(() {
-              Navigator.of(context).pushNamed(MyAnnouncements.routeName);
+            callWithAuth(() async {
+              final myAnnouncements = MyAnnouncements();
+              await _navigateTo(myAnnouncements);
             });
           },
         ),
         ProfileListItem(
           title: "my_favourites",
           icon: Icon(Icons.favorite_outline_rounded),
-          callback: () {
-            callWithAuth(() {
-              Navigator.of(context).pushNamed(MyAnnouncements.routeName);
-            });
-          },
-        ),
-        ProfileListItem(
-          title: "my_account_balance",
-          icon: Icon(Icons.account_balance_wallet_rounded),
           callback: () {
             callWithAuth(() {
               Navigator.of(context).pushNamed(MyAnnouncements.routeName);
@@ -81,7 +83,7 @@ class _UserPageScreenState extends State<UserPageScreen> {
           icon: Icon(Icons.person_rounded),
           callback: () {
             callWithAuth(() {
-              Navigator.of(context).pushNamed(MyAnnouncements.routeName);
+              Navigator.of(context).pushNamed(EditProfileScreen.routeName);
             });
           },
         ),
@@ -95,57 +97,51 @@ class _UserPageScreenState extends State<UserPageScreen> {
           },
         ),
         ProfileListItem(
-          title: "change_language",
-          icon: Icon(Icons.language_rounded),
-          callback: () =>
-              Navigator.of(context).pushNamed(ChangeLanguage.routeName),
-        ),
-        ProfileListItem(
-          title: "profile_logout",
-          icon: Icon(Icons.logout_rounded),
-          callback: () {
-            callWithAuth(() async {
-              await Provider.of<AuthProvider>(context, listen: false).logout();
-              final loginScreen = LoginScreen();
-              Map result = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => loginScreen,
-                  settings: RouteSettings(
-                    arguments: {"relogin": true},
-                  ),
-                ),
-              ) as Map;
-              Future.delayed(Duration.zero).then((_) {
-                _refreshUser();
-              });
-            });
-          },
-        ),
+            title: "change_language",
+            icon: Icon(Icons.language_rounded),
+            callback: () async {
+              final changeLang = ChangeLanguage();
+              await _navigateTo(changeLang);
+            }),
+        Provider.of<AuthProvider>(context).user == null
+            ? Container()
+            : ProfileListItem(
+                title: "profile_logout",
+                icon: Icon(Icons.logout_rounded),
+                callback: () {
+                  callWithAuth(() async {
+                    await showLoginScreen();
+                  });
+                },
+              ),
       ],
     );
   }
 
-  Widget _buildUserDetails(UserModel user) {
+  Widget _buildUserDetails(UserModel? user) {
     return user == null
         ? Container()
         : Container(
             padding: EdgeInsets.symmetric(horizontal: defaultPadding),
             width: double.infinity,
-            height: 140,
+            // height: 140,
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CircleAvatar(
-                  radius: 100.w * 0.10,
-                  child: ClipOval(
-                    child: (user.photo == null)
-                        ? Image.asset(
-                            "assets/images/user.jpg",
-                            fit: BoxFit.cover,
-                          )
-                        : Image.network(
-                            fixMediaUrl(user.photo),
-                          ),
+                Padding(
+                  padding: const EdgeInsets.only(top: defaultPadding),
+                  child: CircleAvatar(
+                    radius: 100.w * 0.10,
+                    child: ClipOval(
+                      child: (user.photo == null)
+                          ? Image.asset(
+                              "assets/images/user.jpg",
+                              fit: BoxFit.cover,
+                            )
+                          : Image.network(
+                              fixMediaUrl(user.photo),
+                            ),
+                    ),
                   ),
                 ),
                 SizedBox(
@@ -176,11 +172,16 @@ class _UserPageScreenState extends State<UserPageScreen> {
                             Text("${user.balance} UZS")
                           ],
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        Wrap(
+                          spacing: 10,
                           children: [
                             OutlinedButton(
-                              onPressed: () {},
+                              onPressed: () async {
+                                callWithAuth(() async {
+                                  final editProfile = EditProfileScreen();
+                                  await _navigateTo(editProfile);
+                                });
+                              },
                               style: OutlinedButton.styleFrom(
                                 primary: normalOrange,
                                 side: BorderSide(
@@ -219,8 +220,9 @@ class _UserPageScreenState extends State<UserPageScreen> {
           );
   }
 
-  UserModel? _user;
   bool _userLoading = false;
+  bool _someChange = false;
+  UserModel? _user;
 
   Future _refreshUser() async {
     setState(() {
@@ -236,11 +238,25 @@ class _UserPageScreenState extends State<UserPageScreen> {
         if (!value.containsKey("status")) {}
       } catch (e) {
         setState(() {
-          _userLoading = false;
           _user = value;
+          _userLoading = false;
         });
       }
     });
+  }
+
+  _navigateTo(page) async {
+    Map result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => page,
+      ),
+    ) as Map;
+    if (result != null && result.containsKey("change")) {
+      setState(() {
+        _someChange = true;
+      });
+    }
   }
 
   @override
@@ -252,24 +268,36 @@ class _UserPageScreenState extends State<UserPageScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_someChange) {
+      _refreshUser().then((_) {
+        Provider.of<NavigationScreenProvider>(context, listen: false)
+            .changePageIndex(4);
+      });
+      _someChange = false;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _userLoading
-                  ? Center(
-                      child: CircularProgressIndicator(),
-                    )
-                  : _buildUserDetails(
-                      Provider.of<AuthProvider>(context, listen: false).user
-                          as UserModel),
-              Divider(),
-              _buildProfileList(),
-              Divider(),
-            ],
+          child: Consumer<AuthProvider>(
+            builder: (context, auth, _) => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _userLoading
+                    ? Center(
+                        child: CircularProgressIndicator(),
+                      )
+                    : _buildUserDetails(auth.user),
+                Divider(),
+                _buildProfileList(),
+                Divider(),
+              ],
+            ),
           ),
         ),
       ),

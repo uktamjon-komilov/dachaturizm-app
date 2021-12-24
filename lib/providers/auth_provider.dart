@@ -33,7 +33,7 @@ class AuthProvider with ChangeNotifier {
   dynamic getAccessToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String access = prefs.getString("access").toString();
-    var expiryDateString = prefs.getString("expires");
+    var expiryDateString = prefs.getString("access_expires");
     if (expiryDateString == null || expiryDateString == "") {
       return "";
     }
@@ -44,26 +44,23 @@ class AuthProvider with ChangeNotifier {
     } else {
       await refresh();
       String access = prefs.getString("access").toString();
+      _userId = Jwt.parseJwt(access)["user_id"];
       return access;
     }
   }
 
   dynamic getUserId() async {
-    print(_userId);
-    print(_accessToken);
-    if (_userId != 0 || _user != null) {
+    if (_userId != 0) {
       final result = _userId;
       return result;
-    } else if (_accessToken == "") {
-      final access = await getAccessToken();
-      if (access == "") {
-        return null;
-      }
-      _accessToken = access;
-      Map payload = Jwt.parseJwt(_accessToken);
-      return payload["user_id"];
     }
-    return null;
+    final access = await getAccessToken();
+    if (access == "") {
+      return null;
+    }
+    _accessToken = access;
+    Map payload = Jwt.parseJwt(_accessToken);
+    return payload["user_id"];
   }
 
   Future<Map<String, dynamic>> checkUser(String phone) async {
@@ -123,7 +120,7 @@ class AuthProvider with ChangeNotifier {
         options: Options(
           headers: {"Content-type": "application/json"},
         ),
-        data: json.encode({"phone": phone, "password": password}),
+        data: {"phone": phone, "password": password},
       );
 
       if (response.statusCode as int >= 200 ||
@@ -133,20 +130,20 @@ class AuthProvider with ChangeNotifier {
         if (data.containsKey("access")) {
           _accessToken = data["access"] as String;
           _refreshToken = data["refresh"] as String;
-          prefs.setString("access", _accessToken);
-          prefs.setString("refresh", _refreshToken);
+          await prefs.setString("access", _accessToken);
+          await prefs.setString("refresh", _refreshToken);
           final expiryDate = DateTime.now().add(Duration(minutes: 59));
           print(expiryDate.toString());
-          prefs.setString("expires", expiryDate.toString());
+          await prefs.setString("access_expires", expiryDate.toString());
           Map<String, dynamic> payload = Jwt.parseJwt(data["access"]);
           _userId = payload["user_id"];
-          await getUserData();
-          notifyListeners();
           return data;
         }
       }
     } catch (e) {
       // await logout();
+      print("debugging");
+      print(e);
     }
     return {"status": false};
   }
@@ -160,22 +157,25 @@ class AuthProvider with ChangeNotifier {
       _refreshToken = "";
       prefs.setString("access", "");
       prefs.setString("refresh", "");
-      prefs.setString("expires", "");
+      prefs.setString("access_expires", "");
     }
-    final response = await dio.post(
-      url,
-      options: Options(
-        headers: {"Content-type": "application/json"},
-      ),
-      data: json.encode({"refresh": "_refresh"}),
-    );
-    if (response.statusCode as int >= 200 || response.statusCode as int < 300) {
-      final data = response.data;
-      prefs.setString("access", data["access"]);
-      final expiryDate = DateTime.now().add(Duration(minutes: 59));
-      prefs.setString("expires", expiryDate.toString());
-      return data["access"];
-    }
+    try {
+      final response = await dio.post(
+        url,
+        options: Options(
+          headers: {"Content-type": "application/json"},
+        ),
+        data: json.encode({"refresh": _refresh}),
+      );
+      if (response.statusCode as int >= 200 ||
+          response.statusCode as int < 300) {
+        final data = response.data;
+        prefs.setString("access", data["access"]);
+        final expiryDate = DateTime.now().add(Duration(minutes: 59));
+        prefs.setString("access_expires", expiryDate.toString());
+        return data["access"];
+      }
+    } catch (e) {}
     return "";
   }
 
@@ -185,8 +185,33 @@ class AuthProvider with ChangeNotifier {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString("access", "");
     prefs.setString("refresh", "");
-    prefs.setString("expires", "");
+    prefs.setString("access_expires", "");
     notifyListeners();
+  }
+
+  Future<Map> updateUser(FormData data) async {
+    final userId = await getUserId();
+    final access = await getAccessToken();
+    final url = "${baseUrl}api/users/${userId}/";
+    try {
+      final response = await dio.patch(
+        url,
+        data: data,
+        options: Options(
+          headers: {
+            "Content-type": "multipart/form-data",
+            "Authorization": "Bearer ${access}"
+          },
+        ),
+      );
+      if (response.statusCode as int >= 200 ||
+          response.statusCode as int < 300) {
+        return response.data;
+      }
+    } catch (e) {
+      print(e);
+    }
+    return {"status": false};
   }
 
   Future getUserData() async {

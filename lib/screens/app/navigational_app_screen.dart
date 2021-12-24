@@ -37,10 +37,10 @@ class _NavigationalAppScreenState extends State<NavigationalAppScreen> {
 
   @override
   void initState() {
-    Future.delayed(Duration.zero).then((_) {
-      Provider.of<AuthProvider>(context).getAccessToken();
-    });
     super.initState();
+    Future.delayed(Duration.zero).then((_) {
+      Provider.of<AuthProvider>(context, listen: false).getAccessToken();
+    });
   }
 
   @override

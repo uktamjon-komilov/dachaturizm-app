@@ -46,12 +46,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Map data = ModalRoute.of(context)?.settings.arguments as Map;
-    bool relogin = false;
-    if (data != null) {
-      relogin = data.containsKey("relogin") && data["relogin"];
-    }
-
     return SafeArea(
       child: Scaffold(
         body: Padding(
@@ -155,16 +149,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   Provider.of<AuthProvider>(context, listen: false)
                       .login(phone, password)
                       .then((value) {
-                    if (value.containsKey("status") && !value["status"]) {
+                    if (value.containsKey("status")) {
                       setState(() {
                         _wrongCredentials = true;
                       });
                     } else {
-                      Navigator.of(context).pushNamedAndRemoveUntil(
-                        NavigationalAppScreen.routeName,
-                        (route) => false,
-                        arguments: {"relogin": relogin},
-                      );
+                      Navigator.of(context)
+                        ..pop()
+                        ..pushReplacementNamed(NavigationalAppScreen.routeName);
                     }
                   });
                 }),

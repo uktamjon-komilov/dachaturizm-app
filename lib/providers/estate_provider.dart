@@ -4,11 +4,15 @@ import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/helpers/locale_helper.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/models/photo_model.dart';
+import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 
 class EstateProvider with ChangeNotifier {
   final Dio dio;
+  final AuthProvider auth;
+
+  EstateProvider({required this.dio, required this.auth});
 
   Map<int, List<EstateModel>> _estates = {};
   List<EstateModel> _searchedTopEstates = [];
@@ -21,8 +25,6 @@ class EstateProvider with ChangeNotifier {
     "toPrice": 0.0,
     "facilities": []
   };
-
-  EstateProvider({required this.dio});
 
   Map get estates {
     return {..._estates};
@@ -395,7 +397,53 @@ class EstateProvider with ChangeNotifier {
     FormData formData = FormData.fromMap(tempData);
     var response = await dio.post(url, data: formData);
 
-    // print(response.data);
     return {"statusCode": response.statusCode};
+  }
+
+  Future getMyEstates() async {
+    const url = "${baseUrl}api/estate/myestates/";
+    final access = await auth.getAccessToken();
+    try {
+      final response = await dio.get(
+        url,
+        options: Options(headers: {
+          "Content-type": "application/json",
+          "Authorization": "Bearer ${access}",
+        }),
+      );
+      if (response.statusCode as int >= 200 ||
+          response.statusCode as int < 300) {
+        List<EstateModel> estates = [];
+        await response.data.forEach((item) async {
+          EstateModel estate = await EstateModel.fromJson(item);
+          estates.add(estate);
+        });
+        return estates;
+      }
+    } catch (e) {}
+
+    return [];
+  }
+
+  Future<bool> advertise(String plan, String id) async {
+    final url = "${baseUrl}api/advertise/${plan}/${id}/";
+    print(url);
+    final access = await auth.getAccessToken();
+    try {
+      final response = await dio.post(url,
+          options: Options(headers: {
+            "Content-type": "application/json",
+            "Authorization": "Bearer ${access}"
+          }));
+      print("alooo");
+      if (response.statusCode as int >= 200 ||
+          response.statusCode as int < 300) {
+        return true;
+      }
+      return false;
+    } catch (e) {
+      print(e);
+    }
+    return false;
   }
 }

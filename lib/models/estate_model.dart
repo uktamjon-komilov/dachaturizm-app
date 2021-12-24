@@ -30,6 +30,8 @@ class EstateModel {
   final int userId;
   final int typeId;
   final bool isTop;
+  final DateTime? created;
+  final DateTime? updated;
 
   EstateModel({
     this.title = "",
@@ -57,6 +59,8 @@ class EstateModel {
     this.bookedDays = const [],
     this.facilities = const [],
     this.isTop = false,
+    this.created,
+    this.updated,
   });
 
   dynamic getAttr(String key) => <String, dynamic>{
@@ -100,6 +104,8 @@ class EstateModel {
       userId: data["user"],
       typeId: data["estate_type"],
       isTop: data["is_top"],
+      created: DateTime.parse(data["created_at"].toString().substring(0, 10)),
+      updated: DateTime.parse(data["updated_at"].toString().substring(0, 10)),
     );
   }
 
