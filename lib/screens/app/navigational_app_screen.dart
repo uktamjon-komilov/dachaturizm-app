@@ -6,6 +6,7 @@ import 'package:dachaturizm/screens/app/estate/create_estate_screen.dart';
 import 'package:dachaturizm/screens/app/home/home_screen.dart';
 import 'package:dachaturizm/screens/app/search/search_screen.dart';
 import 'package:dachaturizm/screens/app/user/user_screen.dart';
+import 'package:dachaturizm/screens/app/user/wishlist_screen.dart';
 import 'package:dachaturizm/screens/auth/login_screen.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_locales/flutter_locales.dart';
@@ -35,6 +36,20 @@ class _NavigationalAppScreenState extends State<NavigationalAppScreen> {
     "userpagescreen_appbar_text",
   ];
 
+  _showLoginScreen() async {
+    Navigator.of(context).pushNamed(LoginScreen.routeName);
+  }
+
+  Future callWithAuth([Function? callback]) async {
+    final access = await Provider.of<AuthProvider>(context, listen: false)
+        .getAccessToken();
+    if (access != "") {
+      if (callback != null) callback();
+    } else {
+      await _showLoginScreen();
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -54,7 +69,11 @@ class _NavigationalAppScreenState extends State<NavigationalAppScreen> {
           }),
           actions: [
             IconButton(
-              onPressed: () {},
+              onPressed: () async {
+                await callWithAuth(() async {
+                  Navigator.of(context).pushNamed(WishlistScreen.routeName);
+                });
+              },
               icon: Icon(
                 Icons.favorite_border_outlined,
                 size: 30,

@@ -32,6 +32,18 @@ class _HomePageScreenState extends State<HomePageScreen> {
   FocusNode _searchFocusNode = FocusNode();
 
   @override
+  void didChangeDependencies() async {
+    bool shouldRefresh =
+        Provider.of<NavigationScreenProvider>(context).refreshHomePage;
+    if (shouldRefresh) {
+      Provider.of<NavigationScreenProvider>(context, listen: false)
+          .refreshHomePage = false;
+      await _refreshHomePage();
+    }
+    super.didChangeDependencies();
+  }
+
+  @override
   void initState() {
     Future.delayed(Duration.zero).then((_) {
       _refreshHomePage();
@@ -40,29 +52,31 @@ class _HomePageScreenState extends State<HomePageScreen> {
   }
 
   Future<void> _refreshHomePage() async {
-    setState(() {
-      _isLoading = true;
-    });
-    Provider.of<BannerProvider>(context, listen: false)
-        .getAndSetTopBanners()
-        .then((_) {
-      Provider.of<EstateTypesProvider>(context, listen: false)
-          .fetchAndSetTypes()
-          .then(
-        (types) {
-          Provider.of<BannerProvider>(context, listen: false)
-              .getAndSetBanners(types)
-              .then((banners) {
-            Provider.of<EstateProvider>(context, listen: false)
-                .fetchAllAndSetEstates()
-                .then((_) {
-              setState(() {
-                _isLoading = false;
+    Future.delayed(Duration.zero).then((_) {
+      setState(() {
+        _isLoading = true;
+      });
+      Provider.of<BannerProvider>(context, listen: false)
+          .getAndSetTopBanners()
+          .then((_) {
+        Provider.of<EstateTypesProvider>(context, listen: false)
+            .fetchAndSetTypes()
+            .then(
+          (types) {
+            Provider.of<BannerProvider>(context, listen: false)
+                .getAndSetBanners(types)
+                .then((banners) {
+              Provider.of<EstateProvider>(context, listen: false)
+                  .fetchAllAndSetEstates()
+                  .then((_) {
+                setState(() {
+                  _isLoading = false;
+                });
               });
             });
-          });
-        },
-      );
+          },
+        );
+      });
     });
   }
 

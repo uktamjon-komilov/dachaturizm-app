@@ -155,7 +155,6 @@ class _EstateCardState extends State<EstateCard> {
                             iconSize: 20,
                             onPressed: () async {
                               bool original = _isLiked;
-
                               await callWithAuth(() async {
                                 setState(() {
                                   _isLiked = !_isLiked;

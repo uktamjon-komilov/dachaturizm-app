@@ -472,4 +472,27 @@ class EstateProvider with ChangeNotifier {
     } catch (e) {}
     return null;
   }
+
+  Future myWishlist() async {
+    const url = "${baseUrl}api/wishlist/mywishlist/";
+    String access = await auth.getAccessToken();
+    Map<String, String> headers = {
+      "Content-type": "application/json",
+      "Authorization": "Bearer ${access}"
+    };
+    List<EstateModel> estates = [];
+    try {
+      final response = await dio.post(url, options: Options(headers: headers));
+      if (response.statusCode as int >= 200 ||
+          response.statusCode as int < 300) {
+        await response.data.forEach((item) async {
+          EstateModel estate = await EstateModel.fromJson(item["estate"]);
+          estate.isLiked = true;
+          estates.add(estate);
+        });
+        return estates;
+      }
+    } catch (e) {}
+    return estates;
+  }
 }

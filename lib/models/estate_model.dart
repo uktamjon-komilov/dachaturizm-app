@@ -32,7 +32,7 @@ class EstateModel {
   final bool isTop;
   final DateTime? created;
   final DateTime? updated;
-  final bool isLiked;
+  bool isLiked;
 
   EstateModel(
       {this.title = "",

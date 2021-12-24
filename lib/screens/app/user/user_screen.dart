@@ -6,6 +6,7 @@ import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/screens/app/user/change_language.dart';
 import 'package:dachaturizm/screens/app/user/edit_profile_screen.dart';
 import 'package:dachaturizm/screens/app/user/my_announcements_screen.dart';
+import 'package:dachaturizm/screens/app/user/wishlist_screen.dart';
 import 'package:dachaturizm/screens/auth/login_screen.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_locales/flutter_locales.dart';
@@ -61,14 +62,14 @@ class _UserPageScreenState extends State<UserPageScreen> {
           },
         ),
         ProfileListItem(
-          title: "my_favourites",
-          icon: Icon(Icons.favorite_outline_rounded),
-          callback: () {
-            callWithAuth(() {
-              Navigator.of(context).pushNamed(MyAnnouncements.routeName);
-            });
-          },
-        ),
+            title: "my_favourites",
+            icon: Icon(Icons.favorite_outline_rounded),
+            callback: () async {
+              await callWithAuth(() async {
+                final wishlist = WishlistScreen();
+                await _navigateTo(wishlist);
+              });
+            }),
         ProfileListItem(
           title: "messages",
           icon: Icon(Icons.chat_bubble_outline_rounded),
@@ -165,13 +166,14 @@ class _UserPageScreenState extends State<UserPageScreen> {
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [Text(user.phone), Text("ID: 0000000")],
+                          children: [Text(user.phone), Text("ID: ${user.id}")],
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             LocaleText("your_balance"),
-                            Text("${user.balance} UZS")
+                            Text(
+                                "${user.balance} ${Locales.string(context, 'sum')}")
                           ],
                         ),
                         Wrap(

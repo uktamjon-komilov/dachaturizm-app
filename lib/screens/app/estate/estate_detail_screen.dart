@@ -4,9 +4,11 @@ import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/helpers/get_my_location.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/models/type_model.dart';
+import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/type_provider.dart';
 import 'package:dachaturizm/screens/app/estate/detail_builders.dart';
+import 'package:dachaturizm/screens/auth/login_screen.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:location/location.dart';
@@ -29,6 +31,21 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
   var detail;
   var _detailBuilder;
   var _location;
+  bool _isLiked = false;
+
+  _showLoginScreen() async {
+    await Navigator.of(context).pushNamed(LoginScreen.routeName);
+  }
+
+  Future callWithAuth([Function? callback]) async {
+    final access = await Provider.of<AuthProvider>(context, listen: false)
+        .getAccessToken();
+    if (access != "") {
+      if (callback != null) callback();
+    } else {
+      await _showLoginScreen();
+    }
+  }
 
   void showCalendar() {
     setState(() {
@@ -78,9 +95,30 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
           ),
         ),
         IconButton(
-          onPressed: () {},
+          onPressed: () async {
+            bool original = _isLiked;
+            await callWithAuth(() async {
+              setState(() {
+                _isLiked = !_isLiked;
+              });
+              Provider.of<EstateProvider>(context, listen: false)
+                  .toggleWishlist(estate.id, original)
+                  .then((value) {
+                if (value == null) {
+                  setState(() {
+                    _isLiked = !_isLiked;
+                  });
+                } else {
+                  setState(() {
+                    _isLiked = value;
+                  });
+                }
+              });
+            });
+          },
           icon: Icon(
-            Icons.favorite_border_rounded,
+            _isLiked ? Icons.favorite : Icons.favorite_border_rounded,
+            color: _isLiked ? Colors.red : Colors.black,
           ),
         ),
       ],
@@ -98,10 +136,13 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
             .then((estate) {
           setState(() {
             detail = estate;
+            _isLiked = estate.isLiked;
             _detailBuilder = DetailBuilder(detail);
-            Future.delayed(Duration(seconds: 1)).then((_) => setState(() {
-                  isLoading = false;
-                }));
+            Future.delayed(Duration(seconds: 1)).then(
+              (_) => setState(() {
+                isLoading = false;
+              }),
+            );
           });
         });
       });
