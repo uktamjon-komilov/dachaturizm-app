@@ -22,7 +22,8 @@ class EstateListingScreen extends StatefulWidget {
 class _EstateListingScreenState extends State<EstateListingScreen> {
   bool _isLoading = false;
   bool _isSearched = false;
-  TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
 
   @override
   void initState() {
@@ -126,7 +127,7 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
                         ),
                         SearchBar(
                           controller: _searchController,
-                          focusNode: FocusNode(),
+                          focusNode: _searchFocusNode,
                           onSubmit: (value) {
                             _search(
                                 estateType != null ? estateType.slug : "dacha",
@@ -196,5 +197,12 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
               ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _searchFocusNode.dispose();
+    _searchController.dispose();
+    super.dispose();
   }
 }

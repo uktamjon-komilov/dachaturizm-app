@@ -5,6 +5,7 @@ import 'package:dachaturizm/providers/banner_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/providers/type_provider.dart';
+import 'package:dachaturizm/restartable_app.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:provider/provider.dart';
@@ -49,6 +50,10 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
                     icon: Icon(Icons.check),
                     onPressed: () async {
                       changeLocale(context, chosenLang);
+                      Provider.of<NavigationScreenProvider>(context,
+                              listen: false)
+                          .refreshHomePage = true;
+                      RestartWidget.restartApp(context);
                       Navigator.of(context).pop({"change": true});
                     },
                   )

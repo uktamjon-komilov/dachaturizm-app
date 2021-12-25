@@ -28,8 +28,8 @@ class HomePageScreen extends StatefulWidget {
 
 class _HomePageScreenState extends State<HomePageScreen> {
   bool _isLoading = true;
-  TextEditingController _searchController = TextEditingController();
-  FocusNode _searchFocusNode = FocusNode();
+  final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
 
   @override
   void didChangeDependencies() async {
@@ -45,10 +45,12 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
   @override
   void initState() {
+    super.initState();
     Future.delayed(Duration.zero).then((_) {
+      FocusScope.of(context).unfocus();
+      _searchController.clear();
       _refreshHomePage();
     });
-    super.initState();
   }
 
   Future<void> _refreshHomePage() async {
@@ -96,6 +98,8 @@ class _HomePageScreenState extends State<HomePageScreen> {
                   children: [
                     SearchBar(
                       controller: _searchController,
+                      focusNode: _searchFocusNode,
+                      autofocus: false,
                       onSubmit: (value) {
                         if (value != "") {
                           String term = _searchController.text;

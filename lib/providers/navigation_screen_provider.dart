@@ -3,10 +3,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class NavigationScreenProvider with ChangeNotifier {
+  final AuthProvider auth;
   int _currentIndex = 0;
-  List<int> _authRequiredScreens = [];
+  List<int> _authRequiredScreens = [2, 3];
   Map<String, dynamic> _data = {};
   bool _refreshHomePage = false;
+
+  NavigationScreenProvider({required this.auth});
 
   int get currentIndex {
     final currentIndex = _currentIndex;
@@ -28,16 +31,20 @@ class NavigationScreenProvider with ChangeNotifier {
     return {..._data};
   }
 
-  changePageIndex(int index, [Function? callback]) {
+  changePageIndex(int index, [Function? callback]) async {
     if (index == 0) {
       _refreshHomePage = true;
     }
     if (!_authRequiredScreens.contains(index)) {
       _currentIndex = index;
-
       notifyListeners();
     } else {
-      callback != null ? callback() : null;
+      String access = await auth.getAccessToken();
+      if (access == "") {
+        callback != null ? callback() : null;
+      } else {
+        _currentIndex = index;
+      }
       notifyListeners();
     }
     if (index == 0) clearData();

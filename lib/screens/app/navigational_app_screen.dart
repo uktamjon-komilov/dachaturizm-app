@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
@@ -60,37 +62,51 @@ class _NavigationalAppScreenState extends State<NavigationalAppScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Consumer<NavigationScreenProvider>(
-              builder: (context, navigator, _) {
-            return LocaleText(appBarTitles[navigator.currentIndex]);
-          }),
-          actions: [
-            IconButton(
-              onPressed: () async {
-                await callWithAuth(() async {
-                  Navigator.of(context).pushNamed(WishlistScreen.routeName);
-                });
-              },
-              icon: Icon(
-                Icons.favorite_border_outlined,
-                size: 30,
-                color: Colors.redAccent,
-              ),
-            )
-          ],
+    return WillPopScope(
+      onWillPop: () async {
+        print(Provider.of<NavigationScreenProvider>(context, listen: false)
+            .currentIndex);
+        if (Provider.of<NavigationScreenProvider>(context, listen: false)
+                .currentIndex ==
+            0) {
+          return exit(0);
+        }
+        Provider.of<NavigationScreenProvider>(context, listen: false)
+            .changePageIndex(0);
+        return false;
+      },
+      child: SafeArea(
+        child: Scaffold(
+          appBar: AppBar(
+            title: Consumer<NavigationScreenProvider>(
+                builder: (context, navigator, _) {
+              return LocaleText(appBarTitles[navigator.currentIndex]);
+            }),
+            actions: [
+              IconButton(
+                onPressed: () async {
+                  await callWithAuth(() async {
+                    Navigator.of(context).pushNamed(WishlistScreen.routeName);
+                  });
+                },
+                icon: Icon(
+                  Icons.favorite_border_outlined,
+                  size: 30,
+                  color: Colors.redAccent,
+                ),
+              )
+            ],
+          ),
+          body: Consumer<NavigationScreenProvider>(
+            builder: (context, navigator, _) {
+              return IndexedStack(
+                index: navigator.currentIndex,
+                children: _screens,
+              );
+            },
+          ),
+          bottomNavigationBar: _buildBottomNavigation(context),
         ),
-        body: Consumer<NavigationScreenProvider>(
-          builder: (context, navigator, _) {
-            return IndexedStack(
-              index: navigator.currentIndex,
-              children: _screens,
-            );
-          },
-        ),
-        bottomNavigationBar: _buildBottomNavigation(context),
       ),
     );
   }

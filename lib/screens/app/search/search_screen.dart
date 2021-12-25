@@ -112,6 +112,8 @@ class _SearchPageScreenState extends State<SearchPageScreen> {
       onWillPop: () async {
         Provider.of<NavigationScreenProvider>(context, listen: false)
             .refreshHomePage = true;
+        Provider.of<NavigationScreenProvider>(context, listen: false)
+            .changePageIndex(0);
         return true;
       },
       child: Container(
@@ -173,7 +175,7 @@ class _SearchPageScreenState extends State<SearchPageScreen> {
                 : SearchBar(
                     controller: _searchController,
                     focusNode: _searchFocusNode,
-                    autofocus: true,
+                    autofocus: false,
                     onSubmit: (value) {
                       _search(value);
                     },
@@ -240,6 +242,7 @@ class _SearchPageScreenState extends State<SearchPageScreen> {
   @override
   void dispose() {
     _searchController.dispose();
+    _searchFocusNode.dispose();
     super.dispose();
   }
 }

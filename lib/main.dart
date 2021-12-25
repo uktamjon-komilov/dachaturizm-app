@@ -6,6 +6,7 @@ import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/facility_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/providers/region_provider.dart';
+import 'package:dachaturizm/restartable_app.dart';
 import 'package:dachaturizm/screens/app/estate/estate_detail_screen.dart';
 import 'package:dachaturizm/screens/app/estate/location_picker_screen.dart';
 import 'package:dachaturizm/screens/app/home/home_screen.dart';
@@ -35,7 +36,7 @@ import 'providers/type_provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Locales.init(["en", "uz", "ru"]);
-  runApp(const MyApp());
+  runApp(RestartWidget(child: const MyApp()));
 }
 
 class MyApp extends StatefulWidget {
@@ -82,9 +83,14 @@ class _MyAppState extends State<MyApp> {
                 EstateProvider(dio: dio, auth: AuthProvider(dio: dio)),
             update: (context, auth, _) => EstateProvider(dio: dio, auth: auth),
           ),
-          ChangeNotifierProvider.value(
-            value: NavigationScreenProvider(),
+          ChangeNotifierProxyProvider<AuthProvider, NavigationScreenProvider>(
+            create: (context) =>
+                NavigationScreenProvider(auth: AuthProvider(dio: dio)),
+            update: (context, auth, _) => NavigationScreenProvider(auth: auth),
           ),
+          // ChangeNotifierProvider.value(
+          //   value: NavigationScreenProvider(),
+          // ),
           ChangeNotifierProvider.value(
             value: FacilityProvider(dio: dio),
           ),
