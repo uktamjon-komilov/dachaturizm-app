@@ -7,6 +7,8 @@ import 'package:dachaturizm/providers/facility_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/providers/region_provider.dart';
 import 'package:dachaturizm/restartable_app.dart';
+import 'package:dachaturizm/screens/app/chat/chat_list_screen.dart';
+import 'package:dachaturizm/screens/app/chat/chat_screen.dart';
 import 'package:dachaturizm/screens/app/estate/estate_detail_screen.dart';
 import 'package:dachaturizm/screens/app/estate/location_picker_screen.dart';
 import 'package:dachaturizm/screens/app/home/home_screen.dart';
@@ -88,9 +90,6 @@ class _MyAppState extends State<MyApp> {
                 NavigationScreenProvider(auth: AuthProvider(dio: dio)),
             update: (context, auth, _) => NavigationScreenProvider(auth: auth),
           ),
-          // ChangeNotifierProvider.value(
-          //   value: NavigationScreenProvider(),
-          // ),
           ChangeNotifierProvider.value(
             value: FacilityProvider(dio: dio),
           ),
@@ -101,8 +100,9 @@ class _MyAppState extends State<MyApp> {
             value: RegionProvider(),
           ),
         ],
-        child: Sizer(
-          builder: (context, orientation, deviceType) => MaterialApp(
+        child: Sizer(builder: (context, orientation, deviceType) {
+          Provider.of<AuthProvider>(context, listen: false).refresh_token();
+          return MaterialApp(
             title: LocaleText("appbar_text").toString(),
             localizationsDelegates: Locales.delegates,
             supportedLocales: Locales.supportedLocales,
@@ -147,12 +147,14 @@ class _MyAppState extends State<MyApp> {
               SearchFilersScreen.routeName: (context) => SearchFilersScreen(),
               EstateDetailScreen.routeName: (context) => EstateDetailScreen(),
               EditProfileScreen.routeName: (context) => EditProfileScreen(),
+              ChatListScreen.routeName: (context) => ChatListScreen(),
+              ChatScreen.routeName: (context) => ChatScreen(),
               MyAnnouncements.routeName: (context) => MyAnnouncements(),
               WishlistScreen.routeName: (context) => WishlistScreen(),
               ChangeLanguage.routeName: (context) => ChangeLanguage(),
             },
-          ),
-        ),
+          );
+        }),
       ),
     );
   }

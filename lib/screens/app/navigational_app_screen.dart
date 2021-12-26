@@ -1,9 +1,8 @@
 import 'dart:io';
-
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
-import 'package:dachaturizm/screens/app/chat/chat_screen.dart';
+import 'package:dachaturizm/screens/app/chat/chat_list_screen.dart';
 import 'package:dachaturizm/screens/app/estate/create_estate_screen.dart';
 import 'package:dachaturizm/screens/app/home/home_screen.dart';
 import 'package:dachaturizm/screens/app/search/search_screen.dart';
@@ -26,7 +25,7 @@ class _NavigationalAppScreenState extends State<NavigationalAppScreen> {
     HomePageScreen(),
     SearchPageScreen(),
     EstateCreationPageScreen(),
-    ChatPageScreen(),
+    ChatListScreen(),
     UserPageScreen()
   ];
 

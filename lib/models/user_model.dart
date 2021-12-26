@@ -17,6 +17,10 @@ class UserModel {
     required this.adsCount,
   });
 
+  String get fullname {
+    return "${firstName} ${lastName}";
+  }
+
   static UserModel fromJson(data) {
     return UserModel(
       id: data["id"],

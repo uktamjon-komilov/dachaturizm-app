@@ -51,52 +51,63 @@ class _UserPageScreenState extends State<UserPageScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ProfileListItem(
-          title: "my_estates",
-          icon: Icon(Icons.notes),
-          callback: () async {
-            callWithAuth(() async {
-              final myAnnouncements = MyAnnouncements();
-              await _navigateTo(myAnnouncements);
-            });
-          },
-        ),
-        ProfileListItem(
-            title: "my_favourites",
-            icon: Icon(Icons.favorite_outline_rounded),
-            callback: () async {
-              await callWithAuth(() async {
-                final wishlist = WishlistScreen();
-                await _navigateTo(wishlist);
-              });
-            }),
-        ProfileListItem(
-          title: "messages",
-          icon: Icon(Icons.chat_bubble_outline_rounded),
-          callback: () {
-            callWithAuth(() {
-              Navigator.of(context).pushNamed(MyAnnouncements.routeName);
-            });
-          },
-        ),
-        ProfileListItem(
-          title: "edit_profile",
-          icon: Icon(Icons.person_rounded),
-          callback: () {
-            callWithAuth(() {
-              Navigator.of(context).pushNamed(EditProfileScreen.routeName);
-            });
-          },
-        ),
-        ProfileListItem(
-          title: "change_password",
-          icon: Icon(Icons.lock),
-          callback: () {
-            callWithAuth(() {
-              Navigator.of(context).pushNamed(MyAnnouncements.routeName);
-            });
-          },
-        ),
+        Provider.of<AuthProvider>(context).user == null
+            ? Container()
+            : ProfileListItem(
+                title: "my_estates",
+                icon: Icon(Icons.notes),
+                callback: () async {
+                  callWithAuth(() async {
+                    final myAnnouncements = MyAnnouncements();
+                    await _navigateTo(myAnnouncements);
+                  });
+                },
+              ),
+        Provider.of<AuthProvider>(context).user == null
+            ? Container()
+            : ProfileListItem(
+                title: "my_favourites",
+                icon: Icon(Icons.favorite_outline_rounded),
+                callback: () async {
+                  await callWithAuth(() async {
+                    final wishlist = WishlistScreen();
+                    await _navigateTo(wishlist);
+                  });
+                }),
+        Provider.of<AuthProvider>(context).user == null
+            ? Container()
+            : ProfileListItem(
+                title: "messages",
+                icon: Icon(Icons.chat_bubble_outline_rounded),
+                callback: () {
+                  callWithAuth(() {
+                    Navigator.of(context).pushNamed(MyAnnouncements.routeName);
+                  });
+                },
+              ),
+        Provider.of<AuthProvider>(context).user == null
+            ? Container()
+            : ProfileListItem(
+                title: "edit_profile",
+                icon: Icon(Icons.person_rounded),
+                callback: () {
+                  callWithAuth(() {
+                    Navigator.of(context)
+                        .pushNamed(EditProfileScreen.routeName);
+                  });
+                },
+              ),
+        Provider.of<AuthProvider>(context).user == null
+            ? Container()
+            : ProfileListItem(
+                title: "change_password",
+                icon: Icon(Icons.lock),
+                callback: () {
+                  callWithAuth(() {
+                    Navigator.of(context).pushNamed(MyAnnouncements.routeName);
+                  });
+                },
+              ),
         ProfileListItem(
             title: "change_language",
             icon: Icon(Icons.language_rounded),
@@ -297,9 +308,9 @@ class _UserPageScreenState extends State<UserPageScreen> {
                         child: CircularProgressIndicator(),
                       )
                     : _buildUserDetails(auth.user),
-                Divider(),
+                // Divider(),
                 _buildProfileList(),
-                Divider(),
+                // Divider(),
               ],
             ),
           ),

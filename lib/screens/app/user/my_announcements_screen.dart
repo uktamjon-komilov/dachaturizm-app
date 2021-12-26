@@ -1,4 +1,6 @@
+import 'package:dachaturizm/components/small_grey_text.dart';
 import 'package:dachaturizm/constants.dart';
+import 'package:dachaturizm/helpers/parse_datetime.dart';
 import 'package:dachaturizm/models/ads_plan.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/providers/currency_provider.dart';
@@ -24,10 +26,6 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
   bool _isLoading = false;
   List<Map<String, dynamic>> _actions = [];
   String _adPlan = "";
-
-  String _parseDateTime(DateTime datetime) {
-    return "${datetime.year}-${datetime.month}-${datetime.day}";
-  }
 
   _showStatusSnackBar(bool value) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -383,7 +381,7 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
             SmallGreyText(
               text: Locales.string(context, "placed") +
                   " " +
-                  _parseDateTime(
+                  parseDateTime(
                     estate.created as DateTime,
                   ),
             ),
@@ -468,28 +466,6 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
           fit: BoxFit.cover,
         ),
       ),
-    );
-  }
-}
-
-class SmallGreyText extends StatelessWidget {
-  const SmallGreyText({
-    Key? key,
-    required this.text,
-  }) : super(key: key);
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: TextStyle(
-        color: normalGrey,
-        fontSize: 10,
-        overflow: TextOverflow.ellipsis,
-      ),
-      maxLines: 1,
     );
   }
 }

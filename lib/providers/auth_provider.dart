@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:dachaturizm/constants.dart';
+import 'package:dachaturizm/models/estate_model.dart';
+import 'package:dachaturizm/models/message_model.dart';
 import 'package:dachaturizm/models/user_model.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -31,6 +33,8 @@ class AuthProvider with ChangeNotifier {
   }
 
   dynamic getAccessToken() async {
+    String refresh = await getRefreshToken();
+    if (refresh == "") return "";
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String access = prefs.getString("access").toString();
     var expiryDateString = prefs.getString("access_expires");
@@ -42,10 +46,26 @@ class AuthProvider with ChangeNotifier {
     if (expiryDate.isAfter(now)) {
       return access;
     } else {
-      await refresh();
+      await refresh_token();
       String access = prefs.getString("access").toString();
       _userId = Jwt.parseJwt(access)["user_id"];
       return access;
+    }
+  }
+
+  dynamic getRefreshToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String refresh = prefs.getString("refresh").toString();
+    var expiryDateString = prefs.getString("refresh_expires");
+    if (expiryDateString == null || expiryDateString == "") {
+      return "";
+    }
+    DateTime expiryDate = DateTime.parse(expiryDateString.toString());
+    DateTime now = DateTime.now();
+    if (expiryDate.isAfter(now)) {
+      return refresh;
+    } else {
+      return await logout();
     }
   }
 
@@ -132,9 +152,12 @@ class AuthProvider with ChangeNotifier {
           _refreshToken = data["refresh"] as String;
           await prefs.setString("access", _accessToken);
           await prefs.setString("refresh", _refreshToken);
-          final expiryDate = DateTime.now().add(Duration(minutes: 59));
-          print(expiryDate.toString());
-          await prefs.setString("access_expires", expiryDate.toString());
+          final accessExpiryDate = DateTime.now().add(Duration(minutes: 59));
+          await prefs.setString("access_expires", accessExpiryDate.toString());
+          final refreshExpiryDate =
+              DateTime.now().add(Duration(days: 29, hours: 23));
+          await prefs.setString(
+              "refresh_expires", refreshExpiryDate.toString());
           Map<String, dynamic> payload = Jwt.parseJwt(data["access"]);
           _userId = payload["user_id"];
           return data;
@@ -148,7 +171,7 @@ class AuthProvider with ChangeNotifier {
     return {"status": false};
   }
 
-  Future<String> refresh() async {
+  Future<String> refresh_token() async {
     const url = "${baseUrl}api/token/refresh/";
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String _refresh = prefs.getString("refresh").toString();
@@ -158,6 +181,7 @@ class AuthProvider with ChangeNotifier {
       prefs.setString("access", "");
       prefs.setString("refresh", "");
       prefs.setString("access_expires", "");
+      prefs.setString("refresh_expires", "");
     }
     try {
       final response = await dio.post(
@@ -186,7 +210,9 @@ class AuthProvider with ChangeNotifier {
     prefs.setString("access", "");
     prefs.setString("refresh", "");
     prefs.setString("access_expires", "");
+    prefs.setString("refresh_expires", "");
     notifyListeners();
+    return "";
   }
 
   Future<Map> updateUser(FormData data) async {
@@ -230,5 +256,58 @@ class AuthProvider with ChangeNotifier {
     }
 
     return {"status": false};
+  }
+
+  Future getMyChats() async {
+    const url = "${baseUrl}api/messages/mychats/";
+    String access = await getAccessToken();
+    String refresh = await getRefreshToken();
+    List<MessageModel> chats = [];
+    if (refresh == null || refresh == "") {
+      return chats;
+    }
+    Map<String, String> headers = {
+      "Content-type": "application/json",
+      "Authorization": "Bearer ${access}"
+    };
+    final response = await dio.get(url, options: Options(headers: headers));
+    if (response.statusCode as int >= 200 || response.statusCode as int < 300) {
+      await response.data.forEach((item) async {
+        MessageModel chat = await MessageModel.fromJson(item);
+        chats.add(chat);
+      });
+    }
+    try {
+      return chats;
+    } catch (e) {}
+    return chats;
+  }
+
+  Future getMessages(int estateId, int receiverId) async {
+    const url = "${baseUrl}api/messages/get-messages/";
+    String access = await getAccessToken();
+    Map<String, String> headers = {
+      "Content-type": "application/json",
+      "Authorization": "Bearer ${access}"
+    };
+    Map<String, dynamic> data = {"estate": null, "messages": []};
+    try {
+      final response = await dio.post(url,
+          data: {"estate": estateId, "receiver": receiverId},
+          options: Options(headers: headers));
+      if (response.statusCode as int >= 200 ||
+          response.statusCode as int < 300) {
+        EstateModel estate =
+            await EstateModel.fromJsonAsBanner(response.data["estate"]);
+        data["estate"] = estate;
+        await response.data["results"].forEach((item) async {
+          MessageModel message = await MessageModel.fromJson(item);
+          data["messages"].add(message);
+        });
+      }
+    } catch (e) {
+      print(e);
+    }
+    return data;
   }
 }

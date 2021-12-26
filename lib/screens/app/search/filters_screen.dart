@@ -2,7 +2,6 @@ import 'package:dachaturizm/components/small_button.dart';
 import 'package:dachaturizm/components/text1.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/models/currency_model.dart';
-import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/models/facility_model.dart';
 import 'package:dachaturizm/models/region_model.dart';
 import 'package:dachaturizm/providers/currency_provider.dart';

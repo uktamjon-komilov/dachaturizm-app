@@ -126,7 +126,9 @@ class EstateProvider with ChangeNotifier {
   Future getData(url) async {
     Map<String, String> headers = {"Content-type": "application/json"};
     String access = await auth.getAccessToken();
-    if (access != "") headers["Authorization"] = "Bearer ${access}";
+    String refresh = await auth.getRefreshToken();
+    if (access != "" && refresh != "")
+      headers["Authorization"] = "Bearer ${access}";
 
     try {
       final response = await dio.get(url, options: Options(headers: headers));

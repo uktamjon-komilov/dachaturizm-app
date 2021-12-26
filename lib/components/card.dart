@@ -1,13 +1,17 @@
 import 'package:dachaturizm/constants.dart';
+import 'package:dachaturizm/models/booking_day.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/screens/app/estate/estate_detail_screen.dart';
 import 'package:dachaturizm/screens/auth/login_screen.dart';
 import "package:flutter/material.dart";
+import 'package:flutter_locales/flutter_locales.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 class EstateCard extends StatefulWidget {
   const EstateCard({
@@ -182,17 +186,22 @@ class _EstateCardState extends State<EstateCard> {
                               color: Colors.red,
                             ),
                           ),
-                          // SizedBox(
-                          //   height: 12,
+                          // IconButton(
+                          //   iconSize: 20,
+                          //   onPressed: () async {
+                          //     final Set<BookingDay> _selectedDays =
+                          //         Set<BookingDay>();
+                          //     for (int i = 0;
+                          //         i < widget.estate.bookedDays.length;
+                          //         i++) {
+                          //       _selectedDays.add(widget.estate.bookedDays[i]);
+                          //     }
+                          //   },
+                          //   icon: Icon(
+                          //     Icons.calendar_today_outlined,
+                          //     color: darkPurple,
+                          //   ),
                           // ),
-                          IconButton(
-                            iconSize: 20,
-                            onPressed: () {},
-                            icon: Icon(
-                              Icons.calendar_today_outlined,
-                              color: darkPurple,
-                            ),
-                          ),
                         ],
                       ),
                     )
