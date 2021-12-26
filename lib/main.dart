@@ -15,6 +15,7 @@ import 'package:dachaturizm/screens/app/home/home_screen.dart';
 import 'package:dachaturizm/screens/app/home/listing_screen.dart';
 import 'package:dachaturizm/screens/app/navigational_app_screen.dart';
 import 'package:dachaturizm/screens/app/search/filters_screen.dart';
+import 'package:dachaturizm/screens/app/user/balance_screen.dart';
 import 'package:dachaturizm/screens/app/user/change_language.dart';
 import 'package:dachaturizm/screens/app/user/edit_profile_screen.dart';
 import 'package:dachaturizm/screens/app/user/my_announcements_screen.dart';
@@ -151,6 +152,7 @@ class _MyAppState extends State<MyApp> {
               ChatScreen.routeName: (context) => ChatScreen(),
               MyAnnouncements.routeName: (context) => MyAnnouncements(),
               WishlistScreen.routeName: (context) => WishlistScreen(),
+              BalanceScreen.routeName: (context) => BalanceScreen(),
               ChangeLanguage.routeName: (context) => ChangeLanguage(),
             },
           );

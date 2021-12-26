@@ -660,6 +660,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                             hintText: "Ism",
                             controller: _announcerController,
                             focusNode: _announcerFocusNode,
+                            validation: false,
                             onChanged: () {
                               setState(() {
                                 _isLoading = false;

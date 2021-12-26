@@ -17,6 +17,7 @@ class NormalTextInput extends StatelessWidget {
     ScrollController? scrollController,
     this.isPhone = false,
     this.isPrice = false,
+    this.validation = false,
   }) : super(key: key);
 
   final String hintText;
@@ -28,6 +29,7 @@ class NormalTextInput extends StatelessWidget {
   final Function onSubmitted;
   final bool isPhone;
   final bool isPrice;
+  final bool validation;
 
   @override
   Widget build(BuildContext context) {
@@ -49,6 +51,7 @@ class NormalTextInput extends StatelessWidget {
         onSubmitted(value);
       },
       validator: (value) {
+        if (!validation) return null;
         if (value != null && value.length < 13 && isPhone) {
           return Locales.string(context, "Please, enter a valid phone number");
         } else if (isPhone) {

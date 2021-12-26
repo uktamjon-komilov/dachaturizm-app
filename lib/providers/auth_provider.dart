@@ -248,7 +248,6 @@ class AuthProvider with ChangeNotifier {
       if (response.statusCode as int >= 200 ||
           response.statusCode as int < 300) {
         Map<String, dynamic> data = response.data;
-        print(data);
         _user = UserModel.fromJson(data);
         notifyListeners();
         return _user;

@@ -42,4 +42,25 @@ class CurrencyProvider with ChangeNotifier {
     }
     return plans;
   }
+
+  Future getPaymentLinks(String type, int userId, double amount,
+      {String? returnUrl}) async {
+    final url = "${baseUrl}api/payment-links/${type}/";
+    try {
+      final response = await dio.post(url, data: {
+        "user": userId,
+        "amount": amount,
+        "return_url": "https://dachaturizm.uz/"
+      });
+
+      if (response.statusCode as int >= 200 ||
+          response.statusCode as int < 300) {
+        return response.data["link"];
+      }
+    } catch (e) {
+      print(e);
+    }
+
+    return "";
+  }
 }

@@ -3,6 +3,7 @@ import 'package:dachaturizm/helpers/url_helper.dart';
 import 'package:dachaturizm/models/user_model.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
+import 'package:dachaturizm/screens/app/user/balance_screen.dart';
 import 'package:dachaturizm/screens/app/user/change_language.dart';
 import 'package:dachaturizm/screens/app/user/edit_profile_screen.dart';
 import 'package:dachaturizm/screens/app/user/my_announcements_screen.dart';
@@ -81,7 +82,9 @@ class _UserPageScreenState extends State<UserPageScreen> {
                 icon: Icon(Icons.chat_bubble_outline_rounded),
                 callback: () {
                   callWithAuth(() {
-                    Navigator.of(context).pushNamed(MyAnnouncements.routeName);
+                    Provider.of<NavigationScreenProvider>(context,
+                            listen: false)
+                        .changePageIndex(3);
                   });
                 },
               ),
@@ -211,7 +214,10 @@ class _UserPageScreenState extends State<UserPageScreen> {
                               ),
                             ),
                             ElevatedButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                Navigator.of(context)
+                                    .pushNamed(BalanceScreen.routeName);
+                              },
                               style: ElevatedButton.styleFrom(
                                 primary: normalOrange,
                                 elevation: 0,
