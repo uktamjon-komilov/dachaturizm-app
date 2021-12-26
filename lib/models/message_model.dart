@@ -23,9 +23,6 @@ class MessageModel {
 
   static Future<MessageModel> fromJson(data) async {
     EstateModel estate = await EstateModel.fromJson(data["estate_detail"]);
-
-    print(data);
-
     return MessageModel(
       id: data["id"],
       sender: UserModel.fromJson(data["sender"]),

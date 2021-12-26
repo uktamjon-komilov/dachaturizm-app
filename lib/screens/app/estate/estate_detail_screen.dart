@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:dachaturizm/constants.dart';
+import 'package:dachaturizm/helpers/get_ip_address.dart';
 import 'package:dachaturizm/helpers/get_my_location.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/models/type_model.dart';
@@ -9,6 +10,7 @@ import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/type_provider.dart';
 import 'package:dachaturizm/screens/app/estate/detail_builders.dart';
 import 'package:dachaturizm/screens/auth/login_screen.dart';
+import 'package:dio/dio.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:location/location.dart';
@@ -149,6 +151,21 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
     });
 
     super.didChangeDependencies();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration.zero).then((_) async {
+      Dio dio = Provider.of<AuthProvider>(context, listen: false).dio;
+      final ip = await getPublicIP(dio);
+      print(ip);
+      if (ip == null) {
+      } else {
+        Provider.of<EstateProvider>(context, listen: false)
+            .addEstateView(ip, detail.id);
+      }
+    });
   }
 
   @override

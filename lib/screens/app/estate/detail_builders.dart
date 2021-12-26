@@ -296,11 +296,19 @@ class DetailBuilder {
       ),
       child: Row(
         children: [
-          CircleAvatar(
-            radius: 23,
-            child: ClipOval(
+          ClipRRect(
+            borderRadius: BorderRadius.circular(25),
+            child: Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(25),
+              ),
               child: detail.userPhoto != ""
-                  ? Image.network(fixMediaUrl(detail.userPhoto))
+                  ? Image.network(
+                      fixMediaUrl(detail.userPhoto),
+                      fit: BoxFit.cover,
+                    )
                   : Image.asset("assets/images/user.png"),
             ),
           ),

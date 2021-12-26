@@ -433,7 +433,6 @@ class EstateProvider with ChangeNotifier {
 
   Future<bool> advertise(String plan, String id) async {
     final url = "${baseUrl}api/advertise/${plan}/${id}/";
-    print(url);
     final access = await auth.getAccessToken();
     try {
       final response = await dio.post(url,
@@ -441,7 +440,6 @@ class EstateProvider with ChangeNotifier {
             "Content-type": "application/json",
             "Authorization": "Bearer ${access}"
           }));
-      print("alooo");
       if (response.statusCode as int >= 200 ||
           response.statusCode as int < 300) {
         return true;
@@ -496,5 +494,10 @@ class EstateProvider with ChangeNotifier {
       }
     } catch (e) {}
     return estates;
+  }
+
+  Future addEstateView(String ip, int estateId) async {
+    const url = "${baseUrl}api/views/";
+    await dio.post(url, data: {"estate": estateId, "ip": ip});
   }
 }
