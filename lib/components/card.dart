@@ -1,4 +1,5 @@
 import 'package:dachaturizm/constants.dart';
+import 'package:dachaturizm/helpers/call_with_auth.dart';
 import 'package:dachaturizm/models/booking_day.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
@@ -27,20 +28,6 @@ class EstateCard extends StatefulWidget {
 
 class _EstateCardState extends State<EstateCard> {
   bool _isLiked = false;
-
-  _showLoginScreen() async {
-    await Navigator.of(context).pushNamed(LoginScreen.routeName);
-  }
-
-  Future callWithAuth([Function? callback]) async {
-    final access = await Provider.of<AuthProvider>(context, listen: false)
-        .getAccessToken();
-    if (access != "") {
-      if (callback != null) callback();
-    } else {
-      await _showLoginScreen();
-    }
-  }
 
   Widget _showTopIndicator() {
     return Positioned(
@@ -159,7 +146,7 @@ class _EstateCardState extends State<EstateCard> {
                             iconSize: 20,
                             onPressed: () async {
                               bool original = _isLiked;
-                              await callWithAuth(() async {
+                              await callWithAuth(context, () async {
                                 setState(() {
                                   _isLiked = !_isLiked;
                                 });

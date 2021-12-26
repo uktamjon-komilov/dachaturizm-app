@@ -32,7 +32,6 @@ class _WishlistScreenState extends State<WishlistScreen> {
       Provider.of<EstateProvider>(context, listen: false)
           .myWishlist()
           .then((value) {
-        print(value);
         setState(() {
           _estates = value;
           _isLoading = false;

@@ -87,9 +87,9 @@ class _BalanceScreenState extends State<BalanceScreen>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
-    // if (state == AppLifecycleState.resumed) {
-    //   await _refreshBalance();
-    // }
+    if (state == AppLifecycleState.resumed) {
+      await _refreshBalance();
+    }
   }
 
   @override

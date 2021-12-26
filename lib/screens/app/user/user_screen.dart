@@ -1,4 +1,5 @@
 import 'package:dachaturizm/constants.dart';
+import 'package:dachaturizm/helpers/call_with_auth.dart';
 import 'package:dachaturizm/helpers/url_helper.dart';
 import 'package:dachaturizm/models/user_model.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
@@ -22,33 +23,7 @@ class UserPageScreen extends StatefulWidget {
 }
 
 class _UserPageScreenState extends State<UserPageScreen> {
-  _showLoginScreen() async {
-    final loginScreen = LoginScreen();
-    Map result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => loginScreen,
-        settings: RouteSettings(
-          arguments: {"relogin": true},
-        ),
-      ),
-    ) as Map;
-    Future.delayed(Duration.zero).then((_) {
-      _refreshUser();
-    });
-  }
-
-  Future callWithAuth([Function? callback]) async {
-    final access = await Provider.of<AuthProvider>(context, listen: false)
-        .getAccessToken();
-    if (access != "") {
-      if (callback != null) callback();
-    } else {
-      await _showLoginScreen();
-    }
-  }
-
-  Column _buildProfileList() {
+  Widget _buildProfileList() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -58,7 +33,7 @@ class _UserPageScreenState extends State<UserPageScreen> {
                 title: "my_estates",
                 icon: Icon(Icons.notes),
                 callback: () async {
-                  callWithAuth(() async {
+                  callWithAuth(context, () async {
                     final myAnnouncements = MyAnnouncements();
                     await _navigateTo(myAnnouncements);
                   });
@@ -70,7 +45,7 @@ class _UserPageScreenState extends State<UserPageScreen> {
                 title: "my_favourites",
                 icon: Icon(Icons.favorite_outline_rounded),
                 callback: () async {
-                  await callWithAuth(() async {
+                  await callWithAuth(context, () async {
                     final wishlist = WishlistScreen();
                     await _navigateTo(wishlist);
                   });
@@ -81,7 +56,7 @@ class _UserPageScreenState extends State<UserPageScreen> {
                 title: "messages",
                 icon: Icon(Icons.chat_bubble_outline_rounded),
                 callback: () {
-                  callWithAuth(() {
+                  callWithAuth(context, () {
                     Provider.of<NavigationScreenProvider>(context,
                             listen: false)
                         .changePageIndex(3);
@@ -94,7 +69,7 @@ class _UserPageScreenState extends State<UserPageScreen> {
                 title: "edit_profile",
                 icon: Icon(Icons.person_rounded),
                 callback: () {
-                  callWithAuth(() {
+                  callWithAuth(context, () {
                     Navigator.of(context)
                         .pushNamed(EditProfileScreen.routeName);
                   });
@@ -106,7 +81,7 @@ class _UserPageScreenState extends State<UserPageScreen> {
                 title: "change_password",
                 icon: Icon(Icons.lock),
                 callback: () {
-                  callWithAuth(() {
+                  callWithAuth(context, () {
                     Navigator.of(context).pushNamed(MyAnnouncements.routeName);
                   });
                 },
@@ -124,10 +99,10 @@ class _UserPageScreenState extends State<UserPageScreen> {
                 title: "profile_logout",
                 icon: Icon(Icons.logout_rounded),
                 callback: () {
-                  callWithAuth(() async {
+                  callWithAuth(context, () async {
                     await Provider.of<AuthProvider>(context, listen: false)
                         .logout();
-                    await _showLoginScreen();
+                    Navigator.of(context).pushNamed(LoginScreen.routeName);
                   });
                 },
               ),
@@ -195,7 +170,7 @@ class _UserPageScreenState extends State<UserPageScreen> {
                           children: [
                             OutlinedButton(
                               onPressed: () async {
-                                callWithAuth(() async {
+                                callWithAuth(context, () async {
                                   final editProfile = EditProfileScreen();
                                   await _navigateTo(editProfile);
                                 });
@@ -243,26 +218,14 @@ class _UserPageScreenState extends State<UserPageScreen> {
 
   bool _userLoading = false;
   bool _someChange = false;
-  UserModel? _user;
 
   Future _refreshUser() async {
     setState(() {
       _userLoading = true;
     });
-    Provider.of<AuthProvider>(context, listen: false)
-        .getUserData()
-        .then((value) {
-      try {
-        setState(() {
-          _userLoading = false;
-        });
-        if (!value.containsKey("status")) {}
-      } catch (e) {
-        setState(() {
-          _user = value;
-          _userLoading = false;
-        });
-      }
+    await Provider.of<AuthProvider>(context, listen: false).getUserData();
+    setState(() {
+      _userLoading = false;
     });
   }
 

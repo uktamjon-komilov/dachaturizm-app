@@ -1,5 +1,6 @@
 import 'package:dachaturizm/components/small_grey_text.dart';
 import 'package:dachaturizm/constants.dart';
+import 'package:dachaturizm/helpers/call_with_auth.dart';
 import 'package:dachaturizm/helpers/parse_datetime.dart';
 import 'package:dachaturizm/models/ads_plan.dart';
 import 'package:dachaturizm/models/estate_model.dart';
@@ -127,6 +128,7 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
   }
 
   void _navigateToEditScreen([String? id]) {}
+
   void _openAdsPriceList([String? id]) {
     showModalBottomSheet(
       context: context,
@@ -230,7 +232,9 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
   void _chooseAction(EstateModel estate, String action) async {
     final chosenAction =
         _actions.firstWhere((_action) => _action["key"] == action);
-    chosenAction["callback"](estate.id.toString());
+    callWithAuth(context, () {
+      chosenAction["callback"](estate.id.toString());
+    });
   }
 
   @override
@@ -277,6 +281,132 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
       },
     ];
     super.didChangeDependencies();
+  }
+
+  Widget _buildDateAndViews(EstateModel estate) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          children: [
+            Icon(
+              Icons.calendar_today_rounded,
+              size: 15,
+              color: normalGrey,
+            ),
+            SizedBox(width: 5),
+            SmallGreyText(
+              text: Locales.string(context, "placed") +
+                  " " +
+                  parseDateTime(
+                    estate.created as DateTime,
+                  ),
+            ),
+          ],
+        ),
+        Row(
+          children: [
+            Icon(
+              Icons.remove_red_eye,
+              size: 15,
+              color: normalGrey,
+            ),
+            SizedBox(width: 5),
+            SmallGreyText(
+              text: "${Locales.string(context, "views")} ${estate.views}",
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLocation(EstateModel estate) {
+    return Row(
+      children: [
+        Icon(
+          Icons.location_city,
+          size: 15,
+          color: normalGrey,
+        ),
+        SizedBox(width: 5),
+        SmallGreyText(text: estate.address),
+      ],
+    );
+  }
+
+  Widget _buildTitleWithStars(EstateModel estate) {
+    return Padding(
+      padding: const EdgeInsets.only(
+        right: defaultPadding * 1.2,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            estate.title,
+            style: TextStyle(
+              color: darkPurple,
+              fontWeight: FontWeight.bold,
+              overflow: TextOverflow.ellipsis,
+            ),
+            maxLines: 1,
+          ),
+          SizedBox(height: 5),
+          RatingBar.builder(
+            ignoreGestures: true,
+            initialRating: estate.rating,
+            minRating: 1,
+            direction: Axis.horizontal,
+            allowHalfRating: true,
+            itemCount: 5,
+            itemSize: 15,
+            itemBuilder: (context, _) => Icon(
+              Icons.star,
+              color: Colors.amber,
+            ),
+            onRatingUpdate: (rating) {},
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildImageBox(EstateModel estate) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(10),
+      child: Container(
+        width: 80,
+        height: 80,
+        child: Image.network(
+          estate.photo,
+          fit: BoxFit.cover,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildThreeDots(EstateModel estate) {
+    return Positioned(
+      right: -15,
+      top: -15,
+      child: PopupMenuButton<String>(
+        elevation: 1,
+        onSelected: (String value) {
+          _chooseAction(estate, value);
+        },
+        itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+          ..._actions
+              .map(
+                (action) => PopupMenuItem<String>(
+                  value: action["key"],
+                  child: Text(action["value"].toString()),
+                ),
+              )
+              .toList(),
+        ],
+      ),
+    );
   }
 
   @override
@@ -331,28 +461,7 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
                                       ),
                                     ],
                                   ),
-                                  Positioned(
-                                    right: -15,
-                                    top: -15,
-                                    child: PopupMenuButton<String>(
-                                      elevation: 1,
-                                      onSelected: (String value) {
-                                        _chooseAction(estate, value);
-                                      },
-                                      itemBuilder: (BuildContext context) =>
-                                          <PopupMenuEntry<String>>[
-                                        ..._actions
-                                            .map(
-                                              (action) => PopupMenuItem<String>(
-                                                value: action["key"],
-                                                child: Text(
-                                                    action["value"].toString()),
-                                              ),
-                                            )
-                                            .toList(),
-                                      ],
-                                    ),
-                                  ),
+                                  _buildThreeDots(estate),
                                 ],
                               ),
                             ),
@@ -362,109 +471,6 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
                   ],
                 ),
               ),
-      ),
-    );
-  }
-
-  Row _buildDateAndViews(EstateModel estate) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Row(
-          children: [
-            Icon(
-              Icons.calendar_today_rounded,
-              size: 15,
-              color: normalGrey,
-            ),
-            SizedBox(width: 5),
-            SmallGreyText(
-              text: Locales.string(context, "placed") +
-                  " " +
-                  parseDateTime(
-                    estate.created as DateTime,
-                  ),
-            ),
-          ],
-        ),
-        Row(
-          children: [
-            Icon(
-              Icons.remove_red_eye,
-              size: 15,
-              color: normalGrey,
-            ),
-            SizedBox(width: 5),
-            SmallGreyText(
-              text: "${Locales.string(context, "views")} ${estate.views}",
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Row _buildLocation(EstateModel estate) {
-    return Row(
-      children: [
-        Icon(
-          Icons.location_city,
-          size: 15,
-          color: normalGrey,
-        ),
-        SizedBox(width: 5),
-        SmallGreyText(text: estate.address),
-      ],
-    );
-  }
-
-  Padding _buildTitleWithStars(EstateModel estate) {
-    return Padding(
-      padding: const EdgeInsets.only(
-        right: defaultPadding * 1.2,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            estate.title,
-            style: TextStyle(
-              color: darkPurple,
-              fontWeight: FontWeight.bold,
-              overflow: TextOverflow.ellipsis,
-            ),
-            maxLines: 1,
-          ),
-          SizedBox(height: 5),
-          RatingBar.builder(
-            ignoreGestures: true,
-            initialRating: estate.rating,
-            minRating: 1,
-            direction: Axis.horizontal,
-            allowHalfRating: true,
-            itemCount: 5,
-            itemSize: 15,
-            itemBuilder: (context, _) => Icon(
-              Icons.star,
-              color: Colors.amber,
-            ),
-            onRatingUpdate: (rating) {},
-          ),
-        ],
-      ),
-    );
-  }
-
-  ClipRRect _buildImageBox(EstateModel estate) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(10),
-      child: Container(
-        width: 80,
-        height: 80,
-        child: Image.network(
-          estate.photo,
-          fit: BoxFit.cover,
-        ),
       ),
     );
   }

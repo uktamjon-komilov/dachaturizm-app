@@ -9,6 +9,7 @@ class MessageModel {
   final String text;
   final int estateId;
   final EstateModel estateDetail;
+  final int count;
 
   MessageModel({
     required this.id,
@@ -17,17 +18,22 @@ class MessageModel {
     required this.text,
     required this.estateId,
     required this.estateDetail,
+    required this.count,
   });
 
   static Future<MessageModel> fromJson(data) async {
     EstateModel estate = await EstateModel.fromJson(data["estate_detail"]);
 
+    print(data);
+
     return MessageModel(
-        id: data["id"],
-        sender: UserModel.fromJson(data["sender"]),
-        receiver: UserModel.fromJson(data["receiver"]),
-        text: data["text"],
-        estateId: data["estate"],
-        estateDetail: estate);
+      id: data["id"],
+      sender: UserModel.fromJson(data["sender"]),
+      receiver: UserModel.fromJson(data["receiver"]),
+      text: data["text"],
+      estateId: data["estate"],
+      estateDetail: estate,
+      count: data["unread_messages_count"],
+    );
   }
 }

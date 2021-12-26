@@ -304,6 +304,32 @@ class AuthProvider with ChangeNotifier {
           data["messages"].add(message);
         });
       }
+    } catch (e) {}
+    return data;
+  }
+
+  Future sendMessage(int estateId, int receiverId, String text) async {
+    const url = "${baseUrl}api/messages/send-message/";
+    String access = await getAccessToken();
+    Map<String, String> headers = {
+      "Content-type": "application/json",
+      "Authorization": "Bearer ${access}"
+    };
+    Map<String, dynamic> data = {"estate": null, "messages": []};
+    try {
+      final response = await dio.post(url,
+          data: {"estate": estateId, "receiver": receiverId, "text": text},
+          options: Options(headers: headers));
+      if (response.statusCode as int >= 200 ||
+          response.statusCode as int < 300) {
+        EstateModel estate =
+            await EstateModel.fromJsonAsBanner(response.data["estate"]);
+        data["estate"] = estate;
+        await response.data["results"].forEach((item) async {
+          MessageModel message = await MessageModel.fromJson(item);
+          data["messages"].add(message);
+        });
+      }
     } catch (e) {
       print(e);
     }

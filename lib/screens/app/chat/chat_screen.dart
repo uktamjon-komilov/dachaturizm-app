@@ -1,12 +1,14 @@
-import 'dart:ffi';
+import 'dart:async';
 
 import 'package:dachaturizm/components/small_grey_text.dart';
 import 'package:dachaturizm/constants.dart';
+import 'package:dachaturizm/helpers/call_with_auth.dart';
 import 'package:dachaturizm/helpers/parse_datetime.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/models/user_model.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
-import 'package:dachaturizm/providers/estate_provider.dart';
+import 'package:dachaturizm/providers/navigation_screen_provider.dart';
+import 'package:dachaturizm/screens/auth/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -29,34 +31,26 @@ class _ChatScreenState extends State<ChatScreen> {
   EstateModel? estate;
   UserModel? sender;
   Map<String, dynamic> _data = {};
+  TextEditingController _textController = TextEditingController();
+  ScrollController _scrollController = ScrollController();
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!_isInit) {
-      Map<String, dynamic> data =
-          ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
-      setState(() {
-        estate = data["estate"];
-        sender = data["sender"];
-        _isInit = true;
-        _isLoading = true;
-      });
-      Provider.of<AuthProvider>(context).getUserId().then((value) {
-        print(value);
+  _sendMessage() async {
+    String text = _textController.text;
+    _textController.text = "";
+    Provider.of<AuthProvider>(context, listen: false)
+        .sendMessage(estate!.id, sender!.id, text)
+        .then((data) {
+      if (data["estate"] == null) {
+        callWithAuth(context, () {
+          Navigator.of(context).pushNamed(LoginScreen.routeName);
+        });
+      } else {
         setState(() {
-          _userId = value;
+          _data = data;
         });
-        Provider.of<AuthProvider>(context, listen: false)
-            .getMessages(estate!.id, sender!.id)
-            .then((value) {
-          setState(() {
-            _data = value;
-            _isLoading = false;
-          });
-        });
-      });
-    }
+        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+      }
+    });
   }
 
   Widget _buildImageBox(EstateModel estate) {
@@ -197,98 +191,144 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
+  Widget _buildInputBox() {
+    return Container(
+      padding: EdgeInsets.fromLTRB(5, 1, 1, 1),
+      child: TextFormField(
+        controller: _textController,
+        style: TextStyle(fontSize: 18),
+        textAlignVertical: TextAlignVertical.center,
+        decoration: InputDecoration(
+          border: null,
+          hintText: "Write a message",
+          suffix: Padding(
+            padding: const EdgeInsets.only(right: 15),
+            child: SizedBox(
+              width: 20,
+              height: 20,
+              child: IconButton(
+                onPressed: () async {
+                  await _sendMessage();
+                },
+                icon: Icon(Icons.send),
+                iconSize: 20,
+                padding: EdgeInsets.all(0),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMessagesList() {
+    return Expanded(
+      child: SingleChildScrollView(
+        controller: _scrollController,
+        child: Column(
+          children: [
+            ..._data["messages"].map((message) {
+              return MessageItem(
+                text: message.text,
+                isSent: message.sender.id == _userId,
+              );
+            }).toList(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_isInit) {
+      Map<String, dynamic> data =
+          ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+      setState(() {
+        estate = data["estate"];
+        sender = data["sender"];
+        _isInit = true;
+        _isLoading = true;
+      });
+      Provider.of<AuthProvider>(context).getUserId().then((value) {
+        if (value == null) {
+          callWithAuth(context, () {
+            Navigator.of(context).pushNamed(LoginScreen.routeName);
+          });
+        } else {
+          setState(() {
+            _userId = value;
+          });
+          Provider.of<AuthProvider>(context, listen: false)
+              .getMessages(estate!.id, sender!.id)
+              .then((value) {
+            setState(() {
+              _data = value;
+              _isLoading = false;
+            });
+            _scrollController
+                .jumpTo(_scrollController.position.maxScrollExtent);
+          });
+        }
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration.zero).then((_) {
+      Timer.periodic(Duration(seconds: 5), (timer) {
+        Provider.of<AuthProvider>(context, listen: false)
+            .getMessages(estate!.id, sender!.id)
+            .then((value) {
+          setState(() {
+            _data = value;
+          });
+          _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+        });
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _textController.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: _isLoading
-            ? Center(
-                child: CircularProgressIndicator(),
-              )
-            : Container(
-                padding: EdgeInsets.fromLTRB(
-                  defaultPadding / 2,
-                  defaultPadding / 2,
-                  defaultPadding / 2,
-                  0,
+    return WillPopScope(
+      onWillPop: () async {
+        Provider.of<NavigationScreenProvider>(context, listen: false)
+            .refreshChatsScreen = true;
+        return true;
+      },
+      child: SafeArea(
+        child: Scaffold(
+          body: _isLoading
+              ? Center(
+                  child: CircularProgressIndicator(),
+                )
+              : Container(
+                  padding: EdgeInsets.fromLTRB(
+                    defaultPadding / 2,
+                    defaultPadding / 2,
+                    defaultPadding / 2,
+                    0,
+                  ),
+                  child: Column(
+                    children: [
+                      _buildEstateBox(),
+                      _buildMessagesList(),
+                      _buildInputBox()
+                    ],
+                  ),
                 ),
-                child: Column(
-                  children: [
-                    _buildEstateBox(),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            ..._data["messages"].map((message) {
-                              return MessageItem(
-                                text: message.text,
-                                isSent: message.sender.id == _userId,
-                              );
-                            }).toList(),
-                            ..._data["messages"].map((message) {
-                              return MessageItem(
-                                text: message.text,
-                                isSent: message.sender.id == _userId,
-                              );
-                            }).toList(),
-                            ..._data["messages"].map((message) {
-                              return MessageItem(
-                                text: message.text,
-                                isSent: message.sender.id == _userId,
-                              );
-                            }).toList(),
-                            ..._data["messages"].map((message) {
-                              return MessageItem(
-                                text: message.text,
-                                isSent: message.sender.id == _userId,
-                              );
-                            }).toList(),
-                            ..._data["messages"].map((message) {
-                              return MessageItem(
-                                text: message.text,
-                                isSent: message.sender.id == _userId,
-                              );
-                            }).toList(),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Container(
-                        height: 60,
-                        child: Expanded(
-                          child: Row(
-                            children: [
-                              TextField(
-                                maxLines: 4,
-                                decoration: InputDecoration(
-                                  border: UnderlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: lightPurple.withOpacity(0.5),
-                                      width: 1,
-                                    ),
-                                  ),
-                                  focusedBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: lightPurple.withOpacity(0.5),
-                                      width: 0.5,
-                                    ),
-                                  ),
-                                ),
-                                style:
-                                    TextStyle(color: darkPurple, fontSize: 18),
-                              ),
-                              Spacer(),
-                              GestureDetector(
-                                onTap: () {},
-                                child: IconButton(
-                                    onPressed: () {}, icon: Icon(Icons.send)),
-                              )
-                            ],
-                          ),
-                        )),
-                  ],
-                ),
-              ),
+        ),
       ),
     );
   }

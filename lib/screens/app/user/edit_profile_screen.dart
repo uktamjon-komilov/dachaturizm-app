@@ -1,10 +1,12 @@
 import 'dart:io';
 
 import 'package:dachaturizm/constants.dart';
+import 'package:dachaturizm/helpers/call_with_auth.dart';
 import 'package:dachaturizm/helpers/url_helper.dart';
 import 'package:dachaturizm/models/user_model.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
+import 'package:dachaturizm/screens/auth/login_screen.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
@@ -66,12 +68,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     setState(() {
       _isLoading = true;
     });
-    Provider.of<AuthProvider>(context, listen: false)
-        .updateUser(formData)
-        .then((value) {
-      Provider.of<AuthProvider>(context, listen: false).getUserData().then((_) {
-        setState(() {
-          _isLoading = false;
+    callWithAuth(context, () {
+      Provider.of<AuthProvider>(context, listen: false)
+          .updateUser(formData)
+          .then((value) {
+        Provider.of<AuthProvider>(context, listen: false)
+            .getUserData()
+            .then((_) {
+          setState(() {
+            _isLoading = false;
+          });
         });
       });
     });

@@ -8,6 +8,7 @@ class NavigationScreenProvider with ChangeNotifier {
   List<int> _authRequiredScreens = [2, 3];
   Map<String, dynamic> _data = {};
   bool _refreshHomePage = false;
+  bool _refreshChatsScreen = false;
 
   NavigationScreenProvider({required this.auth});
 
@@ -20,9 +21,20 @@ class NavigationScreenProvider with ChangeNotifier {
     return _refreshHomePage;
   }
 
+  bool get refreshChatsScreen {
+    return _refreshChatsScreen;
+  }
+
   set refreshHomePage(bool value) {
     _refreshHomePage = value;
     if (_refreshHomePage) {
+      notifyListeners();
+    }
+  }
+
+  set refreshChatsScreen(bool value) {
+    _refreshChatsScreen = value;
+    if (_refreshChatsScreen) {
       notifyListeners();
     }
   }
@@ -34,6 +46,8 @@ class NavigationScreenProvider with ChangeNotifier {
   changePageIndex(int index, [Function? callback]) async {
     if (index == 0) {
       _refreshHomePage = true;
+    } else if (index == 3) {
+      _refreshChatsScreen = true;
     }
     if (!_authRequiredScreens.contains(index)) {
       _currentIndex = index;

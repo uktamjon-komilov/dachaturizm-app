@@ -4,7 +4,6 @@ import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/providers/banner_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
-import 'package:dachaturizm/providers/type_provider.dart';
 import 'package:dachaturizm/restartable_app.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_locales/flutter_locales.dart';
