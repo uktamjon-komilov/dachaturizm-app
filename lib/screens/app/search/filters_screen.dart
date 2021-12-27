@@ -128,7 +128,11 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
                           setState(() {
                             _currentRegion = value as String;
                           });
-                          RegionModel region = RegionModel(id: 0, title: "");
+                          RegionModel region = RegionModel(
+                              id: 0,
+                              title: "",
+                              districts: [],
+                              translations: {});
                           for (int i = 0; i < regions.length; i++) {
                             if (regions[i].id == int.parse(value as String)) {
                               region = regions[i];

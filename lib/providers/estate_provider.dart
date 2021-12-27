@@ -352,36 +352,53 @@ class EstateProvider with ChangeNotifier {
   Future<Map<String, dynamic>> createEstate(Map<String, dynamic> data) async {
     const url = "${baseUrl}api/estate/";
     final locale = await getCurrentLocale();
+    String refresh = await auth.getRefreshToken();
+    if (refresh == null || refresh == "") {
+      return {"statusCode": 400};
+    }
+    String access = await auth.getAccessToken();
+    Options options = Options(headers: {
+      "Content-type": "multipart/form-data",
+      "Authorization": "Bearer ${access}",
+    });
 
     Map<String, dynamic> tempData = {};
 
     int i = 0;
     while (data["photos"].length > 0) {
       if (data["photos"].length == i) break;
-      var photo = MultipartFile.fromFile(data["photos"][i].path,
+      var photo = await MultipartFile.fromFile(data["photos"][i].path,
           filename: "testimage.png");
       tempData["photo${i + 1}"] = photo;
+      i += 1;
     }
+
+    tempData["photo"] = await MultipartFile.fromFile(data["photo"].path,
+        filename: "testimage.png");
 
     Map<String, dynamic> translations = {
       "en": {
         "title": "",
         "description": "",
+        "region": data["region"].translations["en"]["title"],
+        "district": data["region"].translations["en"]["title"],
       },
       "uz": {
         "title": "",
         "description": "",
+        "region": data["region"].translations["uz"]["title"],
+        "district": data["region"].translations["uz"]["title"],
       },
       "ru": {
         "title": "",
         "description": "",
+        "region": data["region"].translations["ru"]["title"],
+        "district": data["region"].translations["ru"]["title"],
       }
     };
 
-    translations[locale.toString()] = {
-      "title": data["title"],
-      "description": data["description"]
-    };
+    translations[locale.toString()]["title"] = data["title"];
+    translations[locale.toString()]["description"] = data["description"];
 
     tempData["translations"] = json.encode(translations);
     tempData["estate_type"] = data["estate_type"];
@@ -395,15 +412,19 @@ class EstateProvider with ChangeNotifier {
     tempData["longtitute"] = data["longtitute"];
     tempData["latitute"] = data["latitute"];
     tempData["announcer"] = data["announcer"];
-    tempData["phone"] = data["phone"];
+    tempData["phone"] = data["phone"].toString().replaceAll("+", "");
     tempData["is_published"] = data["is_published"];
     tempData["facilities"] = "[${data['facilities'].join(',')}]";
     tempData["booked_days"] = "[${data['booked_days'].join(',')}]";
 
-    FormData formData = FormData.fromMap(tempData);
-    var response = await dio.post(url, data: formData);
-
-    return {"statusCode": response.statusCode};
+    try {
+      FormData formData = FormData.fromMap(tempData);
+      var response = await dio.post(url, data: formData, options: options);
+      return {"statusCode": response.statusCode};
+    } catch (e) {
+      print(e);
+    }
+    return {"statusCode": 400};
   }
 
   Future getMyEstates() async {

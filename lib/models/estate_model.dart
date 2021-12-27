@@ -29,7 +29,11 @@ class EstateModel {
   final String phone;
   final int userId;
   final int typeId;
+  final bool isSimple;
   final bool isTop;
+  final bool isBanner;
+  final bool isTopBanner;
+  final bool isAd;
   final DateTime? created;
   final DateTime? updated;
   bool isLiked;
@@ -59,7 +63,11 @@ class EstateModel {
       this.photos = const [],
       this.bookedDays = const [],
       this.facilities = const [],
+      this.isSimple = false,
       this.isTop = false,
+      this.isBanner = false,
+      this.isTopBanner = false,
+      this.isAd = false,
       this.created,
       this.updated,
       this.isLiked = false});
@@ -110,7 +118,11 @@ class EstateModel {
           : [],
       userId: data["user"],
       typeId: data["estate_type"],
+      isSimple: data["is_simple"],
       isTop: data["is_top"],
+      isBanner: data["is_banner"],
+      isTopBanner: data["is_topbanner"],
+      isAd: data["is_ads"],
       created: DateTime.parse(data["created_at"].toString().substring(0, 10)),
       updated: DateTime.parse(data["updated_at"].toString().substring(0, 10)),
       isLiked: data["is_liked"],

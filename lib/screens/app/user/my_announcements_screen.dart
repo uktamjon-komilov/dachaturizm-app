@@ -218,6 +218,7 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
                 Provider.of<EstateProvider>(context, listen: false)
                     .advertise(_adPlan, estateId)
                     .then((value) {
+                  _refresh();
                   _showStatusSnackBar(value);
                   setState(() {
                     _isLoading = false;
@@ -239,28 +240,32 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
     });
   }
 
+  void _refresh() {
+    setState(() {
+      _isLoading = true;
+    });
+    Provider.of<EstateProvider>(context, listen: false)
+        .getMyEstates()
+        .then((value) {
+      setState(() {
+        _estates = value;
+      });
+      Provider.of<CurrencyProvider>(context, listen: false)
+          .fetchAdPlans()
+          .then((value) {
+        setState(() {
+          _plans = value;
+          _isLoading = false;
+        });
+      });
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration.zero).then((_) {
-      setState(() {
-        _isLoading = true;
-      });
-      Provider.of<EstateProvider>(context, listen: false)
-          .getMyEstates()
-          .then((value) {
-        setState(() {
-          _estates = value;
-        });
-        Provider.of<CurrencyProvider>(context, listen: false)
-            .fetchAdPlans()
-            .then((value) {
-          setState(() {
-            _plans = value;
-            _isLoading = false;
-          });
-        });
-      });
+    Future.delayed(Duration.zero).then((_) async {
+      _refresh();
     });
   }
 
@@ -291,35 +296,38 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Row(
-          children: [
-            Icon(
-              Icons.calendar_today_rounded,
-              size: 15,
-              color: normalGrey,
-            ),
-            SizedBox(width: 5),
-            SmallGreyText(
-              text: Locales.string(context, "placed") +
-                  " " +
-                  parseDateTime(
-                    estate.created as DateTime,
-                  ),
-            ),
-          ],
+        Expanded(
+          child: Row(
+            children: [
+              Icon(
+                Icons.calendar_today_rounded,
+                size: 15,
+                color: normalGrey,
+              ),
+              SizedBox(width: 5),
+              SmallGreyText(
+                text: parseDateTime(
+                  estate.created as DateTime,
+                ),
+              ),
+            ],
+          ),
         ),
-        Row(
-          children: [
-            Icon(
-              Icons.remove_red_eye,
-              size: 15,
-              color: normalGrey,
-            ),
-            SizedBox(width: 5),
-            SmallGreyText(
-              text: "${Locales.string(context, "views")} ${estate.views}",
-            ),
-          ],
+        Expanded(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Icon(
+                Icons.remove_red_eye,
+                size: 15,
+                color: normalGrey,
+              ),
+              SizedBox(width: 5),
+              SmallGreyText(
+                text: "${estate.views}",
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -377,14 +385,50 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
   }
 
   Widget _buildImageBox(EstateModel estate) {
+    String type = "";
+    if (estate.isAd) {
+      type = Locales.string(context, "ad");
+    } else if (estate.isBanner) {
+      type = Locales.string(context, "banner");
+    } else if (estate.isTopBanner) {
+      type = Locales.string(context, "topbanner");
+    } else if (estate.isTop) {
+      type = Locales.string(context, "top");
+    } else {
+      type = Locales.string(context, "simple");
+    }
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
       child: Container(
         width: 80,
         height: 80,
-        child: Image.network(
-          estate.photo,
-          fit: BoxFit.cover,
+        child: Stack(
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              child: Image.network(
+                estate.photo,
+                fit: BoxFit.cover,
+              ),
+            ),
+            Positioned(
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 3, horizontal: 5),
+                decoration: BoxDecoration(
+                  color: normalOrange,
+                  borderRadius: BorderRadius.only(
+                    bottomRight: Radius.circular(10),
+                  ),
+                ),
+                child: Text(
+                  type,
+                  style: TextStyle(fontSize: 10, color: Colors.white),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -425,7 +469,7 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
-                                "Hot",
+                                Locales.string(context, "hot"),
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 10),
                               ),
@@ -459,58 +503,64 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
               )
             : Container(
                 padding: EdgeInsets.all(defaultPadding),
-                child: Column(
-                  children: [
-                    ..._estates
-                        .map(
-                          (estate) => GestureDetector(
-                            onTap: () {
-                              Navigator.of(context).pushNamed(
-                                  EstateDetailScreen.routeName,
-                                  arguments: {
-                                    "id": estate.id,
-                                    "typeId": estate.typeId
-                                  });
-                            },
-                            child: Card(
-                              shadowColor: Colors.transparent,
-                              color: Colors.white,
-                              child: Container(
-                                width: 100.w,
-                                height: 100,
-                                padding: EdgeInsets.all(defaultPadding / 2),
-                                child: Stack(
-                                  children: [
-                                    Row(
-                                      children: [
-                                        _buildImageBox(estate),
-                                        SizedBox(
-                                          width: 10,
-                                        ),
-                                        Expanded(
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              _buildTitleWithStars(estate),
-                                              _buildLocation(estate),
-                                              _buildDateAndViews(estate),
-                                            ],
+                child: RefreshIndicator(
+                  onRefresh: () async {
+                    _refresh();
+                  },
+                  child: Column(
+                    children: [
+                      ..._estates
+                          .map(
+                            (estate) => GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).pushNamed(
+                                    EstateDetailScreen.routeName,
+                                    arguments: {
+                                      "id": estate.id,
+                                      "typeId": estate.typeId
+                                    });
+                              },
+                              child: Card(
+                                shadowColor: Colors.transparent,
+                                color: Colors.white,
+                                child: Container(
+                                  width: 100.w,
+                                  height: 100,
+                                  padding: EdgeInsets.all(defaultPadding / 2),
+                                  child: Stack(
+                                    children: [
+                                      Row(
+                                        children: [
+                                          _buildImageBox(estate),
+                                          SizedBox(
+                                            width: 10,
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                    _buildThreeDots(estate),
-                                  ],
+                                          Expanded(
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                _buildTitleWithStars(estate),
+                                                _buildLocation(estate),
+                                                _buildDateAndViews(estate),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      _buildThreeDots(estate),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        )
-                        .toList()
-                  ],
+                          )
+                          .toList()
+                    ],
+                  ),
                 ),
               ),
       ),

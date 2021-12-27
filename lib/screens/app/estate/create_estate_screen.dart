@@ -1,21 +1,28 @@
 import 'dart:io';
 
 import 'package:dachaturizm/components/normal_input.dart';
-import 'package:dachaturizm/components/small_button.dart';
 import 'package:dachaturizm/components/text1.dart';
 import 'package:dachaturizm/constants.dart';
+import 'package:dachaturizm/helpers/call_with_auth.dart';
 import 'package:dachaturizm/models/booking_day.dart';
 import 'package:dachaturizm/models/currency_model.dart';
+import 'package:dachaturizm/models/district_model.dart';
 import 'package:dachaturizm/models/facility_model.dart';
+import 'package:dachaturizm/models/region_model.dart';
 import 'package:dachaturizm/models/type_model.dart';
+import 'package:dachaturizm/models/user_model.dart';
+import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/providers/currency_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/facility_provider.dart';
+import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/providers/type_provider.dart';
 import 'package:dachaturizm/screens/app/estate/location_picker_screen.dart';
+import 'package:dachaturizm/screens/app/user/my_announcements_screen.dart';
 import 'package:flutter/cupertino.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_locales/flutter_locales.dart';
+import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -36,6 +43,8 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
   bool _isSubmitted = false;
   int _currentExtraImageIndex = 0;
   int _descriptionMaxLength = 1000;
+  List<RegionModel> _regions = [];
+  List<DistrictModel> _districts = [];
   String errors = "";
   GlobalKey<FormState> _form = GlobalKey<FormState>();
   ScrollController _scrollController = ScrollController();
@@ -59,10 +68,32 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
   TextEditingController _weekdayPriceController = TextEditingController();
   TextEditingController _weekendPriceController = TextEditingController();
   int _currentCurrencyId = 0;
+  int _currentRegionId = 0;
+  int _currentDistrictId = 0;
   List<int> _facilities = [];
   double _longtitude = 0.0;
   double _latitute = 0.0;
   String _locationName = "";
+
+  void _resetInputs() {
+    _mainImage = null;
+    _extraImages = List.generate(8, (_) => null);
+    _currentSectionId = 0;
+    _titleController.text = "";
+    _descriptionController.text = "";
+    _announcerController.text = "";
+    _phoneController.text = "";
+    _addressController.text = "";
+    _weekdayPriceController.text = "";
+    _weekendPriceController.text = "";
+    _currentCurrencyId = 0;
+    _currentRegionId = 0;
+    _currentDistrictId = 0;
+    _facilities = [];
+    _longtitude = 0.0;
+    _latitute = 0.0;
+    _locationName = "";
+  }
 
   List<String> get _bookedDays {
     return _selectedDays.map((day) => day.date).toList();
@@ -72,7 +103,9 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     if (!_form.currentState!.validate() ||
         _mainImage == null ||
         _currentSectionId == 0 ||
-        _currentCurrencyId == 0) {
+        _currentCurrencyId == 0 ||
+        _currentRegionId == 0 ||
+        _currentDistrictId == 0) {
       _scrollController.animateTo(
         0,
         duration: Duration(milliseconds: 500),
@@ -82,7 +115,8 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
         _isSubmitted = true;
       });
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text("There is some error in filling the input fields.")));
+          content:
+              Text(Locales.string(context, "there_is_error_in_filling_in"))));
       return;
     }
     Map<String, dynamic> data = {};
@@ -90,9 +124,13 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     data["photos"] = _extraImages.where((image) => image != null).toList();
     data["estate_type"] = _currentSectionId.toString();
     data["title"] = _titleController.text;
+    data["region"] =
+        _regions.firstWhere((region) => region.id == _currentRegionId);
+    data["district"] =
+        _districts.firstWhere((district) => district.id == _currentDistrictId);
     data["address"] = _addressController.text;
-    data["longtitute"] = "0.0";
-    data["latitute"] = "0.0";
+    data["longtitute"] = _longtitude;
+    data["latitute"] = _latitute;
     data["description"] = _descriptionController.text;
     data["booked_days"] = _bookedDays;
     data["facilities"] = _facilities;
@@ -105,7 +143,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     data["beds"] = "0";
     data["pool"] = "0";
     data["people"] = "0";
-    data["is_published"] = "false";
+    data["is_published"] = "true";
 
     setState(() {
       _isUploading = true;
@@ -113,10 +151,16 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     });
     Provider.of<EstateProvider>(context, listen: false)
         .createEstate(data)
-        .then((value) {
+        .then((value) async {
       print(value);
+      _resetInputs();
       setState(() {
         _isUploading = false;
+      });
+      Provider.of<NavigationScreenProvider>(context, listen: false)
+          .changePageIndex(5);
+      await callWithAuth(context, () async {
+        Navigator.of(context).pushNamed(MyAnnouncements.routeName);
       });
       return value;
     });
@@ -243,18 +287,30 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     );
   }
 
-  Widget _buildSectionsRow(List<TypeModel> _sections) {
-    return Wrap(
-      children: [
-        ..._sections.map((section) {
-          return SmallButton(section.title,
-              enabled: _currentSectionId == section.id, onPressed: () {
-            setState(() {
-              _currentSectionId = section.id;
-            });
-          });
-        })
+  Widget _buildSelectionRow(List<dynamic> values, value, String placeHolder,
+      {Function? onChanged}) {
+    return DropdownButton<int>(
+      borderRadius: BorderRadius.circular(10),
+      elevation: 1,
+      isExpanded: true,
+      value: value,
+      items: [
+        DropdownMenuItem<int>(
+          value: 0,
+          child: Text(placeHolder),
+        ),
+        ...values.map((value) {
+          return DropdownMenuItem<int>(
+            value: value.id,
+            child: Text(value.title),
+          );
+        }).toList()
       ],
+      onChanged: (value) {
+        if (onChanged != null) {
+          onChanged(value);
+        }
+      },
     );
   }
 
@@ -325,8 +381,8 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                       ),
                       Text(
                         _locationName == ""
-                            ? "Please, tap to show your location on the map"
-                            : "Please, tap to change your location",
+                            ? Locales.string(context, "tap_to_choose_location")
+                            : Locales.string(context, "tap_to_change_location"),
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 14,
@@ -458,22 +514,33 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     setState(() {
       _isLoading = true;
     });
-    Future.delayed(Duration.zero).then((_) {
-      Provider.of<FacilityProvider>(context, listen: false)
-          .fetchAndSetFacilities()
-          .then((facilities) {
-        Provider.of<EstateTypesProvider>(context, listen: false)
-            .fetchAndSetTypes()
-            .then((_) {
-          Provider.of<CurrencyProvider>(context, listen: false)
-              .fetchAndSetCurrencies()
-              .then((_) {
-            setState(() {
-              _isLoading = false;
-            });
+    Future.delayed(Duration.zero).then((_) async {
+      await Future.wait([
+        Provider.of<FacilityProvider>(context, listen: false)
+            .getAddresses()
+            .then((value) {
+          setState(() {
+            _regions = value;
           });
-        });
-      });
+        }),
+        Provider.of<FacilityProvider>(context, listen: false)
+            .fetchAndSetFacilities(),
+        Provider.of<EstateTypesProvider>(context, listen: false)
+            .fetchAndSetTypes(),
+        Provider.of<CurrencyProvider>(context, listen: false)
+            .fetchAndSetCurrencies(),
+        Provider.of<AuthProvider>(context, listen: false)
+            .getUserData()
+            .then((user) {
+          if (user.runtimeType.toString() == "UserModel") {
+            _announcerController.text = "${user!.firstName} ${user.lastName}";
+            _phoneController.text = "+${user.phone}";
+          }
+        }),
+      ]);
+    });
+    setState(() {
+      _isLoading = false;
     });
     super.didChangeDependencies();
   }
@@ -518,7 +585,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "Joylashtirilmoqda...",
+                        Locales.string(context, "saving"),
                         style: TextStyle(
                           color: normalOrange,
                           fontSize: 20,
@@ -556,9 +623,11 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           VerticalHorizontalSizedBox(),
-                          Text1("Asosiy rasm"),
+                          Text1(Locales.string(context, "main_photo")),
                           VerticalHorizontalHalfSizedBox(),
-                          Text("Ushbu surat e'loningiz asosiy rasmi bo'ladi."),
+                          Text(
+                            Locales.string(context, "this_photo_is_main"),
+                          ),
                           VerticalHorizontalSizedBox(),
                           _buildMainImagePicker(
                             image: _mainImage,
@@ -566,23 +635,62 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                             disabled: false,
                           ),
                           ErrorText(
-                            errorText: "Please, pick an image",
+                            errorText: Locales.string(context, "pick_a_photo"),
                             display: (_isSubmitted && _mainImage == null),
                           ),
                           VerticalHorizontalSizedBox(),
-                          Text1("Gallareya"),
+                          Text1(
+                            Locales.string(context, "gallary"),
+                          ),
                           VerticalHorizontalSizedBox(),
                           _buildExtraImagesGrid(),
                           VerticalHorizontalHalfSizedBox(),
-                          Text("*Umumiy maksimum 8ta rasm joylashingiz mumkin"),
+                          Text(Locales.string(context, "max_photo_count_8")),
                           VerticalHorizontalSizedBox(),
-                          Text1("Bo'limni tanlang"),
-                          _buildSectionsRow(sections),
+                          Text1(Locales.string(context, "choose_section")),
+                          _buildSelectionRow(sections, _currentSectionId,
+                              Locales.string(context, "choose_section"),
+                              onChanged: (value) {
+                            setState(() {
+                              _currentSectionId = value as int;
+                            });
+                          }),
                           VerticalHorizontalSizedBox(),
-                          Text1("Sarlavhani kiriting"),
+                          Text1(
+                            Locales.string(context, "region"),
+                          ),
+                          _buildSelectionRow(_regions, _currentRegionId,
+                              Locales.string(context, "choose_region"),
+                              onChanged: (value) {
+                            setState(() {
+                              _currentRegionId = value as int;
+                              if (_currentRegionId == 0) {
+                                _currentDistrictId = 0;
+                                _districts = [];
+                              } else {
+                                _districts = _regions
+                                    .firstWhere((region) =>
+                                        region.id == _currentRegionId)
+                                    .districts;
+                              }
+                            });
+                          }),
+                          VerticalHorizontalSizedBox(),
+                          Text1(
+                            Locales.string(context, "district"),
+                          ),
+                          _buildSelectionRow(_districts, _currentDistrictId,
+                              Locales.string(context, "choose_district"),
+                              onChanged: (value) {
+                            setState(() {
+                              _currentDistrictId = value as int;
+                            });
+                          }),
+                          VerticalHorizontalSizedBox(),
+                          Text1(Locales.string(context, "choose_title")),
                           VerticalHorizontalHalfSizedBox(),
                           NormalTextInput(
-                            hintText: "Masalan, Humsonda dacha arendaga...",
+                            hintText: Locales.string(context, "example_title"),
                             controller: _titleController,
                             focusNode: _titleFocusNode,
                             onChanged: () {
@@ -596,10 +704,13 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                             },
                           ),
                           VerticalHorizontalSizedBox(),
-                          Text1("Manzilni kiriting"),
+                          Text1(
+                            Locales.string(context, "enter_address"),
+                          ),
                           VerticalHorizontalHalfSizedBox(),
                           NormalTextInput(
-                            hintText: "Masalan, Bo'stonliq tumani",
+                            hintText:
+                                Locales.string(context, "example_address"),
                             controller: _addressController,
                             focusNode: _addressFocusNode,
                             onChanged: () {
@@ -613,14 +724,14 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                             },
                           ),
                           VerticalHorizontalSizedBox(),
-                          Text1("Xaritadan tanlang"),
+                          Text1(Locales.string(context, "choose_location")),
                           VerticalHorizontalHalfSizedBox(),
                           _buildLocationPicker(),
                           VerticalHorizontalSizedBox(),
-                          Text1("Tavsif"),
+                          Text1(Locales.string(context, "description")),
                           VerticalHorizontalHalfSizedBox(),
                           NormalTextInput(
-                            hintText: "E'lon haqida...",
+                            hintText: Locales.string(context, "about_estate"),
                             maxLines: 8,
                             maxLength: _descriptionMaxLength,
                             controller: _descriptionController,
@@ -639,25 +750,26 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text("Kamida 50ta belgi yozing"),
+                              Text(
+                                  Locales.string(context, "at_least_50_chars")),
                               Text(
                                   "${_descriptionController.text.length}/${_descriptionMaxLength}"),
                             ],
                           ),
                           VerticalHorizontalSizedBox(),
-                          Text1("Band kunlar (mavjud bo'lsa)"),
+                          Text1(Locales.string(context, "booked_days_if_any")),
                           _buildCalendar(),
                           VerticalHorizontalHalfSizedBox(),
                           BookedDaysHint(),
                           VerticalHorizontalSizedBox(),
-                          Text1("Filterlar qo'shish"),
+                          Text1(Locales.string(context, "adding_filters")),
                           VerticalHorizontalHalfSizedBox(),
                           _buildFacilitiesGrid(facilities),
                           VerticalHorizontalSizedBox(),
-                          Text1("Aloqa"),
+                          Text1(Locales.string(context, "contact")),
                           VerticalHorizontalHalfSizedBox(),
                           NormalTextInput(
-                            hintText: "Ism",
+                            hintText: Locales.string(context, "fullname"),
                             controller: _announcerController,
                             focusNode: _announcerFocusNode,
                             validation: false,
@@ -673,7 +785,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                           ),
                           VerticalHorizontalHalfSizedBox(),
                           NormalTextInput(
-                            hintText: "Telefon raqam",
+                            hintText: Locales.string(context, "phone"),
                             controller: _phoneController,
                             focusNode: _phoneFocusNode,
                             isPhone: true,
@@ -688,10 +800,10 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                             },
                           ),
                           VerticalHorizontalSizedBox(),
-                          Text1("Narx"),
+                          Text1(Locales.string(context, "price")),
                           VerticalHorizontalHalfSizedBox(),
                           NormalTextInput(
-                            hintText: "Hafta kunlari",
+                            hintText: Locales.string(context, "weekday_price"),
                             controller: _weekdayPriceController,
                             focusNode: _weekdayPriceFocusNode,
                             isPrice: true,
@@ -707,7 +819,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                           ),
                           VerticalHorizontalHalfSizedBox(),
                           NormalTextInput(
-                            hintText: "Dam olish kunlari",
+                            hintText: Locales.string(context, "weekend_price"),
                             controller: _weekendPriceController,
                             focusNode: _weekendPriceFocusNode,
                             isPrice: true,
@@ -720,15 +832,16 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                           ),
                           _buildPriceTypeRow(currencies),
                           ErrorText(
-                            errorText: "Please, choose a currency",
+                            errorText:
+                                Locales.string(context, "choose_currency"),
                             display: (_isSubmitted && _currentCurrencyId == 0),
                           ),
                           VerticalHorizontalSizedBox(),
                           ElevatedButton(
                             onPressed: _isLoading
                                 ? () {}
-                                : () {
-                                    sendData();
+                                : () async {
+                                    await sendData();
                                   },
                             style: ElevatedButton.styleFrom(
                               minimumSize: Size(100.w - 2 * defaultPadding, 50),
@@ -750,7 +863,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                                         ),
                                       )
                                     : Text(
-                                        "Joylashtirish",
+                                        Locales.string(context, "save_estate"),
                                         style: TextStyle(
                                           color: _isLoading
                                               ? normalOrange
@@ -834,7 +947,7 @@ class BookedDaysHint extends StatelessWidget {
           ),
         ),
         SizedBox(width: 10),
-        Text("Band qilingan kunlar"),
+        Text(Locales.string(context, "booked_days")),
       ],
     );
   }

@@ -214,7 +214,7 @@ class _ChatScreenState extends State<ChatScreen> {
         textAlignVertical: TextAlignVertical.center,
         decoration: InputDecoration(
           border: null,
-          hintText: "Write a message",
+          hintText: Locales.string(context, "write_a_message"),
           suffix: Padding(
             padding: const EdgeInsets.only(right: 20),
             child: SizedBox(

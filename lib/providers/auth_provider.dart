@@ -120,7 +120,7 @@ class AuthProvider with ChangeNotifier {
         headers: {"Content-type": "application/json"},
       ),
       data: json.encode({
-        "phone": phone,
+        "phone": phone.toString().replaceAll("+", ""),
         "password": password,
         "first_name": firstName,
         "last_name": lastName
@@ -140,7 +140,10 @@ class AuthProvider with ChangeNotifier {
         options: Options(
           headers: {"Content-type": "application/json"},
         ),
-        data: {"phone": phone, "password": password},
+        data: {
+          "phone": phone.toString().replaceAll("+", ""),
+          "password": password
+        },
       );
 
       if (response.statusCode as int >= 200 ||

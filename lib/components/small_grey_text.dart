@@ -11,14 +11,16 @@ class SmallGreyText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: TextStyle(
-        color: normalGrey,
-        fontSize: 10,
-        overflow: TextOverflow.ellipsis,
+    return Flexible(
+      child: Text(
+        text,
+        style: TextStyle(
+          color: normalGrey,
+          fontSize: 10,
+          overflow: TextOverflow.ellipsis,
+        ),
+        maxLines: 1,
       ),
-      maxLines: 1,
     );
   }
 }
