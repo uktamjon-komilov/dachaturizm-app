@@ -294,6 +294,8 @@ class AuthProvider with ChangeNotifier {
       final response = await dio.post(url,
           data: {"estate": estateId, "receiver": receiverId},
           options: Options(headers: headers));
+      print(response.statusCode);
+      print(response.data);
       if (response.statusCode as int >= 200 ||
           response.statusCode as int < 300) {
         EstateModel estate =
@@ -304,7 +306,9 @@ class AuthProvider with ChangeNotifier {
           data["messages"].add(message);
         });
       }
-    } catch (e) {}
+    } catch (e) {
+      print(e);
+    }
     return data;
   }
 

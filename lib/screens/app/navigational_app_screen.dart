@@ -158,11 +158,35 @@ class _NavigationalAppScreenState extends State<NavigationalAppScreen> {
           label: "Add",
         ),
         BottomNavigationBarItem(
-          icon: Icon(
-            Provider.of<NavigationScreenProvider>(context).currentIndex == 3
-                ? Icons.chat_rounded
-                : Icons.chat_outlined,
-            color: darkPurple,
+          icon: Container(
+            child: Center(
+              child: Stack(children: [
+                Icon(
+                  Provider.of<NavigationScreenProvider>(context).currentIndex ==
+                          3
+                      ? Icons.chat_rounded
+                      : Icons.chat_outlined,
+                  color: darkPurple,
+                ),
+                Visibility(
+                  visible: Provider.of<NavigationScreenProvider>(context)
+                          .unreadMessagesCount >
+                      0,
+                  child: Positioned(
+                    right: 0,
+                    top: 0,
+                    child: Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                        color: normalOrange,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                ),
+              ]),
+            ),
           ),
           label: "Chat",
         ),

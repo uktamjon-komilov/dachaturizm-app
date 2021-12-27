@@ -6,11 +6,13 @@ import 'package:dachaturizm/models/ads_plan.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/providers/currency_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
+import 'package:dachaturizm/screens/app/estate/estate_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
+import 'package:flutter_gradients/flutter_gradients.dart';
 
 class MyAnnouncements extends StatefulWidget {
   const MyAnnouncements({Key? key}) : super(key: key);
@@ -270,14 +272,16 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
         "value": Locales.string(context, "edit"),
         "callback": ([String? id]) {
           _navigateToEditScreen(id);
-        }
+        },
+        "hot": false,
       },
       {
         "key": "advertise",
         "value": Locales.string(context, "advertise"),
         "callback": ([String? id]) {
           _openAdsPriceList(id);
-        }
+        },
+        "hot": true,
       },
     ];
     super.didChangeDependencies();
@@ -400,7 +404,35 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
               .map(
                 (action) => PopupMenuItem<String>(
                   value: action["key"],
-                  child: Text(action["value"].toString()),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minWidth: 70),
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              action["value"].toString(),
+                              maxLines: 1,
+                              style: TextStyle(overflow: TextOverflow.ellipsis),
+                            ),
+                          ),
+                          Visibility(
+                            visible: action["hot"],
+                            child: Container(
+                              padding: EdgeInsets.all(3),
+                              decoration: BoxDecoration(
+                                gradient: FlutterGradients.happyMemories(),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                "Hot",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 10),
+                              ),
+                            ),
+                          ),
+                        ]),
+                  ),
                 ),
               )
               .toList(),
@@ -431,38 +463,48 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
                   children: [
                     ..._estates
                         .map(
-                          (estate) => Card(
-                            shadowColor: Colors.transparent,
-                            color: Colors.white,
-                            child: Container(
-                              width: 100.w,
-                              height: 100,
-                              padding: EdgeInsets.all(defaultPadding / 2),
-                              child: Stack(
-                                children: [
-                                  Row(
-                                    children: [
-                                      _buildImageBox(estate),
-                                      SizedBox(
-                                        width: 10,
-                                      ),
-                                      Expanded(
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            _buildTitleWithStars(estate),
-                                            _buildLocation(estate),
-                                            _buildDateAndViews(estate),
-                                          ],
+                          (estate) => GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).pushNamed(
+                                  EstateDetailScreen.routeName,
+                                  arguments: {
+                                    "id": estate.id,
+                                    "typeId": estate.typeId
+                                  });
+                            },
+                            child: Card(
+                              shadowColor: Colors.transparent,
+                              color: Colors.white,
+                              child: Container(
+                                width: 100.w,
+                                height: 100,
+                                padding: EdgeInsets.all(defaultPadding / 2),
+                                child: Stack(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        _buildImageBox(estate),
+                                        SizedBox(
+                                          width: 10,
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  _buildThreeDots(estate),
-                                ],
+                                        Expanded(
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              _buildTitleWithStars(estate),
+                                              _buildLocation(estate),
+                                              _buildDateAndViews(estate),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    _buildThreeDots(estate),
+                                  ],
+                                ),
                               ),
                             ),
                           ),

@@ -5,11 +5,14 @@ import 'package:dachaturizm/helpers/calculate_distance.dart';
 import 'package:dachaturizm/helpers/url_helper.dart';
 import 'package:dachaturizm/models/booking_day.dart';
 import 'package:dachaturizm/models/estate_model.dart';
+import 'package:dachaturizm/models/user_model.dart';
+import 'package:dachaturizm/screens/app/chat/chat_screen.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:intl/intl.dart';
+import 'package:sizer/sizer.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 
@@ -355,48 +358,70 @@ class DetailBuilder {
     );
   }
 
-  Container buildContactBox(context, double halfScreenButtonWidth) {
-    return Container(
-      height: 70,
-      padding: EdgeInsets.symmetric(
-        horizontal: 16,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Expanded(
-            child: OutlinedButton(
-              onPressed: () {},
-              style: OutlinedButton.styleFrom(
-                primary: normalOrange,
-                backgroundColor: Colors.white,
-                side: BorderSide(
-                  width: 1,
-                  color: normalOrange,
-                ),
-                padding: EdgeInsets.symmetric(vertical: 10),
-                minimumSize: Size(halfScreenButtonWidth, 50),
-              ),
-              child: Text(Locales.string(context, "messaging_with_announcer")),
+  Widget buildContactBox(context, fromChat, userId) {
+    return userId == detail.userId
+        ? Container()
+        : Container(
+            height: 70,
+            padding: EdgeInsets.symmetric(
+              horizontal: 16,
             ),
-          ),
-          SizedBox(
-            width: 15,
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-                primary: normalOrange,
-                onPrimary: Colors.white,
-                elevation: 0,
-                shadowColor: Colors.transparent,
-                padding: EdgeInsets.symmetric(vertical: 10),
-                minimumSize: Size(halfScreenButtonWidth, 50)),
-            onPressed: () => UrlLauncher.launch("tel://${detail.phone}"),
-            child: Text(Locales.string(context, "direct_call")),
-          )
-        ],
-      ),
-    );
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () {
+                      if (fromChat) {
+                        Navigator.of(context).pop();
+                      } else {
+                        Navigator.of(context)
+                            .pushNamed(ChatScreen.routeName, arguments: {
+                          "estate": detail,
+                          "sender": UserModel(
+                            id: detail.userId,
+                            adsCount: 0,
+                            balance: 0,
+                            firstName: "",
+                            lastName: "",
+                            phone: "",
+                            photo: "",
+                          )
+                        });
+                      }
+                    },
+                    style: OutlinedButton.styleFrom(
+                      primary: normalOrange,
+                      backgroundColor: Colors.white,
+                      side: BorderSide(
+                        width: 1,
+                        color: normalOrange,
+                      ),
+                      padding: EdgeInsets.symmetric(vertical: 10),
+                      minimumSize: Size(50.w - 1.5 * defaultPadding, 50),
+                    ),
+                    child: Text(
+                        Locales.string(context, "messaging_with_announcer")),
+                  ),
+                ),
+                SizedBox(
+                  width: 15,
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    primary: normalOrange,
+                    onPrimary: Colors.white,
+                    elevation: 0,
+                    shadowColor: Colors.transparent,
+                    padding: EdgeInsets.symmetric(vertical: 10),
+                    minimumSize: Size(50.w - 1.5 * defaultPadding, 50),
+                  ),
+                  onPressed: () => UrlLauncher.launch("tel://${detail.phone}"),
+                  child: Text(Locales.string(context, "direct_call")),
+                )
+              ],
+            ),
+          );
   }
 }

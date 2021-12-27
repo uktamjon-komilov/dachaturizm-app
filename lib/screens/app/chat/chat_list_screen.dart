@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/helpers/url_helper.dart';
 import 'package:dachaturizm/models/estate_model.dart';
@@ -21,6 +23,7 @@ class ChatListScreen extends StatefulWidget {
 class _ChatListScreenState extends State<ChatListScreen> {
   List<MessageModel> _chats = [];
   bool _isLoading = false;
+  int _userId = 0;
 
   _refreshMyChats() async {
     Future.delayed(Duration.zero).then((_) {
@@ -30,6 +33,13 @@ class _ChatListScreenState extends State<ChatListScreen> {
       Provider.of<AuthProvider>(context, listen: false)
           .getMyChats()
           .then((value) {
+        Provider.of<NavigationScreenProvider>(context, listen: false)
+            .unreadMessagesCount = value.fold(0, (sum, item) {
+          if (item.receiver.id == _userId) {
+            return sum + item.count;
+          }
+          return sum;
+        });
         setState(() {
           _chats = value;
           _isLoading = false;
@@ -54,7 +64,11 @@ class _ChatListScreenState extends State<ChatListScreen> {
   void initState() {
     super.initState();
     Future.delayed(Duration.zero).then((_) async {
-      await _refreshMyChats();
+      _userId =
+          await Provider.of<AuthProvider>(context, listen: false).getUserId();
+      Timer.periodic(Duration(seconds: 5), (timer) async {
+        await _refreshMyChats();
+      });
     });
   }
 
@@ -73,19 +87,21 @@ class _ChatListScreenState extends State<ChatListScreen> {
               : ListView.builder(
                   itemCount: _chats.length,
                   itemBuilder: (context, index) {
-                    UserModel sender = _chats[index].sender;
+                    UserModel user = _chats[index].sender.id == _userId
+                        ? _chats[index].receiver
+                        : _chats[index].sender;
                     EstateModel estate = _chats[index].estateDetail;
                     return ListTile(
                       onTap: () {
                         Navigator.of(context).pushNamed(ChatScreen.routeName,
-                            arguments: {"estate": estate, "sender": sender});
+                            arguments: {"estate": estate, "sender": user});
                       },
                       contentPadding: EdgeInsets.symmetric(
                         horizontal: defaultPadding / 1.5,
                         vertical: defaultPadding / 6,
                       ),
                       title: Text(
-                        sender.fullname,
+                        user.fullname,
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
@@ -99,19 +115,23 @@ class _ChatListScreenState extends State<ChatListScreen> {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      trailing: Container(
-                        padding:
-                            EdgeInsets.symmetric(vertical: 5, horizontal: 8),
-                        decoration: BoxDecoration(
-                          color: normalOrange,
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Text(
-                          _chats[index].count.toString(),
-                          style: TextStyle(color: Colors.white, fontSize: 13),
-                        ),
-                      ),
-                      leading: sender.photo == null
+                      trailing: (_chats[index].count < 1 ||
+                              _chats[index].sender.id == _userId)
+                          ? null
+                          : Container(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 5, horizontal: 8),
+                              decoration: BoxDecoration(
+                                color: normalOrange,
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              child: Text(
+                                _chats[index].count.toString(),
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 13),
+                              ),
+                            ),
+                      leading: user.photo == null
                           ? Container(
                               width: 60,
                               height: 60,
@@ -129,7 +149,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(30),
                                 child: Image.network(
-                                  fixMediaUrl(sender.photo),
+                                  fixMediaUrl(user.photo),
                                   fit: BoxFit.cover,
                                 ),
                               ),

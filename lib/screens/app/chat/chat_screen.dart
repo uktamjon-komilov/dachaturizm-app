@@ -8,6 +8,7 @@ import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/models/user_model.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
+import 'package:dachaturizm/screens/app/estate/estate_detail_screen.dart';
 import 'package:dachaturizm/screens/auth/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
@@ -37,6 +38,7 @@ class _ChatScreenState extends State<ChatScreen> {
   _sendMessage() async {
     String text = _textController.text;
     _textController.text = "";
+    if (text == "") return;
     Provider.of<AuthProvider>(context, listen: false)
         .sendMessage(estate!.id, sender!.id, text)
         .then((data) {
@@ -157,35 +159,47 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Widget _buildEstateBox() {
-    return Card(
-      shadowColor: Colors.transparent,
-      color: Colors.white,
-      child: Container(
-        width: 100.w,
-        height: 100,
-        padding: EdgeInsets.all(defaultPadding / 2),
-        child: Stack(
-          children: [
-            Row(
-              children: [
-                _buildImageBox(estate as EstateModel),
-                SizedBox(
-                  width: 10,
-                ),
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildTitleWithStars(estate as EstateModel),
-                      _buildLocation(estate as EstateModel),
-                      _buildDateAndViews(estate as EstateModel),
-                    ],
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).pushNamed(
+          EstateDetailScreen.routeName,
+          arguments: {
+            "id": estate!.id,
+            "typeId": estate!.typeId,
+            "fromChat": true
+          },
+        );
+      },
+      child: Card(
+        shadowColor: Colors.transparent,
+        color: Colors.white,
+        child: Container(
+          width: 100.w,
+          height: 100,
+          padding: EdgeInsets.all(defaultPadding / 2),
+          child: Stack(
+            children: [
+              Row(
+                children: [
+                  _buildImageBox(estate as EstateModel),
+                  SizedBox(
+                    width: 10,
                   ),
-                ),
-              ],
-            ),
-          ],
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildTitleWithStars(estate as EstateModel),
+                        _buildLocation(estate as EstateModel),
+                        _buildDateAndViews(estate as EstateModel),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -202,7 +216,7 @@ class _ChatScreenState extends State<ChatScreen> {
           border: null,
           hintText: "Write a message",
           suffix: Padding(
-            padding: const EdgeInsets.only(right: 15),
+            padding: const EdgeInsets.only(right: 20),
             child: SizedBox(
               width: 20,
               height: 20,
@@ -211,7 +225,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   await _sendMessage();
                 },
                 icon: Icon(Icons.send),
-                iconSize: 20,
+                iconSize: 25,
                 padding: EdgeInsets.all(0),
               ),
             ),
@@ -263,6 +277,7 @@ class _ChatScreenState extends State<ChatScreen> {
           Provider.of<AuthProvider>(context, listen: false)
               .getMessages(estate!.id, sender!.id)
               .then((value) {
+            print(value);
             setState(() {
               _data = value;
               _isLoading = false;

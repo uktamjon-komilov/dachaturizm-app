@@ -33,6 +33,7 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
   var detail;
   var _detailBuilder;
   var _location;
+  int _userId = 0;
   bool _isLiked = false;
 
   _showLoginScreen() async {
@@ -130,22 +131,32 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
   void didChangeDependencies() {
     final Map args = ModalRoute.of(context)?.settings.arguments as Map;
 
-    Future.delayed(Duration.zero).then((_) {
+    Future.delayed(Duration.zero).then((_) async {
       getLocation().then((location) {
         _location = location;
         Provider.of<EstateProvider>(context, listen: false)
             .fetchEstateById(args["id"])
-            .then((estate) {
+            .then((estate) async {
+          _userId = await Provider.of<AuthProvider>(context, listen: false)
+              .getUserId();
           setState(() {
             detail = estate;
             _isLiked = estate.isLiked;
             _detailBuilder = DetailBuilder(detail);
+
             Future.delayed(Duration(seconds: 1)).then(
               (_) => setState(() {
                 isLoading = false;
               }),
             );
           });
+          Dio dio = Provider.of<AuthProvider>(context, listen: false).dio;
+          final ip = await getPublicIP(dio);
+          if (ip == null) {
+          } else {
+            Provider.of<EstateProvider>(context, listen: false)
+                .addEstateView(ip, detail.id);
+          }
         });
       });
     });
@@ -154,26 +165,10 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    Future.delayed(Duration.zero).then((_) async {
-      Dio dio = Provider.of<AuthProvider>(context, listen: false).dio;
-      final ip = await getPublicIP(dio);
-      print(ip);
-      if (ip == null) {
-      } else {
-        Provider.of<EstateProvider>(context, listen: false)
-            .addEstateView(ip, detail.id);
-      }
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     final Map args = ModalRoute.of(context)?.settings.arguments as Map;
     final int estateId = args["id"];
-
-    final halfScreenButtonWidth = (100.w - 3 * defaultPadding) / 2;
+    bool fromChat = args.containsKey("fromChat");
 
     return SafeArea(
       child: Scaffold(
@@ -218,7 +213,7 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
                       ),
                     ),
                   ),
-                  _detailBuilder.buildContactBox(context, halfScreenButtonWidth)
+                  _detailBuilder.buildContactBox(context, fromChat, _userId),
                 ],
               ),
       ),

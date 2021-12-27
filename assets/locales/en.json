@@ -77,6 +77,7 @@
     "advertise": "Advertise",
     "edit": "Edit",
     "my_announcements": "My announcements",
-    "created": "Placed:",
-    "views": "Viewed:"
+    "placed": "Placed:",
+    "views": "Viewed:",
+    "greating": "Hi!"
 }

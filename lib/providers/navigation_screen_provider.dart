@@ -9,6 +9,7 @@ class NavigationScreenProvider with ChangeNotifier {
   Map<String, dynamic> _data = {};
   bool _refreshHomePage = false;
   bool _refreshChatsScreen = false;
+  int _unreadMessagesCount = 0;
 
   NavigationScreenProvider({required this.auth});
 
@@ -37,6 +38,16 @@ class NavigationScreenProvider with ChangeNotifier {
     if (_refreshChatsScreen) {
       notifyListeners();
     }
+  }
+
+  get unreadMessagesCount {
+    return _unreadMessagesCount;
+  }
+
+  set unreadMessagesCount(value) {
+    _unreadMessagesCount = value;
+    print(_unreadMessagesCount);
+    notifyListeners();
   }
 
   Map<String, dynamic> get data {
