@@ -9,6 +9,7 @@ import 'package:dachaturizm/providers/region_provider.dart';
 import 'package:dachaturizm/restartable_app.dart';
 import 'package:dachaturizm/screens/app/chat/chat_list_screen.dart';
 import 'package:dachaturizm/screens/app/chat/chat_screen.dart';
+import 'package:dachaturizm/screens/app/estate/create_estate_screen.dart';
 import 'package:dachaturizm/screens/app/estate/estate_detail_screen.dart';
 import 'package:dachaturizm/screens/app/estate/location_picker_screen.dart';
 import 'package:dachaturizm/screens/app/home/home_screen.dart';
@@ -25,12 +26,14 @@ import 'package:dachaturizm/screens/auth/create_profile_screen.dart';
 import 'package:dachaturizm/screens/auth/otp_confirmation_screen.dart';
 import 'package:dachaturizm/screens/auth/register_screen.dart';
 import 'package:dachaturizm/screens/auth/login_screen.dart';
+import 'package:dachaturizm/screens/auth/reset_password_step1_screen.dart';
 import 'package:dachaturizm/screens/loading/choose_language_screen.dart';
 import 'package:dachaturizm/screens/splash_screen.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
@@ -108,11 +111,13 @@ class _MyAppState extends State<MyApp> {
             localizationsDelegates: Locales.delegates,
             supportedLocales: Locales.supportedLocales,
             locale: locale,
-            theme: new ThemeData(
+            theme: ThemeData(
+              fontFamily: GoogleFonts.inter().fontFamily,
               primarySwatch: Colors.grey,
               textTheme: Theme.of(context).textTheme.apply(
                     bodyColor: darkPurple,
                     displayColor: darkPurple,
+                    fontFamily: GoogleFonts.inter().fontFamily,
                   ),
               primaryTextTheme: TextTheme(
                 headline6: TextStyle(color: Colors.white),
@@ -129,7 +134,7 @@ class _MyAppState extends State<MyApp> {
               ),
             ),
             debugShowCheckedModeBanner: false,
-            home: SplashScreen(),
+            home: NavigationalAppScreen(),
             routes: {
               AuthTypeScreen.routeName: (context) => AuthTypeScreen(),
               RegisterScreen.routeName: (context) => RegisterScreen(),
@@ -145,6 +150,8 @@ class _MyAppState extends State<MyApp> {
               ChooseLangugageScreen.routeName: (context) =>
                   ChooseLangugageScreen(),
               EstateListingScreen.routeName: (context) => EstateListingScreen(),
+              EstateCreationPageScreen.routeName: (context) =>
+                  EstateCreationPageScreen(),
               SearchFilersScreen.routeName: (context) => SearchFilersScreen(),
               EstateDetailScreen.routeName: (context) => EstateDetailScreen(),
               EditProfileScreen.routeName: (context) => EditProfileScreen(),

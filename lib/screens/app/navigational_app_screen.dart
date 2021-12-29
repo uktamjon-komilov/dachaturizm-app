@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:dachaturizm/constants.dart';
+import 'package:dachaturizm/helpers/call_with_auth.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/screens/app/chat/chat_list_screen.dart';
@@ -9,6 +10,7 @@ import 'package:dachaturizm/screens/app/search/search_screen.dart';
 import 'package:dachaturizm/screens/app/user/user_screen.dart';
 import 'package:dachaturizm/screens/app/user/wishlist_screen.dart';
 import 'package:dachaturizm/screens/auth/login_screen.dart';
+import 'package:dachaturizm/styles/text_styles.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:provider/provider.dart';
@@ -37,20 +39,6 @@ class _NavigationalAppScreenState extends State<NavigationalAppScreen> {
     "userpagescreen_appbar_text",
   ];
 
-  _showLoginScreen() async {
-    Navigator.of(context).pushNamed(LoginScreen.routeName);
-  }
-
-  Future callWithAuth([Function? callback]) async {
-    final access = await Provider.of<AuthProvider>(context, listen: false)
-        .getAccessToken();
-    if (access != "") {
-      if (callback != null) callback();
-    } else {
-      await _showLoginScreen();
-    }
-  }
-
   @override
   void initState() {
     super.initState();
@@ -63,8 +51,6 @@ class _NavigationalAppScreenState extends State<NavigationalAppScreen> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        print(Provider.of<NavigationScreenProvider>(context, listen: false)
-            .currentIndex);
         if (Provider.of<NavigationScreenProvider>(context, listen: false)
                 .currentIndex ==
             0) {
@@ -77,21 +63,38 @@ class _NavigationalAppScreenState extends State<NavigationalAppScreen> {
       child: SafeArea(
         child: Scaffold(
           appBar: AppBar(
+            toolbarHeight:
+                Provider.of<NavigationScreenProvider>(context).currentIndex == 0
+                    ? 78
+                    : null,
+            centerTitle: false,
             title: Consumer<NavigationScreenProvider>(
                 builder: (context, navigator, _) {
+              if (navigator.currentIndex == 0) {
+                return Container(
+                  padding: EdgeInsets.only(left: 8),
+                  child: Image.asset(
+                    "assets/images/logo-horizontal-sm.png",
+                    height: 40,
+                  ),
+                );
+              }
               return LocaleText(appBarTitles[navigator.currentIndex]);
             }),
             actions: [
-              IconButton(
-                onPressed: () async {
-                  await callWithAuth(() async {
-                    Navigator.of(context).pushNamed(WishlistScreen.routeName);
-                  });
-                },
-                icon: Icon(
-                  Icons.favorite_border_outlined,
-                  size: 30,
-                  color: Colors.redAccent,
+              Padding(
+                padding: const EdgeInsets.only(right: 5),
+                child: IconButton(
+                  onPressed: () async {
+                    await callWithAuth(context, () async {
+                      Navigator.of(context).pushNamed(WishlistScreen.routeName);
+                    });
+                  },
+                  icon: Icon(
+                    Icons.favorite_border_rounded,
+                    size: 24,
+                    color: favouriteRed,
+                  ),
                 ),
               )
             ],
@@ -111,11 +114,15 @@ class _NavigationalAppScreenState extends State<NavigationalAppScreen> {
   }
 
   Widget _buildBottomNavigation(BuildContext context) {
+    int currentIndex =
+        Provider.of<NavigationScreenProvider>(context).currentIndex;
+
     return BottomNavigationBar(
-      showSelectedLabels: false,
-      showUnselectedLabels: false,
+      selectedLabelStyle: TextStyles.display4(),
+      unselectedLabelStyle:
+          TextStyles.display4().copyWith(color: Color(0xFFBDBDBD)),
       type: BottomNavigationBarType.fixed,
-      currentIndex: Provider.of<NavigationScreenProvider>(context).currentIndex,
+      currentIndex: currentIndex,
       onTap: (index) {
         if (index != 1) {
           Provider.of<NavigationScreenProvider>(context, listen: false)
@@ -132,28 +139,26 @@ class _NavigationalAppScreenState extends State<NavigationalAppScreen> {
       items: [
         BottomNavigationBarItem(
           icon: Icon(
-            Provider.of<NavigationScreenProvider>(context).currentIndex == 0
-                ? Icons.home_rounded
-                : Icons.home_outlined,
-            color: darkPurple,
+            currentIndex == 0
+                ? Icons.dashboard_rounded
+                : Icons.dashboard_outlined,
+            color: currentIndex == 0 ? darkPurple : Color(0xFFBDBDBD),
           ),
           label: "Home",
         ),
         BottomNavigationBarItem(
           icon: Icon(
-            Provider.of<NavigationScreenProvider>(context).currentIndex == 1
-                ? Icons.search_outlined
-                : Icons.search,
-            color: darkPurple,
+            currentIndex == 1 ? Icons.search_rounded : Icons.search_outlined,
+            color: currentIndex == 1 ? darkPurple : Color(0xFFBDBDBD),
           ),
           label: "Search",
         ),
         BottomNavigationBarItem(
           icon: Icon(
-            Provider.of<NavigationScreenProvider>(context).currentIndex == 2
+            currentIndex == 2
                 ? Icons.add_circle_rounded
                 : Icons.add_circle_outline_rounded,
-            color: darkPurple,
+            color: currentIndex == 2 ? darkPurple : Color(0xFFBDBDBD),
           ),
           label: "Add",
         ),
@@ -162,11 +167,10 @@ class _NavigationalAppScreenState extends State<NavigationalAppScreen> {
             child: Center(
               child: Stack(children: [
                 Icon(
-                  Provider.of<NavigationScreenProvider>(context).currentIndex ==
-                          3
-                      ? Icons.chat_rounded
-                      : Icons.chat_outlined,
-                  color: darkPurple,
+                  currentIndex == 3
+                      ? Icons.question_answer_rounded
+                      : Icons.question_answer_outlined,
+                  color: currentIndex == 3 ? darkPurple : Color(0xFFBDBDBD),
                 ),
                 Visibility(
                   visible: Provider.of<NavigationScreenProvider>(context)
@@ -195,7 +199,7 @@ class _NavigationalAppScreenState extends State<NavigationalAppScreen> {
             Provider.of<NavigationScreenProvider>(context).currentIndex == 4
                 ? Icons.person_rounded
                 : Icons.person_outline_rounded,
-            color: darkPurple,
+            color: currentIndex == 4 ? darkPurple : Color(0xFFBDBDBD),
           ),
           label: "User",
         ),

@@ -1,15 +1,15 @@
 import 'dart:convert';
-
 import 'package:dachaturizm/components/card.dart';
-import 'package:dachaturizm/components/search_bar.dart';
-import 'package:dachaturizm/components/text1.dart';
+import 'package:dachaturizm/components/search_bar_with_filter.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/screens/app/search/filters_screen.dart';
+import 'package:dachaturizm/styles/text_styles.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_locales/flutter_locales.dart';
+import 'package:path/path.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
@@ -66,7 +66,7 @@ class _SearchPageScreenState extends State<SearchPageScreen> {
     }
   }
 
-  Future<void> _search(value) async {
+  Future<void> _search(context, value) async {
     Map<String, dynamic> filters =
         Provider.of<EstateProvider>(context, listen: false).searchFilters;
     setState(() {
@@ -81,14 +81,14 @@ class _SearchPageScreenState extends State<SearchPageScreen> {
     });
   }
 
-  void _unsearch() async {
+  void _unsearch(context) async {
     Provider.of<EstateProvider>(context, listen: false).unsetSearchedResults();
     FocusScope.of(context).requestFocus(_searchFocusNode);
   }
 
   Future<void> _refreshAction() async {
     _searchController.text = "";
-    _unsearch();
+    _unsearch(context);
   }
 
   @override
@@ -105,7 +105,7 @@ class _SearchPageScreenState extends State<SearchPageScreen> {
     if (term != "") {
       Provider.of<NavigationScreenProvider>(context, listen: false).clearData();
       _searchController.text = term;
-      _search(term);
+      _search(context, term);
     }
 
     return WillPopScope(
@@ -172,12 +172,12 @@ class _SearchPageScreenState extends State<SearchPageScreen> {
             ),
             _isLoading
                 ? Container()
-                : SearchBar(
+                : SearchBarWithFilter(
                     controller: _searchController,
                     focusNode: _searchFocusNode,
                     autofocus: false,
                     onSubmit: (value) {
-                      _search(value);
+                      _search(context, value);
                     },
                     onChange: (value) {
                       Provider.of<NavigationScreenProvider>(context,
@@ -215,8 +215,12 @@ class _SearchPageScreenState extends State<SearchPageScreen> {
                                   Padding(
                                     padding: const EdgeInsets.symmetric(
                                         vertical: defaultPadding / 2),
-                                    child: Text1(
-                                      Locales.string(context, "search_results"),
+                                    child: Text(
+                                      Locales.string(
+                                        context,
+                                        "search_results",
+                                      ),
+                                      style: TextStyles.display2(),
                                     ),
                                   ),
                                   Wrap(

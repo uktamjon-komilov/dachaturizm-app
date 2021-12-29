@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dachaturizm/components/chips.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/helpers/calculate_distance.dart';
+import 'package:dachaturizm/helpers/call_with_auth.dart';
 import 'package:dachaturizm/helpers/url_helper.dart';
 import 'package:dachaturizm/models/booking_day.dart';
 import 'package:dachaturizm/models/estate_model.dart';
@@ -376,18 +377,20 @@ class DetailBuilder {
                       if (fromChat) {
                         Navigator.of(context).pop();
                       } else {
-                        Navigator.of(context)
-                            .pushNamed(ChatScreen.routeName, arguments: {
-                          "estate": detail,
-                          "sender": UserModel(
-                            id: detail.userId,
-                            adsCount: 0,
-                            balance: 0,
-                            firstName: "",
-                            lastName: "",
-                            phone: "",
-                            photo: "",
-                          )
+                        callWithAuth(context, () {
+                          Navigator.of(context)
+                              .pushNamed(ChatScreen.routeName, arguments: {
+                            "estate": detail,
+                            "sender": UserModel(
+                              id: detail.userId,
+                              adsCount: 0,
+                              balance: 0,
+                              firstName: "",
+                              lastName: "",
+                              phone: "",
+                              photo: "",
+                            )
+                          });
                         });
                       }
                     },

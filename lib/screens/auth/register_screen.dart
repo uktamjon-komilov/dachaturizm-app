@@ -4,7 +4,7 @@ import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/screens/auth/login_screen.dart';
 import 'package:dachaturizm/screens/auth/otp_confirmation_screen.dart';
-import 'package:dachaturizm/screens/styles/input.dart';
+import 'package:dachaturizm/styles/input.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';

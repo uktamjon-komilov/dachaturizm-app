@@ -1,10 +1,10 @@
 import 'package:dachaturizm/components/card.dart';
-import 'package:dachaturizm/components/search_bar.dart';
-import 'package:dachaturizm/components/text1.dart';
+import 'package:dachaturizm/components/search_bar_with_filter.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/providers/type_provider.dart';
+import 'package:dachaturizm/styles/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:provider/provider.dart';
@@ -125,7 +125,7 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
                         SizedBox(
                           height: defaultPadding,
                         ),
-                        SearchBar(
+                        SearchBarWithFilter(
                           controller: _searchController,
                           focusNode: _searchFocusNode,
                           onSubmit: (value) {
@@ -155,8 +155,11 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
                                       Padding(
                                         padding: const EdgeInsets.symmetric(
                                             vertical: defaultPadding / 2),
-                                        child: Text1(Locales.string(
-                                            context, "top_estates")),
+                                        child: Text(
+                                          Locales.string(
+                                              context, "top_estates"),
+                                          style: TextStyles.display2(),
+                                        ),
                                       ),
                                       Wrap(
                                         children: [
@@ -176,8 +179,10 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
                                   Padding(
                                     padding: const EdgeInsets.symmetric(
                                         vertical: defaultPadding / 2),
-                                    child: Text1(Locales.string(
-                                        context, "simple_estates")),
+                                    child: Text(
+                                      Locales.string(context, "simple_estates"),
+                                      style: TextStyles.display2(),
+                                    ),
                                   ),
                                   Wrap(
                                     children: [

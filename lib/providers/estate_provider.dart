@@ -102,7 +102,7 @@ class EstateProvider with ChangeNotifier {
     return null;
   }
 
-  Future fetchEstateById(estateId) async {
+  Future<EstateModel> fetchEstateById(estateId) async {
     final url = "${baseUrl}api/estate/${estateId}/";
     var extractedData = await getData(url);
     var estate = await EstateModel.fromJson(extractedData);
@@ -349,32 +349,26 @@ class EstateProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<Map<String, dynamic>> createEstate(Map<String, dynamic> data) async {
-    const url = "${baseUrl}api/estate/";
+  prepareData(data, [estate]) async {
     final locale = await getCurrentLocale();
-    String refresh = await auth.getRefreshToken();
-    if (refresh == null || refresh == "") {
-      return {"statusCode": 400};
-    }
-    String access = await auth.getAccessToken();
-    Options options = Options(headers: {
-      "Content-type": "multipart/form-data",
-      "Authorization": "Bearer ${access}",
-    });
-
     Map<String, dynamic> tempData = {};
 
-    int i = 0;
-    while (data["photos"].length > 0) {
-      if (data["photos"].length == i) break;
-      var photo = await MultipartFile.fromFile(data["photos"][i].path,
-          filename: "testimage.png");
-      tempData["photo${i + 1}"] = photo;
-      i += 1;
+    if (data.containsKey("photos")) {
+      int i = 0;
+
+      while (data["photos"].length > 0) {
+        if (data["photos"].length == i) break;
+        var photo = await MultipartFile.fromFile(data["photos"][i].path,
+            filename: "testimage.png");
+        tempData["photo${i + 1}"] = photo;
+        i += 1;
+      }
     }
 
-    tempData["photo"] = await MultipartFile.fromFile(data["photo"].path,
-        filename: "testimage.png");
+    if (data.containsKey("photo")) {
+      tempData["photo"] = await MultipartFile.fromFile(data["photo"].path,
+          filename: "testimage.png");
+    }
 
     Map<String, dynamic> translations = {
       "en": {
@@ -397,29 +391,124 @@ class EstateProvider with ChangeNotifier {
       }
     };
 
-    translations[locale.toString()]["title"] = data["title"];
-    translations[locale.toString()]["description"] = data["description"];
+    if (data.containsKey("title")) {
+      translations[locale.toString()]["title"] = data["title"];
+    } else {
+      translations[locale.toString()]["title"] = estate.title;
+    }
+
+    if (data.containsKey("description")) {
+      translations[locale.toString()]["description"] = data["description"];
+    } else {
+      translations[locale.toString()]["description"] = estate.description;
+    }
 
     tempData["translations"] = json.encode(translations);
-    tempData["estate_type"] = data["estate_type"];
-    tempData["price_type"] = data["price_type"];
-    tempData["beds"] = data["beds"];
-    tempData["pool"] = data["pool"];
-    tempData["people"] = data["people"];
-    tempData["weekday_price"] = data["weekday_price"];
-    tempData["weekend_price"] = data["weekend_price"];
-    tempData["address"] = data["address"];
-    tempData["longtitute"] = data["longtitute"];
-    tempData["latitute"] = data["latitute"];
-    tempData["announcer"] = data["announcer"];
-    tempData["phone"] = data["phone"].toString().replaceAll("+", "");
-    tempData["is_published"] = data["is_published"];
-    tempData["facilities"] = "[${data['facilities'].join(',')}]";
-    tempData["booked_days"] = "[${data['booked_days'].join(',')}]";
+
+    if (data.containsKey("estate_type")) {
+      tempData["estate_type"] = data["estate_type"];
+    }
+
+    if (data.containsKey("price_type")) {
+      tempData["price_type"] = data["price_type"];
+    }
+
+    if (data.containsKey("beds")) {
+      tempData["beds"] = data["beds"];
+    }
+
+    if (data.containsKey("pool")) {
+      tempData["pool"] = data["pool"];
+    }
+
+    if (data.containsKey("people")) {
+      tempData["people"] = data["people"];
+    }
+
+    if (data.containsKey("weekday_price")) {
+      tempData["weekday_price"] = data["weekday_price"];
+    }
+
+    if (data.containsKey("weekend_price")) {
+      tempData["weekend_price"] = data["weekend_price"];
+    }
+
+    if (data.containsKey("address")) {
+      tempData["address"] = data["address"];
+    }
+
+    if (data.containsKey("longtitute")) {
+      tempData["longtitute"] = data["longtitute"];
+    }
+
+    if (data.containsKey("latitute")) {
+      tempData["latitute"] = data["latitute"];
+    }
+
+    if (data.containsKey("announcer")) {
+      tempData["announcer"] = data["announcer"];
+    }
+
+    if (data.containsKey("phone")) {
+      tempData["phone"] = data["phone"].toString().replaceAll("+", "");
+    }
+
+    if (data.containsKey("is_published")) {
+      tempData["is_published"] = data["is_published"];
+    }
+
+    if (data.containsKey("facilities")) {
+      tempData["facilities"] = "[${data['facilities'].join(',')}]";
+    }
+
+    if (data.containsKey("booked_days")) {
+      tempData["booked_days"] = "[${data['booked_days'].join(',')}]";
+    }
+
+    return tempData;
+  }
+
+  Future<Map<String, dynamic>> createEstate(Map<String, dynamic> data) async {
+    const url = "${baseUrl}api/estate/";
+    String refresh = await auth.getRefreshToken();
+    if (refresh == null || refresh == "") {
+      return {"statusCode": 400};
+    }
+    String access = await auth.getAccessToken();
+    Options options = Options(headers: {
+      "Content-type": "multipart/form-data",
+      "Authorization": "Bearer ${access}",
+    });
+
+    Map<String, dynamic> tempData = await prepareData(data);
 
     try {
       FormData formData = FormData.fromMap(tempData);
       var response = await dio.post(url, data: formData, options: options);
+      return {"statusCode": response.statusCode};
+    } catch (e) {
+      print(e);
+    }
+    return {"statusCode": 400};
+  }
+
+  Future updateEstate(userId, data, estate) async {
+    final url = "${baseUrl}api/estate/${userId}/";
+    String refresh = await auth.getRefreshToken();
+    if (refresh == null || refresh == "") {
+      return {"statusCode": 400};
+    }
+    String access = await auth.getAccessToken();
+    Options options = Options(headers: {
+      "Content-type": "multipart/form-data",
+      "Authorization": "Bearer ${access}",
+    });
+
+    Map<String, dynamic> tempData = await prepareData(data, estate);
+
+    try {
+      FormData formData = FormData.fromMap(tempData);
+      var response = await dio.patch(url, data: formData, options: options);
       return {"statusCode": response.statusCode};
     } catch (e) {
       print(e);

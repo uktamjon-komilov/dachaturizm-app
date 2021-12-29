@@ -1,10 +1,10 @@
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
-import 'package:dachaturizm/components/text1.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/providers/currency_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/screens/auth/login_screen.dart';
+import 'package:dachaturizm/styles/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
@@ -131,7 +131,10 @@ class _BalanceScreenState extends State<BalanceScreen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text1("Balans: ${_balance} so'm"),
+                      Text(
+                        "Balans: ${_balance} so'm",
+                        style: TextStyles.display2(),
+                      ),
                       SizedBox(height: 10),
                       TextFormField(
                         controller: _amountController,

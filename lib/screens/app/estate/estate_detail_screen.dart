@@ -129,39 +129,39 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
   }
 
   void didChangeDependencies() {
+    super.didChangeDependencies();
+
     final Map args = ModalRoute.of(context)?.settings.arguments as Map;
 
     Future.delayed(Duration.zero).then((_) async {
       getLocation().then((location) {
         _location = location;
-        Provider.of<EstateProvider>(context, listen: false)
-            .fetchEstateById(args["id"])
-            .then((estate) async {
-          _userId = await Provider.of<AuthProvider>(context, listen: false)
-              .getUserId();
-          setState(() {
-            detail = estate;
-            _isLiked = estate.isLiked;
-            _detailBuilder = DetailBuilder(detail);
+      });
+      Provider.of<EstateProvider>(context, listen: false)
+          .fetchEstateById(args["id"])
+          .then((estate) async {
+        _userId =
+            await Provider.of<AuthProvider>(context, listen: false).getUserId();
+        setState(() {
+          detail = estate;
+          _isLiked = estate.isLiked;
+          _detailBuilder = DetailBuilder(detail);
 
-            Future.delayed(Duration(seconds: 1)).then(
-              (_) => setState(() {
-                isLoading = false;
-              }),
-            );
-          });
-          Dio dio = Provider.of<AuthProvider>(context, listen: false).dio;
-          final ip = await getPublicIP(dio);
-          if (ip == null) {
-          } else {
-            Provider.of<EstateProvider>(context, listen: false)
-                .addEstateView(ip, detail.id);
-          }
+          Future.delayed(Duration(seconds: 1)).then(
+            (_) => setState(() {
+              isLoading = false;
+            }),
+          );
         });
+        Dio dio = Provider.of<AuthProvider>(context, listen: false).dio;
+        final ip = await getPublicIP(dio);
+        if (ip == null) {
+        } else {
+          Provider.of<EstateProvider>(context, listen: false)
+              .addEstateView(ip, detail.id);
+        }
       });
     });
-
-    super.didChangeDependencies();
   }
 
   @override

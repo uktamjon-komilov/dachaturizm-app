@@ -26,7 +26,14 @@ class HorizontalAd extends StatelessWidget {
         height: 150,
         width: width == null ? (size.width - 2 * defaultPadding) : width,
         margin: EdgeInsets.symmetric(vertical: 20),
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
+        decoration:
+            BoxDecoration(borderRadius: BorderRadius.circular(10), boxShadow: [
+          BoxShadow(
+            color: darkPurple.withOpacity(0.15),
+            offset: Offset(0, 4),
+            blurRadius: 10,
+          )
+        ]),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(10),
           child: Container(
@@ -45,22 +52,25 @@ class HorizontalAd extends StatelessWidget {
                   top: 0,
                   left: 0,
                   child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    width: 160,
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 28),
+                    width: 152,
                     height: 150,
                     decoration: BoxDecoration(color: Color(0xCC3B2F43)),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           estate.title,
                           style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                              overflow: TextOverflow.ellipsis),
-                          maxLines: 2,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            letterSpacing: 0.5,
+                            overflow: TextOverflow.ellipsis,
+                            height: 1.25,
+                          ),
+                          maxLines: 3,
                         ),
                         Text(
                           "${estate.weekdayPrice} ${estate.priceType}",

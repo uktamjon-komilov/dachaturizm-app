@@ -115,5 +115,9 @@
     "weekend_price": "Weekend price",
     "choose_currency": "Please, choose a currency",
     "save_estate": "Create announcement",
-    "booked_days": "Days occupied"
+    "booked_days": "Days occupied",
+    "login_profile": "My profile",
+    "wishlist": "Wishlist",
+    "no_wishlist_items": "No items in your wishlist",
+    "reset_password": "Reset password"
 }

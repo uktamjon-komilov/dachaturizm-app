@@ -3,7 +3,7 @@ import 'package:dachaturizm/components/text_link.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/screens/auth/login_screen.dart';
-import 'package:dachaturizm/screens/styles/input.dart';
+import 'package:dachaturizm/styles/input.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:provider/provider.dart';

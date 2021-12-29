@@ -1,18 +1,14 @@
+import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/helpers/call_with_auth.dart';
-import 'package:dachaturizm/models/booking_day.dart';
 import 'package:dachaturizm/models/estate_model.dart';
-import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/screens/app/estate/estate_detail_screen.dart';
-import 'package:dachaturizm/screens/auth/login_screen.dart';
+import 'package:dachaturizm/styles/text_styles.dart';
 import "package:flutter/material.dart";
-import 'package:flutter_locales/flutter_locales.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
-import 'package:table_calendar/table_calendar.dart';
 
 class EstateCard extends StatefulWidget {
   const EstateCard({
@@ -28,22 +24,8 @@ class EstateCard extends StatefulWidget {
 
 class _EstateCardState extends State<EstateCard> {
   bool _isLiked = false;
-
-  Widget _showTopIndicator() {
-    return Positioned(
-      top: 10,
-      left: 10,
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-        decoration: BoxDecoration(
-            color: Colors.orange, borderRadius: BorderRadius.circular(15)),
-        child: Text(
-          "TOP",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-      ),
-    );
-  }
+  final CurrencyTextInputFormatter _formatter = CurrencyTextInputFormatter(
+      symbol: "", decimalDigits: 0, customPattern: "### ### ###");
 
   @override
   void initState() {
@@ -58,14 +40,20 @@ class _EstateCardState extends State<EstateCard> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: (100.w - 2 * defaultPadding) / 2,
-      height: 250,
+      width: (100.w - 2.25 * defaultPadding) / 2,
+      height: 246,
+      decoration: BoxDecoration(boxShadow: [
+        BoxShadow(
+          offset: Offset(0, 2),
+          blurRadius: 4,
+          color: Colors.black.withOpacity(0.07),
+        )
+      ]),
       child: Card(
         clipBehavior: Clip.antiAlias,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15),
         ),
-        elevation: 2,
         child: InkWell(
           onTap: () {
             Navigator.of(context).pushNamed(EstateDetailScreen.routeName,
@@ -79,8 +67,8 @@ class _EstateCardState extends State<EstateCard> {
               Stack(
                 children: [
                   Ink.image(
-                    height: 130,
-                    fit: BoxFit.fill,
+                    height: 145,
+                    fit: BoxFit.cover,
                     image: NetworkImage(
                       widget.estate.photo,
                     ),
@@ -95,7 +83,7 @@ class _EstateCardState extends State<EstateCard> {
                   children: [
                     Flexible(
                       child: Padding(
-                        padding: const EdgeInsets.fromLTRB(8, 12, 0, 12),
+                        padding: const EdgeInsets.all(10),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -103,8 +91,10 @@ class _EstateCardState extends State<EstateCard> {
                             Text(
                               widget.estate.title,
                               style: TextStyle(
-                                color: darkPurple,
-                                fontSize: 14,
+                                fontSize: 12,
+                                height: 1.33,
+                                letterSpacing: 0.1,
+                                fontWeight: FontWeight.w600,
                                 overflow: TextOverflow.ellipsis,
                               ),
                               maxLines: 2,
@@ -116,23 +106,22 @@ class _EstateCardState extends State<EstateCard> {
                               direction: Axis.horizontal,
                               allowHalfRating: true,
                               itemCount: 5,
-                              itemSize: 20.0,
+                              itemSize: 14,
                               itemBuilder: (context, _) => Icon(
-                                Icons.star,
-                                color: Colors.amber,
+                                Icons.star_rounded,
+                                color: yellowish,
                               ),
+                              unratedColor: Color(0xFFEDEDED),
                               onRatingUpdate: (rating) {
                                 print(rating);
                               },
                             ),
                             Text(
-                              "${widget.estate.weekdayPrice.toInt()} ${widget.estate.priceType}",
-                              style: TextStyle(
-                                color: darkPurple,
-                                fontSize: 17,
-                                fontWeight: FontWeight.bold,
-                                overflow: TextOverflow.ellipsis,
-                              ),
+                              _formatter.format(
+                                      widget.estate.weekdayPrice.toString()) +
+                                  " ${widget.estate.priceType}",
+                              style: TextStyles.display4()
+                                  .copyWith(color: normalOrange),
                             )
                           ],
                         ),
@@ -140,7 +129,7 @@ class _EstateCardState extends State<EstateCard> {
                     ),
                     Container(
                       child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           IconButton(
                             iconSize: 20,
@@ -170,25 +159,10 @@ class _EstateCardState extends State<EstateCard> {
                               _isLiked
                                   ? Icons.favorite
                                   : Icons.favorite_border_outlined,
-                              color: Colors.red,
+                              color: favouriteRed,
+                              size: 20.0,
                             ),
                           ),
-                          // IconButton(
-                          //   iconSize: 20,
-                          //   onPressed: () async {
-                          //     final Set<BookingDay> _selectedDays =
-                          //         Set<BookingDay>();
-                          //     for (int i = 0;
-                          //         i < widget.estate.bookedDays.length;
-                          //         i++) {
-                          //       _selectedDays.add(widget.estate.bookedDays[i]);
-                          //     }
-                          //   },
-                          //   icon: Icon(
-                          //     Icons.calendar_today_outlined,
-                          //     color: darkPurple,
-                          //   ),
-                          // ),
                         ],
                       ),
                     )
@@ -196,6 +170,26 @@ class _EstateCardState extends State<EstateCard> {
                 ),
               )
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _showTopIndicator() {
+    return Positioned(
+      top: 10,
+      left: 10,
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 2, horizontal: 5),
+        decoration: BoxDecoration(
+            color: normalOrange, borderRadius: BorderRadius.circular(5)),
+        child: Text(
+          "TOP",
+          style: TextStyle(
+            fontSize: 11,
+            color: Colors.white,
+            fontWeight: FontWeight.w700,
           ),
         ),
       ),

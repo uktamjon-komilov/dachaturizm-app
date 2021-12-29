@@ -28,6 +28,15 @@ class _UserPageScreenState extends State<UserPageScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Provider.of<AuthProvider>(context).user == null
+            ? ProfileListItem(
+                title: "login_profile",
+                icon: Icon(Icons.person),
+                callback: () {
+                  Navigator.of(context).pushNamed(LoginScreen.routeName);
+                },
+              )
+            : Container(),
+        Provider.of<AuthProvider>(context).user == null
             ? Container()
             : ProfileListItem(
                 title: "my_estates",

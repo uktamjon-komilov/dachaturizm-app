@@ -80,8 +80,8 @@
     "views": "Koʻrildi:",
     "ad": "Reklama",
     "banner": "Banner",
-    "topbanner": "To'p Banner",
-    "top": "To'p",
+    "topbanner": "Top Banner",
+    "top": "Top",
     "simple": "Oddiy",
     "hot": "New",
     "write_a_message": "Xabar yozing",
@@ -115,5 +115,9 @@
     "weekend_price": "Dam olish kunlari",
     "choose_currency": "Please, choose a currency",
     "save_estate": "Joylashtirish",
-    "booked_days": "Band qilingan kunlar"
+    "booked_days": "Band qilingan kunlar",
+    "login_profile": "Mening profilim",
+    "wishlist": "Yoqtirganlarim",
+    "no_wishlist_items": "Yoqtirganlarim ro'yhati mavjud emas",
+    "reset_password": "Parolni yangilash"
 }

@@ -31,6 +31,7 @@ class _ChatScreenState extends State<ChatScreen> {
   int _userId = 0;
   EstateModel? estate;
   UserModel? sender;
+  Timer? _timer;
   Map<String, dynamic> _data = {};
   TextEditingController _textController = TextEditingController();
   ScrollController _scrollController = ScrollController();
@@ -110,35 +111,37 @@ class _ChatScreenState extends State<ChatScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Row(
-          children: [
-            Icon(
-              Icons.calendar_today_rounded,
-              size: 15,
-              color: normalGrey,
-            ),
-            SizedBox(width: 5),
-            SmallGreyText(
-              text: Locales.string(context, "placed") +
-                  " " +
-                  parseDateTime(
-                    estate.created as DateTime,
-                  ),
-            ),
-          ],
+        Expanded(
+          child: Row(
+            children: [
+              Icon(
+                Icons.calendar_today_rounded,
+                size: 15,
+                color: normalGrey,
+              ),
+              SizedBox(width: 5),
+              SmallGreyText(
+                text: parseDateTime(
+                  estate.created as DateTime,
+                ),
+              ),
+            ],
+          ),
         ),
-        Row(
-          children: [
-            Icon(
-              Icons.remove_red_eye,
-              size: 15,
-              color: normalGrey,
-            ),
-            SizedBox(width: 5),
-            SmallGreyText(
-              text: "${Locales.string(context, "views")} ${estate.views}",
-            ),
-          ],
+        Expanded(
+          child: Row(
+            children: [
+              Icon(
+                Icons.remove_red_eye,
+                size: 15,
+                color: normalGrey,
+              ),
+              SizedBox(width: 5),
+              SmallGreyText(
+                text: "${estate.views}",
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -177,26 +180,22 @@ class _ChatScreenState extends State<ChatScreen> {
           width: 100.w,
           height: 100,
           padding: EdgeInsets.all(defaultPadding / 2),
-          child: Stack(
+          child: Row(
             children: [
-              Row(
-                children: [
-                  _buildImageBox(estate as EstateModel),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildTitleWithStars(estate as EstateModel),
-                        _buildLocation(estate as EstateModel),
-                        _buildDateAndViews(estate as EstateModel),
-                      ],
-                    ),
-                  ),
-                ],
+              _buildImageBox(estate as EstateModel),
+              SizedBox(
+                width: 10,
+              ),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildTitleWithStars(estate as EstateModel),
+                    _buildLocation(estate as EstateModel),
+                    _buildDateAndViews(estate as EstateModel),
+                  ],
+                ),
               ),
             ],
           ),
@@ -267,9 +266,7 @@ class _ChatScreenState extends State<ChatScreen> {
       });
       Provider.of<AuthProvider>(context).getUserId().then((value) {
         if (value == null) {
-          callWithAuth(context, () {
-            Navigator.of(context).pushNamed(LoginScreen.routeName);
-          });
+          Navigator.of(context).pushNamed(LoginScreen.routeName);
         } else {
           setState(() {
             _userId = value;
@@ -277,13 +274,12 @@ class _ChatScreenState extends State<ChatScreen> {
           Provider.of<AuthProvider>(context, listen: false)
               .getMessages(estate!.id, sender!.id)
               .then((value) {
-            print(value);
             setState(() {
               _data = value;
               _isLoading = false;
             });
-            _scrollController
-                .jumpTo(_scrollController.position.maxScrollExtent);
+            // _scrollController
+            //     .jumpTo(_scrollController.position.maxScrollExtent);
           });
         }
       });
@@ -294,14 +290,14 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     super.initState();
     Future.delayed(Duration.zero).then((_) {
-      Timer.periodic(Duration(seconds: 5), (timer) {
+      _timer = Timer.periodic(Duration(seconds: 5), (timer) {
         Provider.of<AuthProvider>(context, listen: false)
             .getMessages(estate!.id, sender!.id)
             .then((value) {
           setState(() {
             _data = value;
           });
-          _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+          // _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
         });
       });
     });
@@ -311,6 +307,7 @@ class _ChatScreenState extends State<ChatScreen> {
   void dispose() {
     _textController.dispose();
     _scrollController.dispose();
+    _timer!.cancel();
     super.dispose();
   }
 

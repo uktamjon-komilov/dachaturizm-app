@@ -1,4 +1,5 @@
 import 'package:dachaturizm/constants.dart';
+import 'package:dachaturizm/styles/text_styles.dart';
 import 'package:flutter/material.dart';
 
 class TextLinkButton extends StatelessWidget {
@@ -23,10 +24,7 @@ class TextLinkButton extends StatelessWidget {
             bottom: BorderSide(color: darkPurple, width: 2),
           ),
         ),
-        child: Text(
-          text,
-          style: TextStyle(fontSize: 16),
-        ),
+        child: Text(text, style: TextStyles.display3()),
       ),
     );
   }

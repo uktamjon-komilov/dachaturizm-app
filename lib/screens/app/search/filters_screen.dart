@@ -1,5 +1,4 @@
 import 'package:dachaturizm/components/small_button.dart';
-import 'package:dachaturizm/components/text1.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/models/currency_model.dart';
 import 'package:dachaturizm/models/facility_model.dart';
@@ -8,7 +7,8 @@ import 'package:dachaturizm/providers/currency_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/facility_provider.dart';
 import 'package:dachaturizm/providers/region_provider.dart';
-import 'package:dachaturizm/screens/styles/input.dart';
+import 'package:dachaturizm/styles/input.dart';
+import 'package:dachaturizm/styles/text_styles.dart';
 import 'package:flutter/cupertino.dart';
 import "package:flutter/material.dart";
 import 'package:provider/provider.dart';
@@ -108,7 +108,10 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text1("Regions"),
+                      Text(
+                        "Regions",
+                        style: TextStyles.display2(),
+                      ),
                       DropdownButton<String>(
                         isExpanded: true,
                         value: _currentRegion,
@@ -148,7 +151,10 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text1("Price range"),
+                          Text(
+                            "Price range",
+                            style: TextStyles.display2(),
+                          ),
                           _buildCurrenciesRow(currencies),
                         ],
                       ),
@@ -171,7 +177,10 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
                       SizedBox(
                         height: defaultPadding,
                       ),
-                      Text1("Facilities"),
+                      Text(
+                        "Facilities",
+                        style: TextStyles.display2(),
+                      ),
                       _buildFacilityList(facilities),
                     ],
                   ),

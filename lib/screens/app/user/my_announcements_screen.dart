@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:dachaturizm/components/small_grey_text.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/helpers/call_with_auth.dart';
@@ -6,13 +8,13 @@ import 'package:dachaturizm/models/ads_plan.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/providers/currency_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
+import 'package:dachaturizm/screens/app/estate/create_estate_screen.dart';
 import 'package:dachaturizm/screens/app/estate/estate_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
-import 'package:flutter_gradients/flutter_gradients.dart';
 
 class MyAnnouncements extends StatefulWidget {
   const MyAnnouncements({Key? key}) : super(key: key);
@@ -129,7 +131,10 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
     );
   }
 
-  void _navigateToEditScreen([String? id]) {}
+  void _navigateToEditScreen([String? id]) {
+    Navigator.of(context).pushNamed(EstateCreationPageScreen.routeName,
+        arguments: {"estate": id});
+  }
 
   void _openAdsPriceList([String? id]) {
     showModalBottomSheet(
@@ -465,7 +470,11 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
                             child: Container(
                               padding: EdgeInsets.all(3),
                               decoration: BoxDecoration(
-                                gradient: FlutterGradients.happyMemories(),
+                                gradient: LinearGradient(
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                  colors: [Colors.purple, Colors.blue],
+                                ),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(

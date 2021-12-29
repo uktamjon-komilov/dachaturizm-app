@@ -115,5 +115,9 @@
     "weekend_price": "Выходные дни",
     "choose_currency": "Пожалуйста, выберите валюту",
     "save_estate": "Создать объявление",
-    "booked_days": "Напряженные дни"
+    "booked_days": "Напряженные дни",
+    "login_profile": "Мой профайл",
+    "wishlist": "Избранные",
+    "no_wishlist_items": "Нет списка моих избранных",
+    "reset_password": "Сбросить пароль"
 }

@@ -27,9 +27,6 @@ class _ChatListScreenState extends State<ChatListScreen> {
 
   _refreshMyChats() async {
     Future.delayed(Duration.zero).then((_) {
-      setState(() {
-        _isLoading = true;
-      });
       Provider.of<AuthProvider>(context, listen: false)
           .getMyChats()
           .then((value) {
@@ -42,7 +39,6 @@ class _ChatListScreenState extends State<ChatListScreen> {
         });
         setState(() {
           _chats = value;
-          _isLoading = false;
         });
       });
     });

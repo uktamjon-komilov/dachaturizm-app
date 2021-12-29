@@ -10,7 +10,6 @@ class DistrictModel {
 
   static Future<DistrictModel> fromJson(data) async {
     String locale = await getCurrentLocale();
-    print(data);
     return DistrictModel(
       id: data["id"],
       title: data["translations"][locale]["title"],
