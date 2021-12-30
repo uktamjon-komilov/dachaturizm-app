@@ -12,6 +12,7 @@ import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/providers/type_provider.dart';
 import 'package:dachaturizm/screens/app/home/listing_screen.dart';
+import 'package:dachaturizm/screens/app/home/services_list_screen.dart';
 import 'package:dachaturizm/styles/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
@@ -126,54 +127,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
                 .visitSearchPage(term);
           }
         },
-      ),
-    );
-  }
-
-  _showCalendarModal(_selectedDays) async {
-    DateTime now = DateTime.now();
-    DateTime _focusedDay = DateTime.now();
-
-    await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text("Band qilingan kunlar"),
-        content: TableCalendar(
-          firstDay: now,
-          lastDay: DateTime.utc(now.year + 1, 12, 31),
-          focusedDay: _focusedDay,
-          locale: Locales.currentLocale(context).toString(),
-          headerStyle: HeaderStyle(
-            formatButtonVisible: false,
-            titleCentered: true,
-            titleTextStyle: TextStyle(
-              color: darkPurple,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-            titleTextFormatter: (date, locale) =>
-                "${DateFormat.y(locale).format(date)}, ${DateFormat.MMMM(locale).format(date)}",
-          ),
-          calendarStyle: CalendarStyle(
-            cellMargin: EdgeInsets.all(3),
-            selectedDecoration: BoxDecoration(
-              color: normalOrange,
-              borderRadius: BorderRadius.circular(5),
-            ),
-            todayDecoration: BoxDecoration(
-              color: lightPurple,
-              borderRadius: BorderRadius.circular(5),
-            ),
-            todayTextStyle: TextStyle(
-              color: Colors.white,
-            ),
-          ),
-          selectedDayPredicate: (day) {
-            return _selectedDays.contains(BookingDay.toObj(day));
-            // return true;
-          },
-          startingDayOfWeek: StartingDayOfWeek.monday,
-        ),
       ),
     );
   }
@@ -350,7 +303,13 @@ class _HomePageScreenState extends State<HomePageScreen> {
                 }).toList(),
                 Container(
                   margin: EdgeInsets.only(right: 34),
-                  child: CategoryItem(title: "Xizmatlar"),
+                  child: CategoryItem(
+                    title: "Xizmatlar",
+                    onTap: () {
+                      Navigator.of(context)
+                          .pushNamed(ServicesListScreen.routeName);
+                    },
+                  ),
                 ),
               ],
             ),

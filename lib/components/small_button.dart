@@ -28,7 +28,7 @@ class SmallButton extends StatelessWidget {
         child: Text(
           text,
           style: TextStyle(
-            color: Colors.white,
+            color: enabled ? Colors.white : greyishLight,
             fontSize: 12,
           ),
         ),

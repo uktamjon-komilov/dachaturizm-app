@@ -27,4 +27,14 @@ class TextStyles {
       height: 1.5625,
     );
   }
+
+  static TextStyle display1() {
+    return TextStyle(
+      color: darkPurple,
+      fontSize: 14,
+      fontWeight: FontWeight.w600,
+      letterSpacing: 0.1,
+      height: 1.7857,
+    );
+  }
 }

@@ -1,9 +1,20 @@
+import 'package:dachaturizm/components/app_bar.dart';
+import 'package:dachaturizm/components/bottom_navbar.dart';
 import 'package:dachaturizm/components/card.dart';
+import 'package:dachaturizm/components/no_result.dart';
 import 'package:dachaturizm/components/search_bar_with_filter.dart';
+import 'package:dachaturizm/components/small_button.dart';
 import 'package:dachaturizm/constants.dart';
+import 'package:dachaturizm/models/type_model.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/providers/type_provider.dart';
+import 'package:dachaturizm/screens/app/chat/chat_list_screen.dart';
+import 'package:dachaturizm/screens/app/estate/create_estate_screen.dart';
+import 'package:dachaturizm/screens/app/home/home_screen.dart';
+import 'package:dachaturizm/screens/app/search/search_screen.dart';
+import 'package:dachaturizm/screens/app/user/user_screen.dart';
+import 'package:dachaturizm/screens/auth/login_screen.dart';
 import 'package:dachaturizm/styles/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
@@ -21,16 +32,42 @@ class EstateListingScreen extends StatefulWidget {
 
 class _EstateListingScreenState extends State<EstateListingScreen> {
   bool _isLoading = false;
+  bool _isInit = true;
   bool _isSearched = false;
+  bool _showTop = true;
+  TypeModel? _estateType;
+  List? _topEstates;
+  List? _simpleEstates;
+  List? _currentEstates;
+
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
 
   @override
-  void initState() {
-    Future.delayed(Duration.zero).then((_) {
-      _refreshAction();
-    });
-    super.initState();
+  void didChangeDependencies() async {
+    super.didChangeDependencies();
+    if (_isInit) {
+      _isInit = false;
+      await _refreshAction();
+      final int estateTypeId =
+          ModalRoute.of(context)!.settings.arguments as int;
+      setState(() {
+        _topEstates = _isSearched
+            ? Provider.of<EstateProvider>(context).searchedTopEstates
+            : Provider.of<EstateProvider>(context, listen: false)
+                .getEstatesByType(estateTypeId, top: true);
+
+        _simpleEstates = _isSearched
+            ? Provider.of<EstateProvider>(context).searchedSimpleEstates
+            : Provider.of<EstateProvider>(context, listen: false)
+                .getEstatesByType(estateTypeId);
+
+        _estateType = Provider.of<EstateTypesProvider>(context, listen: false)
+            .getType(estateTypeId);
+
+        _currentEstates = _topEstates;
+      });
+    }
   }
 
   Future<void> _refreshAction() async {
@@ -45,7 +82,6 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
       });
     });
     _searchController.text = "";
-    // _unsearch();
   }
 
   Future<void> _search(slug, value) async {
@@ -66,28 +102,8 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
     });
   }
 
-  void _unsearch() {
-    Provider.of<EstateProvider>(context, listen: false).unsetSearchedResults();
-    setState(() {
-      _isSearched = false;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    final int estateTypeId = ModalRoute.of(context)!.settings.arguments as int;
-    final List topEstates = _isSearched
-        ? Provider.of<EstateProvider>(context, listen: false).searchedTopEstates
-        : Provider.of<EstateProvider>(context, listen: false)
-            .getEstatesByType(estateTypeId, top: true);
-    final List simpleEstates = _isSearched
-        ? Provider.of<EstateProvider>(context, listen: false)
-            .searchedSimpleEstates
-        : Provider.of<EstateProvider>(context, listen: false)
-            .getEstatesByType(estateTypeId);
-    final estateType = Provider.of<EstateTypesProvider>(context, listen: false)
-        .getType(estateTypeId);
-
     return WillPopScope(
       onWillPop: () async {
         Provider.of<NavigationScreenProvider>(context, listen: false)
@@ -95,9 +111,10 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
         return true;
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(Locales.string(context, "types")),
-        ),
+        appBar: buildNavigationalAppBar(context, _estateType!.title, () {
+          Provider.of<NavigationScreenProvider>(context, listen: false)
+              .refreshHomePage = true;
+        }),
         body: _isLoading
             ? Center(
                 child: CircularProgressIndicator(),
@@ -105,101 +122,85 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
             : RefreshIndicator(
                 onRefresh: _refreshAction,
                 child: Container(
-                  height: (topEstates.length == 0 && simpleEstates.length == 0)
-                      ? 100.h - 4 * defaultPadding
-                      : null,
-                  padding: EdgeInsets.symmetric(horizontal: defaultPadding),
+                  height:
+                      (_topEstates!.length == 0 && _simpleEstates!.length == 0)
+                          ? 100.h - 4 * defaultPadding
+                          : null,
                   child: SingleChildScrollView(
                     physics: AlwaysScrollableScrollPhysics(),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SizedBox(
-                          height: defaultPadding,
+                          height: 24,
                         ),
-                        Text(
-                          estateType != null ? estateType.title : "",
-                          style: TextStyle(
-                              fontSize: 28, fontWeight: FontWeight.w700),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: defaultPadding),
+                          child: SearchBarWithFilter(
+                            controller: _searchController,
+                            focusNode: _searchFocusNode,
+                            onSubmit: (value) {
+                              _search(
+                                  _estateType != null
+                                      ? _estateType!.slug
+                                      : "dacha",
+                                  value);
+                            },
+                            onChange: (value) {
+                              if (value == "") {
+                                _refreshAction();
+                              }
+                            },
+                          ),
                         ),
-                        SizedBox(
-                          height: defaultPadding,
+                        Visibility(
+                          visible: _currentEstates!.length > 0,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: defaultPadding),
+                            child: Row(
+                              children: [
+                                SmallButton("Top", enabled: _showTop,
+                                    onPressed: () {
+                                  setState(() {
+                                    _showTop = true;
+                                    _currentEstates = _topEstates;
+                                  });
+                                }),
+                                SmallButton("Oddiy", enabled: !_showTop,
+                                    onPressed: () {
+                                  setState(() {
+                                    _showTop = false;
+                                    _currentEstates = _simpleEstates;
+                                  });
+                                }),
+                              ],
+                            ),
+                          ),
                         ),
-                        SearchBarWithFilter(
-                          controller: _searchController,
-                          focusNode: _searchFocusNode,
-                          onSubmit: (value) {
-                            _search(
-                                estateType != null ? estateType.slug : "dacha",
-                                value);
-                          },
-                          onChange: (value) {
-                            if (value == "") {
-                              _refreshAction();
-                            }
-                          },
+                        _buildCardsBlock(context, _currentEstates),
+                        Visibility(
+                          visible: _currentEstates!.length == 0,
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(
+                              2 * defaultPadding,
+                              100,
+                              2 * defaultPadding,
+                              0,
+                            ),
+                            child: NoResult(),
+                          ),
                         ),
-                        (topEstates.length == 0 && simpleEstates.length == 0)
-                            ? Container(
-                                height: 100,
-                                child: Center(
-                                  child: Text(
-                                      Locales.string(context, "no_results")),
-                                ),
-                              )
-                            : (topEstates.length > 0)
-                                ? Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: defaultPadding / 2),
-                                        child: Text(
-                                          Locales.string(
-                                              context, "top_estates"),
-                                          style: TextStyles.display2(),
-                                        ),
-                                      ),
-                                      Wrap(
-                                        children: [
-                                          ...topEstates
-                                              .map((estate) =>
-                                                  EstateCard(estate: estate))
-                                              .toList()
-                                        ],
-                                      ),
-                                    ],
-                                  )
-                                : Container(),
-                        (simpleEstates.length > 0)
-                            ? Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: defaultPadding / 2),
-                                    child: Text(
-                                      Locales.string(context, "simple_estates"),
-                                      style: TextStyles.display2(),
-                                    ),
-                                  ),
-                                  Wrap(
-                                    children: [
-                                      ...simpleEstates
-                                          .map((estate) =>
-                                              EstateCard(estate: estate))
-                                          .toList()
-                                    ],
-                                  ),
-                                ],
-                              )
-                            : Container(),
+                        SizedBox(height: defaultPadding),
                       ],
                     ),
                   ),
                 ),
               ),
+        bottomNavigationBar: buildBottomNavigation(context, () {
+          Navigator.of(context).pop();
+        }),
       ),
     );
   }
@@ -209,5 +210,26 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
     _searchFocusNode.dispose();
     _searchController.dispose();
     super.dispose();
+  }
+
+  Widget _buildCardsBlock(BuildContext context, List? estates) {
+    return estates!.length == 0
+        ? Container()
+        : Container(
+            width: 100.w,
+            padding: EdgeInsets.fromLTRB(
+              defaultPadding,
+              0,
+              defaultPadding,
+              0,
+            ),
+            child: Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              runSpacing: 6,
+              children: [
+                ...estates.map((estate) => EstateCard(estate: estate)).toList(),
+              ],
+            ),
+          );
   }
 }

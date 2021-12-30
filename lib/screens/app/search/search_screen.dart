@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:dachaturizm/components/card.dart';
+import 'package:dachaturizm/components/no_result.dart';
 import 'package:dachaturizm/components/search_bar_with_filter.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/models/estate_model.dart';
@@ -117,59 +118,12 @@ class _SearchPageScreenState extends State<SearchPageScreen> {
         return true;
       },
       child: Container(
-        height: (allEstates.length == 0) ? 100.w - 4 * defaultPadding : null,
+        height: (allEstates.length == 0) ? 100.h - 4 * defaultPadding : null,
         padding: EdgeInsets.symmetric(horizontal: defaultPadding),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
-              height: defaultPadding,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  Locales.string(context, "search"),
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.w700),
-                ),
-                Row(
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context)
-                            .pushNamed(SearchFilersScreen.routeName);
-                      },
-                      child: Text("Filters"),
-                      style: ElevatedButton.styleFrom(
-                        elevation: 0,
-                        primary: lightGrey,
-                      ),
-                    ),
-                    SizedBox(
-                      width: defaultPadding / 2,
-                    ),
-                    hasFilters
-                        ? ElevatedButton.icon(
-                            onPressed: () {
-                              Provider.of<EstateProvider>(context,
-                                      listen: false)
-                                  .clearSearchFilters();
-                            },
-                            label: Text("Clear"),
-                            icon: Icon(Icons.clear),
-                            style: ElevatedButton.styleFrom(
-                              elevation: 0,
-                              primary: lightGrey,
-                            ),
-                          )
-                        : Container(),
-                  ],
-                ),
-              ],
-            ),
-            SizedBox(
-              height: defaultPadding,
-            ),
+            SizedBox(height: 24),
             _isLoading
                 ? Container()
                 : SearchBarWithFilter(
@@ -201,12 +155,16 @@ class _SearchPageScreenState extends State<SearchPageScreen> {
                             ),
                           )
                         : ((allEstates.length == 0)
-                            ? Container(
-                                height: 100,
-                                child: Center(
-                                  child: Text(
-                                    Locales.string(context, "no_results"),
+                            ? Visibility(
+                                visible: allEstates.length == 0,
+                                child: Padding(
+                                  padding: const EdgeInsets.fromLTRB(
+                                    2 * defaultPadding,
+                                    100,
+                                    2 * defaultPadding,
+                                    0,
                                   ),
+                                  child: NoResult(),
                                 ),
                               )
                             : Column(

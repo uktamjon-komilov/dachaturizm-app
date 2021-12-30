@@ -14,6 +14,8 @@ import 'package:dachaturizm/screens/app/estate/estate_detail_screen.dart';
 import 'package:dachaturizm/screens/app/estate/location_picker_screen.dart';
 import 'package:dachaturizm/screens/app/home/home_screen.dart';
 import 'package:dachaturizm/screens/app/home/listing_screen.dart';
+import 'package:dachaturizm/screens/app/home/service_screen.dart';
+import 'package:dachaturizm/screens/app/home/services_list_screen.dart';
 import 'package:dachaturizm/screens/app/navigational_app_screen.dart';
 import 'package:dachaturizm/screens/app/search/filters_screen.dart';
 import 'package:dachaturizm/screens/app/user/balance_screen.dart';
@@ -26,7 +28,6 @@ import 'package:dachaturizm/screens/auth/create_profile_screen.dart';
 import 'package:dachaturizm/screens/auth/otp_confirmation_screen.dart';
 import 'package:dachaturizm/screens/auth/register_screen.dart';
 import 'package:dachaturizm/screens/auth/login_screen.dart';
-import 'package:dachaturizm/screens/auth/reset_password_step1_screen.dart';
 import 'package:dachaturizm/screens/loading/choose_language_screen.dart';
 import 'package:dachaturizm/screens/splash_screen.dart';
 import 'package:dio/dio.dart';
@@ -134,7 +135,7 @@ class _MyAppState extends State<MyApp> {
               ),
             ),
             debugShowCheckedModeBanner: false,
-            home: NavigationalAppScreen(),
+            home: SplashScreen(),
             routes: {
               AuthTypeScreen.routeName: (context) => AuthTypeScreen(),
               RegisterScreen.routeName: (context) => RegisterScreen(),
@@ -152,6 +153,8 @@ class _MyAppState extends State<MyApp> {
               EstateListingScreen.routeName: (context) => EstateListingScreen(),
               EstateCreationPageScreen.routeName: (context) =>
                   EstateCreationPageScreen(),
+              ServicesListScreen.routeName: (context) => ServicesListScreen(),
+              ServiceScreen.routeName: (context) => ServiceScreen(),
               SearchFilersScreen.routeName: (context) => SearchFilersScreen(),
               EstateDetailScreen.routeName: (context) => EstateDetailScreen(),
               EditProfileScreen.routeName: (context) => EditProfileScreen(),
