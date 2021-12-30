@@ -133,6 +133,8 @@ class _MyAppState extends State<MyApp> {
                 backgroundColor: Colors.white,
                 elevation: 0.2,
               ),
+              backgroundColor: Colors.white,
+              scaffoldBackgroundColor: Colors.white,
             ),
             debugShowCheckedModeBanner: false,
             home: SplashScreen(),

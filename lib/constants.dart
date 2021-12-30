@@ -6,6 +6,7 @@ const yellowish = Color(0xFFFFC833);
 const normalOrange = Color(0xFFF17C31);
 const disabledOrange = Color(0xFFFAFAFA);
 const lightGrey = Color(0xFFEFF5FB);
+const inputGrey = Color(0xFFF2F2F2);
 const greyishLight = Color(0xFFBDBDBD);
 const lessNormalGrey = Color(0xFFF1F1F1);
 const normalGrey = Color(0xFF838589);

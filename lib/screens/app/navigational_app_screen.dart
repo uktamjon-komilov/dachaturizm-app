@@ -30,6 +30,8 @@ class _NavigationalAppScreenState extends State<NavigationalAppScreen>
 
   @override
   Widget build(BuildContext context) {
+    int currentIndex =
+        Provider.of<NavigationScreenProvider>(context).currentIndex;
     return WillPopScope(
       onWillPop: () async {
         if (Provider.of<NavigationScreenProvider>(context, listen: false)
@@ -44,11 +46,8 @@ class _NavigationalAppScreenState extends State<NavigationalAppScreen>
       child: SafeArea(
         child: Scaffold(
           appBar: AppBar(
-            toolbarHeight:
-                Provider.of<NavigationScreenProvider>(context).currentIndex == 0
-                    ? 78
-                    : null,
-            centerTitle: false,
+            toolbarHeight: currentIndex == 0 ? 78 : null,
+            centerTitle: currentIndex == 0 ? false : true,
             title: Consumer<NavigationScreenProvider>(
                 builder: (context, navigator, _) {
               if (navigator.currentIndex == 0) {

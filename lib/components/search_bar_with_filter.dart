@@ -1,4 +1,5 @@
 import 'package:dachaturizm/constants.dart';
+import 'package:dachaturizm/screens/app/search/filters_screen.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:sizer/sizer.dart';
@@ -78,6 +79,7 @@ class SearchBarWithFilter extends StatelessWidget {
           ]),
           child: TextButton(
             onPressed: () {
+              Navigator.of(context).pushNamed(SearchFilersScreen.routeName);
               if (onFilterTap == null) {
                 onFilterTap!();
               }

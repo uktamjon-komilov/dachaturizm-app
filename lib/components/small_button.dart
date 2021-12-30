@@ -19,9 +19,12 @@ class SmallButton extends StatelessWidget {
       margin: EdgeInsets.only(right: defaultPadding / 2),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
           primary: enabled ? normalOrange : disabledOrange,
           minimumSize: Size(40, 25),
-          padding: EdgeInsets.symmetric(horizontal: defaultPadding / 3),
+          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           elevation: 0,
           shadowColor: Colors.transparent,
         ),
