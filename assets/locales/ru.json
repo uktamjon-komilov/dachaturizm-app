@@ -29,7 +29,7 @@
     "register": "Зарегистрируйтесь здесь",
     "have_profile?": "Уже зарегистрирован?",
     "confirm_otp_code": "Подтверждение смс",
-    "otp_code_has_been_sent_to_below_number": "Код одноразового пароля был отправлен на указанный ниже номер: ",
+    "otp_code_has_been_sent_to_below_number": "На ваш номер отправлен код подтверждения",
     "confirm": "Подтверждать",
     "have_not_received_sms?": "Вы не получали SMS?",
     "resend_sms": "Повторно отправить",
@@ -120,5 +120,7 @@
     "wishlist": "Избранные",
     "no_wishlist_items": "Нет списка моих избранных",
     "reset_password": "Сбросить пароль",
-    "welcome": "Добро пожаловать!"
+    "welcome": "Добро пожаловать!",
+    "wrong_login_and_password": "Логин или пароль неверный",
+    "new_profile_new_results": "Новые результаты с новым профилем"
 }

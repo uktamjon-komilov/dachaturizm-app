@@ -6,12 +6,19 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class PhoneNumberField extends StatelessWidget {
   const PhoneNumberField(
-      {Key? key, this.onFieldSubmitted, this.onChanged, this.validator})
+      {Key? key,
+      this.onFieldSubmitted,
+      this.onChanged,
+      this.validator,
+      this.controller,
+      this.focusNode})
       : super(key: key);
 
   final void Function(String)? onFieldSubmitted;
   final void Function(String)? onChanged;
   final String? Function(String?)? validator;
+  final TextEditingController? controller;
+  final FocusNode? focusNode;
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +37,8 @@ class PhoneNumberField extends StatelessWidget {
       onFieldSubmitted: onFieldSubmitted,
       onChanged: onChanged,
       validator: validator,
+      controller: controller,
+      focusNode: focusNode,
     );
   }
 }

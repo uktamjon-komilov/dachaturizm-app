@@ -31,70 +31,76 @@ class _OTPConfirmationScreenState extends State<OTPConfirmationScreen> {
                 child: CircularProgressIndicator(),
               )
             : Padding(
-                padding: const EdgeInsets.all(defaultPadding),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    LocaleText(
-                      "confirm_otp_code",
-                      style: TextStyle(
-                        fontSize: 25,
-                        color: normalOrange,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Text(
-                      Locales.string(context,
-                              "otp_code_has_been_sent_to_below_number") +
-                          "+998 99 517 53 47",
-                      style: TextStyle(
-                          fontSize: 17,
-                          color: normalGrey,
-                          fontWeight: FontWeight.w500),
-                      textAlign: TextAlign.center,
-                    ),
-                    SizedBox(
-                      height: 30,
-                    ),
-                    OtpTextField(
-                      numberOfFields: 5,
-                      borderColor: normalOrange,
-                      focusedBorderColor: normalOrange,
-                      fieldWidth: 60,
-                      textStyle:
-                          TextStyle(fontSize: 21, fontWeight: FontWeight.w600),
-                      showFieldAsBox: true,
-
-                      onCodeChanged: (String code) {},
-                      onSubmit: (String verificationCode) {
-                        checkCode(context, phone, verificationCode);
-                      }, // end onSubmit
-                    ),
-                    SizedBox(
-                      height: 32,
-                    ),
-                    SizedBox(
-                      height: 24,
-                    ),
-                    Wrap(
+                padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
+                child: Center(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        LocaleText(
-                          "have_not_received_sms?",
-                          style: TextStyle(fontSize: 16),
+                        Image.asset(
+                          "assets/images/logo.png",
+                          width: 120,
+                          fit: BoxFit.cover,
                         ),
-                        SizedBox(width: 10),
-                        TextLinkButton(Locales.string(context, "resend_sms"),
-                            () {
-                          Provider.of<AuthProvider>(context, listen: false)
-                              .checkUser(phone)
-                              .then((value) {});
-                        }),
+                        SizedBox(height: defaultPadding * 1.5),
+                        Text(
+                          Locales.string(context, "confirm_otp_code"),
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w500,
+                            height: 1.25,
+                          ),
+                        ),
+                        SizedBox(height: defaultPadding / 2),
+                        Text(
+                          Locales.string(context,
+                              "otp_code_has_been_sent_to_below_number"),
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            height: 1.43,
+                            color: greyishLight,
+                          ),
+                        ),
+                        SizedBox(height: 30),
+                        OtpTextField(
+                          numberOfFields: 5,
+                          borderColor: normalOrange,
+                          focusedBorderColor: normalOrange,
+                          borderWidth: 1,
+                          borderRadius: BorderRadius.circular(15),
+                          fieldWidth: 60,
+                          textStyle: TextStyle(
+                            fontSize: 21,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.3,
+                          ),
+                          showFieldAsBox: true,
+                          onCodeChanged: (String code) {},
+                          onSubmit: (String verificationCode) {
+                            checkCode(context, phone, verificationCode);
+                          }, // end onSubmit
+                        ),
+                        SizedBox(height: defaultPadding * 1.5),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              Locales.string(context, "have_not_received_sms?"),
+                              style: TextStyle(fontSize: 12),
+                            ),
+                            SizedBox(width: 10),
+                            TextLinkButton(
+                                Locales.string(context, "resend_sms"), () {
+                              Provider.of<AuthProvider>(context, listen: false)
+                                  .checkUser(phone)
+                                  .then((value) {});
+                            }),
+                          ],
+                        )
                       ],
-                    )
-                  ],
+                    ),
+                  ),
                 ),
               ),
       ),

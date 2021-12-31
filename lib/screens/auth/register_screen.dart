@@ -1,4 +1,5 @@
 import 'package:dachaturizm/components/fluid_big_button.dart';
+import 'package:dachaturizm/components/phone_input.dart';
 import 'package:dachaturizm/components/text_link.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
@@ -32,77 +33,88 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 child: CircularProgressIndicator(),
               )
             : Padding(
-                padding: const EdgeInsets.all(defaultPadding),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    LocaleText(
-                      "register",
-                      style: TextStyle(
-                        fontSize: 25,
-                        color: normalOrange,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    SizedBox(
-                      height: 60,
-                    ),
-                    TextFormField(
-                      controller: _phoneController,
-                      inputFormatters: [
-                        MaskTextInputFormatter(mask: "+998 ## ### ## ##")
-                      ],
-                      decoration: InputDecoration(
-                        border: InputStyles.inputBorder(),
-                        focusedBorder: InputStyles.focusBorder(),
-                        prefixIcon: Icon(
-                          Icons.phone_outlined,
-                        ),
-                        hintText: Locales.string(context, "phone_number_hint"),
-                      ),
-                      keyboardType: TextInputType.number,
-                    ),
-                    SizedBox(
-                      height: 32,
-                    ),
-                    FluidBigButton(Locales.string(context, "register"),
-                        onPress: () {
-                      String phone = _phoneController.text.replaceAll(" ", "");
-                      if (phone.length == 13) {
-                        setState(() {
-                          _isLoading = true;
-                        });
-                        Provider.of<AuthProvider>(context, listen: false)
-                            .checkUser(phone)
-                            .then((value) {
-                          if (value["status"]) {
-                            setState(() {
-                              _isLoading = false;
-                            });
-                            Navigator.of(context).pushNamed(
-                                OTPConfirmationScreen.routeName,
-                                arguments: phone);
-                          }
-                        });
-                      }
-                    }),
-                    SizedBox(
-                      height: 24,
-                    ),
-                    Wrap(
+                padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
+                child: Center(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        LocaleText(
-                          "have_profile?",
-                          style: TextStyle(fontSize: 16),
+                        Image.asset(
+                          "assets/images/logo.png",
+                          width: 120,
+                          fit: BoxFit.cover,
                         ),
-                        SizedBox(width: 10),
-                        TextLinkButton(Locales.string(context, "log_in"), () {
-                          Navigator.of(context)
-                              .pushReplacementNamed(LoginScreen.routeName);
-                        }),
+                        SizedBox(height: defaultPadding * 1.5),
+                        Text(
+                          Locales.string(context, "register"),
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w500,
+                            height: 1.25,
+                          ),
+                        ),
+                        SizedBox(height: defaultPadding / 2),
+                        Text(
+                          Locales.string(context, "new_profile_new_results"),
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            height: 1.43,
+                            color: greyishLight,
+                          ),
+                        ),
+                        SizedBox(height: 28),
+                        PhoneNumberField(
+                          controller: _phoneController,
+                          onFieldSubmitted: (value) {
+                            FocusScope.of(context).requestFocus(FocusNode());
+                          },
+                        ),
+                        SizedBox(height: defaultPadding),
+                        FluidBigButton(
+                          Locales.string(context, "next"),
+                          onPress: () {
+                            String phone =
+                                _phoneController.text.replaceAll(" ", "");
+                            if (phone.length == 13) {
+                              setState(() {
+                                _isLoading = true;
+                              });
+                              Provider.of<AuthProvider>(context, listen: false)
+                                  .checkUser(phone)
+                                  .then((value) {
+                                if (value["status"]) {
+                                  setState(() {
+                                    _isLoading = false;
+                                  });
+                                  Navigator.of(context).pushNamed(
+                                      OTPConfirmationScreen.routeName,
+                                      arguments: phone);
+                                }
+                              });
+                            }
+                          },
+                        ),
+                        SizedBox(height: defaultPadding * 1.5),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              Locales.string(context, "have_profile?"),
+                              style: TextStyle(fontSize: 12),
+                            ),
+                            SizedBox(width: 10),
+                            TextLinkButton(Locales.string(context, "log_in"),
+                                () {
+                              Navigator.of(context)
+                                  .pushReplacementNamed(LoginScreen.routeName);
+                            }),
+                          ],
+                        ),
                       ],
-                    )
-                  ],
+                    ),
+                  ),
                 ),
               ),
       ),

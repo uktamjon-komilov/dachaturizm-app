@@ -147,9 +147,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(height: 1.5 * defaultPadding),
                     TextLinkButton(
                         Locales.string(context, "forgot_password?"), () {}),
-                    SizedBox(
-                      height: 24,
-                    ),
+                    SizedBox(height: defaultPadding * 1.5),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -164,7 +162,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               .pushReplacementNamed(RegisterScreen.routeName);
                         }),
                       ],
-                    )
+                    ),
                   ],
                 ),
               ),

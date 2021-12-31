@@ -29,7 +29,7 @@
     "register": "Ro'yhatdan o'ting",
     "have_profile?": "Ro'yhatdan o'tganmisiz?",
     "confirm_otp_code": "Sms kodni tasdiqlash",
-    "otp_code_has_been_sent_to_below_number": "Sms kod quyidagi telefon raqamga yuborildi: ",
+    "otp_code_has_been_sent_to_below_number": "Tasdiqlash kodi raqamingizga yuborildi",
     "confirm": "Tasdiqlash",
     "have_not_received_sms?": "Sms kelmadimi?",
     "resend_sms": "Qayta jo'natish",
@@ -120,5 +120,7 @@
     "wishlist": "Yoqtirganlarim",
     "no_wishlist_items": "Yoqtirganlarim ro'yhati mavjud emas",
     "reset_password": "Parolni yangilash",
-    "welcome": "Xush kelibsiz!"
+    "welcome": "Xush kelibsiz!",
+    "wrong_login_and_password": "Login yoki parol noto'g'ri",
+    "new_profile_new_results": "Yangi profil bilan yangi natijalar"
 }
