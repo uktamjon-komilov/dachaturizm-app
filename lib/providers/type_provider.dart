@@ -25,7 +25,7 @@ class EstateTypesProvider with ChangeNotifier {
     return result;
   }
 
-  Future<List<TypeModel>> fetchAndSetTypes() async {
+  Future<List<TypeModel>> getTypes() async {
     const url = "${baseUrl}api/estate-types/";
     // try {
     final response = await dio.get(url);

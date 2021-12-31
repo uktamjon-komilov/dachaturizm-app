@@ -6,34 +6,23 @@ import 'package:dachaturizm/components/search_bar_with_filter.dart';
 import 'package:dachaturizm/components/small_button.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/models/type_model.dart';
-import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
-import 'package:dachaturizm/providers/type_provider.dart';
-import 'package:dachaturizm/screens/app/chat/chat_list_screen.dart';
-import 'package:dachaturizm/screens/app/estate/create_estate_screen.dart';
-import 'package:dachaturizm/screens/app/home/home_screen.dart';
-import 'package:dachaturizm/screens/app/search/search_screen.dart';
-import 'package:dachaturizm/screens/app/user/user_screen.dart';
-import 'package:dachaturizm/screens/auth/login_screen.dart';
-import 'package:dachaturizm/styles/text_styles.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_locales/flutter_locales.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 class EstateListingScreen extends StatefulWidget {
   const EstateListingScreen({Key? key}) : super(key: key);
 
-  static const routeName = "/estate-listing";
+  static const String routeName = "/estate-listing";
 
   @override
   State<EstateListingScreen> createState() => _EstateListingScreenState();
 }
 
 class _EstateListingScreenState extends State<EstateListingScreen> {
-  bool _isLoading = false;
+  bool _isLoading = true;
   bool _isInit = true;
-  bool _isSearched = false;
   bool _showTop = true;
   TypeModel? _estateType;
   List? _topEstates;
@@ -49,24 +38,8 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
     if (_isInit) {
       _isInit = false;
       await _refreshAction();
-      final int estateTypeId =
-          ModalRoute.of(context)!.settings.arguments as int;
-      setState(() {
-        _topEstates = _isSearched
-            ? Provider.of<EstateProvider>(context).searchedTopEstates
-            : Provider.of<EstateProvider>(context, listen: false)
-                .getEstatesByType(estateTypeId, top: true);
-
-        _simpleEstates = _isSearched
-            ? Provider.of<EstateProvider>(context).searchedSimpleEstates
-            : Provider.of<EstateProvider>(context, listen: false)
-                .getEstatesByType(estateTypeId);
-
-        _estateType = Provider.of<EstateTypesProvider>(context, listen: false)
-            .getType(estateTypeId);
-
-        _currentEstates = _topEstates;
-      });
+      final TypeModel _estateType =
+          ModalRoute.of(context)!.settings.arguments as TypeModel;
     }
   }
 
@@ -74,32 +47,13 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
     setState(() {
       _isLoading = true;
     });
-    Provider.of<EstateProvider>(context, listen: false)
-        .fetchAllAndSetEstates()
-        .then((value) {
-      setState(() {
-        _isLoading = false;
-      });
-    });
-    _searchController.text = "";
-  }
-
-  Future<void> _search(slug, value) async {
-    setState(() {
-      _isLoading = true;
-    });
-    Provider.of<EstateProvider>(context, listen: false)
-        .searchTop(slug, term: value)
-        .then((_) {
-      Provider.of<EstateProvider>(context, listen: false)
-          .searchSimple(slug, term: value)
-          .then((_) {
-        setState(() {
-          _isLoading = false;
-          _isSearched = true;
-        });
-      });
-    });
+    // Provider.of<EstateProvider>(context, listen: false)
+    //     .fetchAllAndSetEstates()
+    //     .then((value) {
+    //   setState(() {
+    //     _isLoading = false;
+    //   });
+    // });
   }
 
   @override
@@ -141,11 +95,11 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
                             controller: _searchController,
                             focusNode: _searchFocusNode,
                             onSubmit: (value) {
-                              _search(
-                                  _estateType != null
-                                      ? _estateType!.slug
-                                      : "dacha",
-                                  value);
+                              // _search(
+                              //     _estateType != null
+                              //         ? _estateType!.slug
+                              //         : "dacha",
+                              //     value);
                             },
                             onChange: (value) {
                               if (value == "") {

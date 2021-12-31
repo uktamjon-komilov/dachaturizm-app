@@ -4,7 +4,6 @@ import 'package:dachaturizm/components/horizontal_ad.dart';
 import 'package:dachaturizm/components/search_bar_with_filter.dart';
 import 'package:dachaturizm/components/text_link.dart';
 import 'package:dachaturizm/constants.dart';
-import 'package:dachaturizm/models/booking_day.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/models/type_model.dart';
 import 'package:dachaturizm/providers/banner_provider.dart';
@@ -16,10 +15,8 @@ import 'package:dachaturizm/screens/app/home/services_list_screen.dart';
 import 'package:dachaturizm/styles/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
-import 'package:table_calendar/table_calendar.dart';
 
 class HomePageScreen extends StatefulWidget {
   const HomePageScreen({Key? key}) : super(key: key);
@@ -34,6 +31,36 @@ class _HomePageScreenState extends State<HomePageScreen> {
   bool _isLoading = true;
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
+
+  Future<void> _refreshHomePage() async {
+    Future.delayed(Duration.zero).then((_) {
+      setState(() {
+        _isLoading = true;
+      });
+      Provider.of<BannerProvider>(context, listen: false).getTopBanners();
+      Provider.of<EstateTypesProvider>(context, listen: false).getTypes().then(
+        (types) {
+          Future.wait([
+            Provider.of<BannerProvider>(context, listen: false)
+                .getBanners(types),
+            Provider.of<EstateProvider>(context, listen: false)
+                .getTopEstates(types),
+          ]).then((_) {
+            setState(() {
+              _isLoading = false;
+            });
+          });
+        },
+      );
+    });
+  }
+
+  _navigateToCategory(BuildContext context, TypeModel type) {
+    Navigator.of(context).pushNamed(
+      EstateListingScreen.routeName,
+      arguments: type,
+    );
+  }
 
   @override
   void didChangeDependencies() async {
@@ -59,6 +86,10 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
   @override
   Widget build(BuildContext context) {
+    List<TypeModel> types = Provider.of<EstateTypesProvider>(context).items;
+    List<EstateModel> topBanners =
+        Provider.of<BannerProvider>(context).topBanners;
+
     return Scaffold(
       body: _isLoading
           ? Center(
@@ -72,16 +103,18 @@ class _HomePageScreenState extends State<HomePageScreen> {
                     child: SingleChildScrollView(
                       child: Column(
                         children: [
-                          _buidlCategoryRow(context),
-                          SizedBox(height: 24),
+                          _buidlCategoryRow(context, types),
+                          SizedBox(height: defaultPadding * 1.5),
                           _buildSearchBar(context),
-                          _buildTopBannerBlock(
-                            context,
-                            Provider.of<BannerProvider>(context).topBanners,
-                          ),
+                          _buildTopBannerBlock(context, topBanners),
+                          SizedBox(height: defaultPadding * 1.5),
                           Container(
                             padding: EdgeInsets.fromLTRB(
-                                defaultPadding, 24, defaultPadding, 0),
+                              defaultPadding,
+                              24,
+                              defaultPadding,
+                              0,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.grey[100],
                               borderRadius: BorderRadius.only(
@@ -91,8 +124,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                             ),
                             child: Column(
                               children: [
-                                ...Provider.of<EstateTypesProvider>(context)
-                                    .items
+                                ...types
                                     .map((item) => _buildEstateTypeBlock(item))
                                     .toList(),
                               ],
@@ -131,86 +163,64 @@ class _HomePageScreenState extends State<HomePageScreen> {
     );
   }
 
-  Future<void> _refreshHomePage() async {
-    Future.delayed(Duration.zero).then((_) {
-      setState(() {
-        _isLoading = true;
-      });
-      Provider.of<BannerProvider>(context, listen: false)
-          .getAndSetTopBanners()
-          .then((_) {
-        Provider.of<EstateTypesProvider>(context, listen: false)
-            .fetchAndSetTypes()
-            .then(
-          (types) {
-            Provider.of<BannerProvider>(context, listen: false)
-                .getAndSetBanners(types)
-                .then((banners) {
-              Provider.of<EstateProvider>(context, listen: false)
-                  .fetchAllAndSetEstates()
-                  .then((_) {
-                setState(() {
-                  _isLoading = false;
-                });
-              });
-            });
-          },
-        );
-      });
-    });
-  }
-
   Widget _buildCardsBlock(BuildContext context, List estates) {
     if (estates.length > 4) estates = estates.sublist(0, 4);
 
-    return estates.length == 0
-        ? Container()
-        : Container(
-            width: 100.w,
-            padding: EdgeInsets.only(top: defaultPadding),
-            child: Wrap(
-              alignment: WrapAlignment.spaceBetween,
-              runSpacing: 6,
-              children: [
-                ...estates.map((estate) => EstateCard(estate: estate)).toList(),
-              ],
-            ),
-          );
+    return Visibility(
+      visible: estates.length > 0,
+      child: Container(
+        width: 100.w,
+        padding: EdgeInsets.only(top: defaultPadding),
+        child: Wrap(
+          alignment: WrapAlignment.spaceBetween,
+          runSpacing: 6,
+          children: [
+            ...estates.map((estate) => EstateCard(estate: estate)).toList(),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildTopBannerBlock(BuildContext context, List banners) {
     if (banners.length > 4) banners = banners.sublist(0, 4);
 
-    return banners.length == 0
-        ? Container()
-        : Container(
-            height: 190,
-            padding: EdgeInsets.symmetric(horizontal: defaultPadding),
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              physics: AlwaysScrollableScrollPhysics(),
-              children: [
-                ...banners.map((banner) => _buildBannerItem(banner)).toList()
-              ],
-            ),
-          );
+    return Visibility(
+      visible: banners.length == 0,
+      child: Container(
+        height: 190,
+        padding: EdgeInsets.symmetric(horizontal: defaultPadding),
+        child: ListView(
+          scrollDirection: Axis.horizontal,
+          physics: AlwaysScrollableScrollPhysics(),
+          children: [
+            ...banners.map((banner) => _buildBannerItem(banner)).toList()
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildBannerBlock(BuildContext context, List banners) {
     if (banners.length > 4) banners = banners.sublist(0, 4);
 
-    return banners.length == 0
-        ? Container()
-        : Container(
-            height: 190,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              physics: AlwaysScrollableScrollPhysics(),
-              children: [
-                ...banners.map((banner) => _buildBannerItem(banner)).toList()
-              ],
-            ),
-          );
+    print(1);
+    print(banners);
+    print(2);
+
+    return Visibility(
+      visible: banners.length > 0,
+      child: Container(
+        height: 190,
+        child: ListView(
+          scrollDirection: Axis.horizontal,
+          physics: AlwaysScrollableScrollPhysics(),
+          children: [
+            ...banners.map((banner) => _buildBannerItem(banner)).toList()
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildBannerItem(EstateModel estate) {
@@ -228,50 +238,40 @@ class _HomePageScreenState extends State<HomePageScreen> {
   }
 
   Widget _buildEstateTypeBlock(TypeModel type) {
-    List topEstates = Provider.of<EstateProvider>(context, listen: false)
-        .getEstatesByType(type.id, top: true);
-    Map banners = Provider.of<BannerProvider>(context).banners;
+    List topEstates = Provider.of<EstateProvider>(context).topEstates[type.id];
+    List banners = Provider.of<BannerProvider>(context).banners[type.id];
 
-    return (topEstates.length > 0 || banners[type.id].length > 0)
-        ? Container(
-            child: Column(
+    return Visibility(
+      visible: (topEstates.length > 0 || banners.length > 0),
+      child: Container(
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              textBaseline: TextBaseline.alphabetic,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  textBaseline: TextBaseline.alphabetic,
-                  children: [
-                    Text(
-                      Locales.string(context, "top") +
-                          " ${type.title.toLowerCase()}",
-                      style: TextStyles.display2(),
-                    ),
-                    TextLinkButton(Locales.string(context, "all"), () {
-                      Navigator.of(context).pushNamed(
-                        EstateListingScreen.routeName,
-                        arguments: type.id,
-                      );
-                    })
-                  ],
+                Text(
+                  Locales.string(context, "top") +
+                      " ${type.title.toLowerCase()}",
+                  style: TextStyles.display2(),
                 ),
-                (topEstates.length > 0)
-                    ? _buildCardsBlock(context, topEstates)
-                    : Container(),
-                (banners[type.id].length > 0)
-                    ? _buildBannerBlock(
-                        context,
-                        banners[type.id],
-                      )
-                    : Container(),
+                TextLinkButton(Locales.string(context, "all"), () {
+                  _navigateToCategory(context, type);
+                })
               ],
             ),
-          )
-        : Container();
+            _buildCardsBlock(context, topEstates),
+            _buildBannerBlock(context, banners)
+          ],
+        ),
+      ),
+    );
   }
 
-  Widget _buidlCategoryRow(BuildContext context) {
+  Widget _buidlCategoryRow(BuildContext context, List types) {
     return Container(
       height: 133,
-      padding: EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.symmetric(horizontal: defaultPadding),
       decoration: BoxDecoration(
         color: Colors.grey[100],
         borderRadius: BorderRadius.only(
@@ -286,17 +286,14 @@ class _HomePageScreenState extends State<HomePageScreen> {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                ...Provider.of<EstateTypesProvider>(context).items.map((item) {
+                ...types.map((item) {
                   return Container(
                     margin: EdgeInsets.only(right: 34),
                     child: CategoryItem(
                       title: item.title,
                       icon: item.icon,
                       onTap: () {
-                        Navigator.of(context).pushNamed(
-                          EstateListingScreen.routeName,
-                          arguments: item.id,
-                        );
+                        _navigateToCategory(context, item);
                       },
                     ),
                   );

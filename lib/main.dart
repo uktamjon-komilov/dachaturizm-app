@@ -158,7 +158,7 @@ class _MyAppState extends State<MyApp> {
                   NavigationalAppScreen(),
               ChooseLangugageScreen.routeName: (context) =>
                   ChooseLangugageScreen(),
-              EstateListingScreen.routeName: (context) => EstateListingScreen(),
+              // EstateListingScreen.routeName: (context) => EstateListingScreen(),
               EstateCreationPageScreen.routeName: (context) =>
                   EstateCreationPageScreen(),
               ServicesListScreen.routeName: (context) => ServicesListScreen(),

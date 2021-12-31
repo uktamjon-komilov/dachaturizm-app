@@ -558,27 +558,27 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     });
     Future.delayed(Duration.zero).then((_) async {
       Future.wait([
-        Provider.of<FacilityProvider>(context, listen: false)
-            .getAddresses()
-            .then((value) {
-          setState(() {
-            _regions = value;
-          });
-        }),
-        Provider.of<FacilityProvider>(context, listen: false)
-            .fetchAndSetFacilities(),
-        Provider.of<EstateTypesProvider>(context, listen: false)
-            .fetchAndSetTypes(),
-        Provider.of<CurrencyProvider>(context, listen: false)
-            .fetchAndSetCurrencies(),
-        Provider.of<AuthProvider>(context, listen: false)
-            .getUserData()
-            .then((user) {
-          if (user.runtimeType.toString() == "UserModel") {
-            _announcerController.text = "${user!.firstName} ${user.lastName}";
-            _phoneController.text = "+${user.phone}";
-          }
-        }),
+        // Provider.of<FacilityProvider>(context, listen: false)
+        //     .getAddresses()
+        //     .then((value) {
+        //   setState(() {
+        //     _regions = value;
+        //   });
+        // }),
+        // Provider.of<FacilityProvider>(context, listen: false)
+        //     .fetchAndSetFacilities(),
+        // Provider.of<EstateTypesProvider>(context, listen: false)
+        //     .fetchAndSetTypes(),
+        // Provider.of<CurrencyProvider>(context, listen: false)
+        //     .fetchAndSetCurrencies(),
+        // Provider.of<AuthProvider>(context, listen: false)
+        //     .getUserData()
+        //     .then((user) {
+        //   if (user.runtimeType.toString() == "UserModel") {
+        //     _announcerController.text = "${user!.firstName} ${user.lastName}";
+        //     _phoneController.text = "+${user.phone}";
+        //   }
+        // }),
       ]).then((_) async {
         Map data = ModalRoute.of(context)?.settings.arguments as Map;
         String locale = await getCurrentLocale();
@@ -587,33 +587,33 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
           setState(() {
             _isEditing = true;
           });
-          Provider.of<EstateProvider>(context, listen: false)
-              .fetchEstateById(data["estate"])
-              .then((value) {
-            _estate = value;
-            _mainImage = value.photo;
-            print(_mainImage);
-            _extraImages = List.generate(8, (_) => null);
-            value.photos.forEach((photo) {
-              int index = value.photos.indexOf(photo);
-              _extraImages[index] = photo.photo;
-            });
-            _currentSectionId = value.typeId;
-            _titleController.text = value.title;
-            _descriptionController.text = value.description;
-            _announcerController.text = value.announcer;
-            _phoneController.text = value.phone;
-            _addressController.text = value.address;
-            _weekdayPriceController.text = value.weekdayPrice.toString();
-            _weekendPriceController.text = value.weekendPrice.toString();
-            _currentCurrencyId = int.parse(value.priceType);
-            // _currentRegionId = _regions.firstWhere((region) => region.translations[]);
-            // _currentDistrictId = 0;
-            _facilities =
-                value.facilities.map((facility) => facility.id).toList();
-            _longtitude = value.longtitute;
-            _latitute = value.latitute;
-          });
+          // Provider.of<EstateProvider>(context, listen: false)
+          //     .fetchEstateById(data["estate"])
+          //     .then((value) {
+          //   _estate = value;
+          //   _mainImage = value.photo;
+          //   print(_mainImage);
+          //   _extraImages = List.generate(8, (_) => null);
+          //   value.photos.forEach((photo) {
+          //     int index = value.photos.indexOf(photo);
+          //     _extraImages[index] = photo.photo;
+          //   });
+          //   _currentSectionId = value.typeId;
+          //   _titleController.text = value.title;
+          //   _descriptionController.text = value.description;
+          //   _announcerController.text = value.announcer;
+          //   _phoneController.text = value.phone;
+          //   _addressController.text = value.address;
+          //   _weekdayPriceController.text = value.weekdayPrice.toString();
+          //   _weekendPriceController.text = value.weekendPrice.toString();
+          //   _currentCurrencyId = int.parse(value.priceType);
+          //   // _currentRegionId = _regions.firstWhere((region) => region.translations[]);
+          //   // _currentDistrictId = 0;
+          //   _facilities =
+          //       value.facilities.map((facility) => facility.id).toList();
+          //   _longtitude = value.longtitute;
+          //   _latitute = value.latitute;
+          // });
         }
       });
     });

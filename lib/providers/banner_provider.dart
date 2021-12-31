@@ -21,24 +21,25 @@ class BannerProvider with ChangeNotifier {
     return {..._banners};
   }
 
-  Future<List<EstateModel>> getAndSetTopBanners() async {
+  Future<List<EstateModel>> getTopBanners() async {
     const url = "${baseUrl}api/estate/topbanners/";
     final response = await dio.get(url);
+    List<EstateModel> topBanners = [];
     if (response.statusCode as int >= 200 || response.statusCode as int < 300) {
-      _topBanners = [];
       final extractedData = response.data;
       for (var i = 0; i < extractedData.length; i++) {
         final banner = await EstateModel.fromJson(extractedData[i]);
-        _topBanners.add(banner);
+        topBanners.add(banner);
       }
     } else {
-      _topBanners = [];
+      topBanners = [];
     }
-    return _topBanners;
+    _topBanners = topBanners;
+    notifyListeners();
+    return topBanners;
   }
 
-  Future<Map<int, List<EstateModel>>> getAndSetBanners(
-      List<TypeModel> types) async {
+  Future<Map<int, List<EstateModel>>> getBanners(List<TypeModel> types) async {
     Map<int, List<EstateModel>> banners = {};
     for (var i = 0; i < types.length; i++) {
       final url = "${baseUrl}api/banners/${types[i].slug}/";
@@ -55,6 +56,7 @@ class BannerProvider with ChangeNotifier {
       }
     }
     _banners = banners;
+    notifyListeners();
     return {...banners};
   }
 }
