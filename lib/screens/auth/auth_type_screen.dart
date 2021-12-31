@@ -1,4 +1,5 @@
-import 'package:dachaturizm/components/fluid_big.dart';
+import 'package:dachaturizm/components/fluid_big_button.dart';
+import 'package:dachaturizm/components/fluid_outlined_button.dart';
 import 'package:dachaturizm/components/text_link.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/screens/app/navigational_app_screen.dart';
@@ -20,70 +21,40 @@ class AuthTypeScreen extends StatefulWidget {
 class _AuthTypeScreenState extends State<AuthTypeScreen> {
   @override
   Widget build(BuildContext context) {
-    final value = ModalRoute.of(context)?.settings.arguments;
-    print(value);
-
     return Scaffold(
       body: SafeArea(
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: defaultPadding * 2),
+          padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Center(
-                      child: Image.asset(
-                        "assets/images/logo.png",
-                        scale: 2.5,
-                      ),
-                    ),
-                    SizedBox(
-                      height: defaultPadding * 2,
-                    ),
-                    Text(
-                      "Tez. Oson. Qulay.",
-                      style: TextStyle(
-                        color: darkPurple,
-                        fontSize: 35,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
+              Image.asset(
+                "assets/images/logo.png",
+                width: 120,
+                fit: BoxFit.cover,
               ),
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    FluidBigButton(
-                      Locales.string(context, "register"),
-                      onPress: () {
-                        Navigator.of(context)
-                            .pushNamed(RegisterScreen.routeName);
-                      },
-                    ),
-                    FluidBigButton(
-                      Locales.string(context, "log_in"),
-                      onPress: () {
-                        Navigator.of(context).pushNamed(LoginScreen.routeName);
-                      },
-                    ),
-                    SizedBox(
-                      height: defaultPadding * 2,
-                    ),
-                    TextLinkButton(Locales.string(context, "skip"), () async {
-                      SharedPreferences prefs =
-                          await SharedPreferences.getInstance();
-                      prefs.setBool("noAuth", true);
-                      Navigator.of(context).pushReplacementNamed(
-                          NavigationalAppScreen.routeName);
-                    })
-                  ],
-                ),
+              SizedBox(height: 90),
+              FluidBigButton(
+                Locales.string(context, "register"),
+                onPress: () {
+                  Navigator.of(context).pushNamed(RegisterScreen.routeName);
+                },
               ),
+              SizedBox(height: 12),
+              FluidOutlinedButton(
+                Locales.string(context, "log_in"),
+                onPress: () {
+                  Navigator.of(context).pushNamed(LoginScreen.routeName);
+                },
+              ),
+              SizedBox(height: 72),
+              TextLinkButton(Locales.string(context, "skip"), () async {
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                prefs.setBool("noAuth", true);
+                Navigator.of(context)
+                    .pushReplacementNamed(NavigationalAppScreen.routeName);
+              }),
             ],
           ),
         ),

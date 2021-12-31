@@ -1,4 +1,5 @@
 import 'package:dachaturizm/constants.dart';
+import 'package:dachaturizm/styles/input.dart';
 import 'package:flutter/material.dart';
 import 'package:dachaturizm/styles/text_styles.dart';
 
@@ -27,23 +28,9 @@ class TextInput extends StatelessWidget {
       onFieldSubmitted: onFieldSubmitted,
       style: TextStyles.display5(),
       decoration: InputDecoration(
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide(
-            color: inputGrey,
-            width: 1,
-          ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide(
-            color: normalOrange,
-            width: 1,
-          ),
-        ),
+        border: InputStyles.inputBorder(),
+        enabledBorder: InputStyles.enabledBorder(),
+        focusedBorder: InputStyles.focusBorder(),
         contentPadding: EdgeInsets.symmetric(horizontal: defaultPadding / 2),
         hintText: hintText ?? "",
         hintStyle: TextStyles.display5().copyWith(color: greyishLight),

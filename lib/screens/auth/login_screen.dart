@@ -1,4 +1,7 @@
-import 'package:dachaturizm/components/fluid_big.dart';
+import 'package:dachaturizm/components/app_bar.dart';
+import 'package:dachaturizm/components/fluid_big_button.dart';
+import 'package:dachaturizm/components/password_input.dart';
+import 'package:dachaturizm/components/phone_input.dart';
 import 'package:dachaturizm/components/text_link.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
@@ -50,138 +53,121 @@ class _LoginScreenState extends State<LoginScreen> {
     return SafeArea(
       child: Scaffold(
         body: Padding(
-          padding: const EdgeInsets.all(defaultPadding),
+          padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
           child: Form(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                LocaleText(
-                  "log_in",
-                  style: TextStyle(
-                    fontSize: 25,
-                    color: normalOrange,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                SizedBox(
-                  height: 60,
-                ),
-                TextFormField(
-                  focusNode: _phoneFocusNode,
-                  controller: _phoneController,
-                  inputFormatters: [
-                    MaskTextInputFormatter(mask: "+998 ## ### ## ##")
-                  ],
-                  decoration: InputDecoration(
-                    border: InputStyles.inputBorder(),
-                    focusedBorder: InputStyles.focusBorder(),
-                    prefixIcon: Icon(
-                      Icons.phone_outlined,
+            child: Center(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      "assets/images/logo.png",
+                      width: 120,
+                      fit: BoxFit.cover,
                     ),
-                    hintText: Locales.string(context, "phone_number_hint"),
-                  ),
-                  keyboardType: TextInputType.number,
-                  onFieldSubmitted: (value) {
-                    FocusScope.of(context).requestFocus(_passwordFocusNode);
-                  },
-                  onChanged: (value) {
-                    if (_wrongCredentials) {
-                      setState(() {
-                        _wrongCredentials = false;
-                      });
-                    }
-                  },
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                TextField(
-                  focusNode: _passwordFocusNode,
-                  controller: _passwordController,
-                  decoration: InputDecoration(
-                    border: InputStyles.inputBorder(),
-                    focusedBorder: InputStyles.focusBorder(),
-                    prefixIcon: Icon(
-                      Icons.lock,
-                    ),
-                    hintText: Locales.string(context, "password_hint"),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        Icons.remove_red_eye,
+                    SizedBox(height: defaultPadding * 1.5),
+                    Text(
+                      Locales.string(context, "log_in"),
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w500,
+                        height: 1.25,
                       ),
-                      onPressed: () {
-                        setState(() {
-                          _hidePassword = !_hidePassword;
-                        });
+                    ),
+                    SizedBox(height: defaultPadding / 2),
+                    Text(
+                      Locales.string(context, "welcome"),
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        height: 1.43,
+                        color: greyishLight,
+                      ),
+                    ),
+                    SizedBox(height: 28),
+                    PhoneNumberField(
+                      onFieldSubmitted: (value) {
+                        FocusScope.of(context).requestFocus(_passwordFocusNode);
+                      },
+                      onChanged: (value) {
+                        if (_wrongCredentials) {
+                          setState(() {
+                            _wrongCredentials = false;
+                          });
+                        }
                       },
                     ),
-                  ),
-                  obscureText: _hidePassword,
-                  onChanged: (value) {
-                    if (_wrongCredentials) {
-                      setState(() {
-                        _wrongCredentials = false;
-                      });
-                    }
-                  },
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                _wrongCredentials
-                    ? LocaleText(
-                        "wrong_login_and_password",
-                        style: TextStyle(
-                          color: Colors.red,
-                        ),
-                      )
-                    : Container(),
-                SizedBox(
-                  height: 20,
-                ),
-                TextLinkButton(
-                    Locales.string(context, "forgot_password?"), () {}),
-                SizedBox(
-                  height: 32,
-                ),
-                FluidBigButton(Locales.string(context, "log_in"),
-                    onPress: () async {
-                  String phone = _phoneController.text.replaceAll(" ", "");
-                  String password = _passwordController.text;
-                  Provider.of<AuthProvider>(context, listen: false)
-                      .login(phone, password)
-                      .then((value) async {
-                    if (value.containsKey("status")) {
-                      setState(() {
-                        _wrongCredentials = true;
-                      });
-                    } else {
-                      SharedPreferences prefs =
-                          await SharedPreferences.getInstance();
-                      prefs.setBool("noAuth", true);
-                      Navigator.of(context)
-                        ..pop()
-                        ..pushReplacementNamed(NavigationalAppScreen.routeName);
-                    }
-                  });
-                }),
-                SizedBox(
-                  height: 24,
-                ),
-                Wrap(
-                  children: [
-                    LocaleText(
-                      "no_profile?",
-                      style: TextStyle(fontSize: 16),
+                    SizedBox(height: 8),
+                    PasswordInputField(
+                      focusNode: _passwordFocusNode,
+                      controller: _passwordController,
+                      onChanged: (value) {
+                        if (_wrongCredentials) {
+                          setState(() {
+                            _wrongCredentials = false;
+                          });
+                        }
+                      },
                     ),
-                    SizedBox(width: 10),
-                    TextLinkButton(Locales.string(context, "register"), () {
-                      Navigator.of(context)
-                          .pushReplacementNamed(RegisterScreen.routeName);
+                    Visibility(
+                      visible: _wrongCredentials,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: defaultPadding),
+                        child: Text(
+                          Locales.string(context, "wrong_login_and_password"),
+                          style: TextStyle(
+                            color: Colors.red,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: defaultPadding),
+                    FluidBigButton(Locales.string(context, "log_in"),
+                        onPress: () async {
+                      String phone = _phoneController.text.replaceAll(" ", "");
+                      String password = _passwordController.text;
+                      Provider.of<AuthProvider>(context, listen: false)
+                          .login(phone, password)
+                          .then((value) async {
+                        if (value.containsKey("status")) {
+                          setState(() {
+                            _wrongCredentials = true;
+                          });
+                        } else {
+                          SharedPreferences prefs =
+                              await SharedPreferences.getInstance();
+                          prefs.setBool("noAuth", true);
+                          Navigator.of(context)
+                            ..pop()
+                            ..pushReplacementNamed(
+                                NavigationalAppScreen.routeName);
+                        }
+                      });
                     }),
+                    SizedBox(height: 1.5 * defaultPadding),
+                    TextLinkButton(
+                        Locales.string(context, "forgot_password?"), () {}),
+                    SizedBox(
+                      height: 24,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          Locales.string(context, "no_profile?"),
+                          style: TextStyle(fontSize: 12),
+                        ),
+                        SizedBox(width: 10),
+                        TextLinkButton(Locales.string(context, "register"), () {
+                          Navigator.of(context)
+                              .pushReplacementNamed(RegisterScreen.routeName);
+                        }),
+                      ],
+                    )
                   ],
-                )
-              ],
+                ),
+              ),
             ),
           ),
         ),

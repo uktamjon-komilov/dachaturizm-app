@@ -1,4 +1,4 @@
-import 'package:dachaturizm/components/fluid_big.dart';
+import 'package:dachaturizm/components/fluid_big_button.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/styles/input.dart';
 import 'package:flutter/material.dart';

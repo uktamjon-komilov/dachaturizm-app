@@ -119,5 +119,6 @@
     "login_profile": "Mening profilim",
     "wishlist": "Yoqtirganlarim",
     "no_wishlist_items": "Yoqtirganlarim ro'yhati mavjud emas",
-    "reset_password": "Parolni yangilash"
+    "reset_password": "Parolni yangilash",
+    "welcome": "Xush kelibsiz!"
 }

@@ -119,5 +119,6 @@
     "login_profile": "Мой профайл",
     "wishlist": "Избранные",
     "no_wishlist_items": "Нет списка моих избранных",
-    "reset_password": "Сбросить пароль"
+    "reset_password": "Сбросить пароль",
+    "welcome": "Добро пожаловать!"
 }

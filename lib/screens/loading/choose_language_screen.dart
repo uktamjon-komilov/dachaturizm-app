@@ -1,10 +1,11 @@
-import 'package:dachaturizm/components/fluid_big.dart';
+import 'package:dachaturizm/components/fluid_big_button.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/screens/auth/auth_type_screen.dart';
 import 'package:dachaturizm/helpers/locale_helper.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sizer/sizer.dart';
 
 class ChooseLangugageScreen extends StatefulWidget {
   const ChooseLangugageScreen({Key? key}) : super(key: key);
@@ -20,53 +21,53 @@ class _ChooseLangugageScreenState extends State<ChooseLangugageScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-
     return SafeArea(
       child: Scaffold(
         body: Container(
+          padding: EdgeInsets.fromLTRB(defaultPadding, 110, defaultPadding, 0),
           width: double.infinity,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                padding: EdgeInsets.symmetric(vertical: size.height * 0.12),
-                child: Image.asset("assets/images/languages.png"),
-              ),
-              LocaleText(
-                "choose_language",
-                style: TextStyle(
-                  fontSize: 25,
-                  color: darkPurple,
-                  fontWeight: FontWeight.w700,
+                width: 110,
+                height: 110,
+                child: Image.asset(
+                  "assets/images/languages.png",
+                  fit: BoxFit.cover,
                 ),
               ),
+              SizedBox(height: 105),
+              Text(
+                Locales.string(context, "choose_language"),
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  height: 1.2,
+                  letterSpacing: 0.4,
+                ),
+              ),
+              SizedBox(height: 36),
               Column(
                 children: [
                   _buildLangitem("uz"),
+                  SizedBox(height: 8),
                   _buildLangitem("ru"),
+                  SizedBox(height: 8),
                   _buildLangitem("en"),
                 ],
               ),
-              Container(
-                margin: EdgeInsets.symmetric(
-                  horizontal: defaultPadding * 2,
-                ),
-                child: FluidBigButton(
-                  Locales.string(context, "next"),
-                  onPress: () async {
-                    if (chosenLang == "") return;
-                    changeLocale(context, chosenLang);
-                    setNotFirstTime();
-                    Navigator.pushReplacementNamed(
-                        context, AuthTypeScreen.routeName);
-                  },
-                  disabled: chosenLang == "",
-                ),
-              ),
-              SizedBox(
-                height: 30,
+              SizedBox(height: 52),
+              FluidBigButton(
+                Locales.string(context, "next"),
+                onPress: () async {
+                  if (chosenLang == "") return;
+                  changeLocale(context, chosenLang);
+                  setNotFirstTime();
+                  Navigator.pushReplacementNamed(
+                      context, AuthTypeScreen.routeName);
+                },
+                disabled: chosenLang == "",
               )
             ],
           ),
@@ -85,26 +86,30 @@ class _ChooseLangugageScreenState extends State<ChooseLangugageScreen> {
       },
       child: Container(
         width: 130,
-        decoration: BoxDecoration(
-          color: chosenLang == lang
-              ? normalOrange.withOpacity(0.12)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(30),
+        padding: EdgeInsets.symmetric(
+          vertical: 8,
+          horizontal: 10,
         ),
-        padding: const EdgeInsets.all(5.0),
+        decoration: BoxDecoration(
+          color: chosenLang == lang ? lightGrey : Colors.transparent,
+          borderRadius: BorderRadius.circular(15),
+        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset("assets/images/flag_${lang}.png"),
-            SizedBox(
-              width: 11,
+            Image.asset(
+              "assets/images/flag_${lang}.png",
+              height: 28,
+              width: 48,
             ),
+            SizedBox(width: 11),
             Text(
               "${lang}".toUpperCase(),
               style: TextStyle(
-                fontSize: 35,
-                color: darkPurple,
-                fontWeight: FontWeight.w700,
+                fontSize: 28,
+                fontWeight: FontWeight.w500,
+                height: 1.22,
+                letterSpacing: 0.4,
               ),
             )
           ],

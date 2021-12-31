@@ -4,21 +4,27 @@ import "package:flutter/material.dart";
 class InputStyles {
   static OutlineInputBorder inputBorder() {
     return OutlineInputBorder(
+      borderRadius: BorderRadius.circular(15),
+    );
+  }
+
+  static OutlineInputBorder enabledBorder() {
+    return OutlineInputBorder(
+      borderRadius: BorderRadius.circular(15),
       borderSide: BorderSide(
-        color: Color(0xFFBABABA),
+        color: inputGrey,
         width: 1,
       ),
-      borderRadius: BorderRadius.circular(10),
     );
   }
 
   static OutlineInputBorder focusBorder() {
     return OutlineInputBorder(
+      borderRadius: BorderRadius.circular(15),
       borderSide: BorderSide(
         color: normalOrange,
         width: 1,
       ),
-      borderRadius: BorderRadius.circular(10),
     );
   }
 }

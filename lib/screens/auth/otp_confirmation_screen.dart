@@ -1,4 +1,4 @@
-import 'package:dachaturizm/components/fluid_big.dart';
+import 'package:dachaturizm/components/fluid_big_button.dart';
 import 'package:dachaturizm/components/text_link.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';

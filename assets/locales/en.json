@@ -119,5 +119,6 @@
     "login_profile": "My profile",
     "wishlist": "Wishlist",
     "no_wishlist_items": "No items in your wishlist",
-    "reset_password": "Reset password"
+    "reset_password": "Reset password",
+    "welcome": "Welcome!"
 }
