@@ -56,26 +56,40 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
 
     return SafeArea(
       child: Scaffold(
-        body: Container(
-          padding: const EdgeInsets.all(defaultPadding),
-          child: Center(
-            child: SingleChildScrollView(
-              child: Form(
-                key: _form,
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
+          child: Form(
+            key: _form,
+            child: Center(
+              child: SingleChildScrollView(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    LocaleText(
-                      "create_profile",
+                    Image.asset(
+                      "assets/images/logo.png",
+                      width: 120,
+                      fit: BoxFit.cover,
+                    ),
+                    SizedBox(height: defaultPadding * 1.5),
+                    Text(
+                      Locales.string(context, "create_profile"),
                       style: TextStyle(
-                        fontSize: 25,
-                        color: normalOrange,
-                        fontWeight: FontWeight.w700,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w500,
+                        height: 1.25,
                       ),
                     ),
-                    SizedBox(
-                      height: 60,
+                    SizedBox(height: defaultPadding / 2),
+                    Text(
+                      Locales.string(context, "new_profile_new_results"),
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        height: 1.43,
+                        color: greyishLight,
+                      ),
                     ),
+                    SizedBox(height: 28),
                     _buildTextInput(
                       context,
                       hintText: "first_name_hint_text",
@@ -122,7 +136,10 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                       controller: _confirmPasswordController,
                     ),
                     CheckboxListTile(
-                      title: LocaleText("i_agree_to_the_terms"),
+                      title: Text(
+                        Locales.string(context, "i_agree_to_the_terms"),
+                        style: TextStyle(fontSize: 12),
+                      ),
                       controlAffinity: ListTileControlAffinity.leading,
                       value: _agreeTerms,
                       activeColor: normalOrange,
@@ -134,7 +151,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                     ),
                     TextLinkButton(Locales.string(context, "terms_of_use"), () {
                       UrlLauncher.launch(
-                          "http://45.129.170.152/staticpages/terms-of-use");
+                          "${baseFrontUrl}staticpages/terms-of-use");
                     }),
                     SizedBox(
                       height: 16,
@@ -148,16 +165,14 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                           )
                         : Container(),
                     _userAlreadyExists
-                        ? LocaleText(
+                        ? Text(
                             "user_already_exists_with_this_phone",
                             style: TextStyle(
                               color: Colors.red,
                             ),
                           )
                         : Container(),
-                    SizedBox(
-                      height: 16,
-                    ),
+                    SizedBox(height: 16),
                     (_agreeTerms)
                         ? FluidBigButton(
                             Locales.string(context, "create_profile"),
@@ -226,13 +241,19 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
         decoration: InputDecoration(
           border: InputStyles.inputBorder(),
           focusedBorder: InputStyles.focusBorder(),
+          enabledBorder: InputStyles.enabledBorder(),
           labelText: Locales.string(context, hintText),
           floatingLabelStyle: TextStyle(color: normalOrange),
-          prefixIcon: Icon(iconData),
+          prefixIcon: Icon(iconData, color: greyishLight),
           hintText: Locales.string(context, hintText),
+          hintStyle: TextStyle(color: greyishLight),
           suffixIcon: (suffixIcon != null && onPressed != null)
               ? IconButton(
-                  icon: Icon(suffixIcon as IconData), onPressed: onPressed)
+                  icon: Icon(
+                    suffixIcon as IconData,
+                    color: greyishLight,
+                  ),
+                  onPressed: onPressed)
               : null,
         ),
         validator: (value) {

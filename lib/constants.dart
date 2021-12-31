@@ -13,3 +13,4 @@ const normalGrey = Color(0xFF838589);
 const favouriteRed = Color(0xFFEB5757);
 const double defaultPadding = 20.0;
 const baseUrl = "https://dachaturzm.uz/";
+const baseFrontUrl = "https://dachaturizm.uz/";
