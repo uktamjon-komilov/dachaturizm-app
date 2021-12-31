@@ -122,5 +122,10 @@
     "reset_password": "Reset password",
     "welcome": "Welcome!",
     "wrong_login_and_password": "Login or password is incorrect",
-    "new_profile_new_results": "New results with new profile"
+    "new_profile_new_results": "New results with new profile",
+    "enter_your_phone_number": "Enter your phone number",
+    "wrong_phone_number": "This phone number is not registered in our system",
+    "wrong_otp_code": "OTP code is wrong",
+    "new_password": "Reset password",
+    "renew_profile_password": "Update your profile password"
 }

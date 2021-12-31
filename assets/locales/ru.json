@@ -122,5 +122,10 @@
     "reset_password": "Сбросить пароль",
     "welcome": "Добро пожаловать!",
     "wrong_login_and_password": "Логин или пароль неверный",
-    "new_profile_new_results": "Новые результаты с новым профилем"
+    "new_profile_new_results": "Новые результаты с новым профилем",
+    "enter_your_phone_number": "Введите свой номер телефона",
+    "wrong_phone_number": "Этот номер телефона не зарегистрирован в нашей системе",
+    "wrong_otp_code": "OTP-код неверен",
+    "new_password": "Сбросить пароль",
+    "renew_profile_password": "Обновите пароль вашего профиля"
 }

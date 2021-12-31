@@ -340,4 +340,39 @@ class AuthProvider with ChangeNotifier {
     }
     return data;
   }
+
+  Future<Map<String, bool>> resetPasswordBase(String url, dynamic data) async {
+    Map<String, bool> result = {"status": false};
+    try {
+      final response = await dio.post(url, data: data);
+      if (response.statusCode as int >= 200 ||
+          response.statusCode as int < 300) {
+        result["status"] = response.data["result"];
+      }
+    } catch (e) {}
+    return result;
+  }
+
+  Future<Map<String, bool>> resetPassword1(String phone) async {
+    const url = "${baseUrl}api/users/reset-password/step1/";
+    Map<String, dynamic> data = {"phone": phone};
+    return await resetPasswordBase(url, data);
+  }
+
+  Future<Map<String, bool>> resetPassword2(String phone, String code) async {
+    const url = "${baseUrl}api/users/reset-password/step2/";
+    Map<String, dynamic> data = {"phone": phone, "code": code};
+    return await resetPasswordBase(url, data);
+  }
+
+  Future<Map<String, bool>> resetPassword3(
+      String phone, String code, String newPassword) async {
+    const url = "${baseUrl}api/users/reset-password/step3/";
+    Map<String, dynamic> data = {
+      "phone": phone,
+      "code": code,
+      "new_password": newPassword
+    };
+    return await resetPasswordBase(url, data);
+  }
 }

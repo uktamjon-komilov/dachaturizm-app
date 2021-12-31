@@ -28,6 +28,9 @@ import 'package:dachaturizm/screens/auth/create_profile_screen.dart';
 import 'package:dachaturizm/screens/auth/otp_confirmation_screen.dart';
 import 'package:dachaturizm/screens/auth/register_screen.dart';
 import 'package:dachaturizm/screens/auth/login_screen.dart';
+import 'package:dachaturizm/screens/auth/reset_password_step1_screen.dart';
+import 'package:dachaturizm/screens/auth/reset_password_step2_screen.dart';
+import 'package:dachaturizm/screens/auth/reset_password_step3_screen.dart';
 import 'package:dachaturizm/screens/loading/choose_language_screen.dart';
 import 'package:dachaturizm/screens/splash_screen.dart';
 import 'package:dio/dio.dart';
@@ -147,6 +150,9 @@ class _MyAppState extends State<MyApp> {
               LocationPickerScreen.routeName: (context) =>
                   LocationPickerScreen(),
               LoginScreen.routeName: (context) => LoginScreen(),
+              ResetPasswordStep1.routeName: (context) => ResetPasswordStep1(),
+              ResetPasswordStep2.routeName: (context) => ResetPasswordStep2(),
+              ResetPasswordStep3.routeName: (context) => ResetPasswordStep3(),
               HomePageScreen.routeName: (context) => HomePageScreen(),
               NavigationalAppScreen.routeName: (context) =>
                   NavigationalAppScreen(),

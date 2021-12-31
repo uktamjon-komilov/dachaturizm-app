@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
-class PhoneNumberField extends StatelessWidget {
+class PhoneNumberField extends StatefulWidget {
   const PhoneNumberField(
       {Key? key,
       this.onFieldSubmitted,
@@ -21,6 +21,11 @@ class PhoneNumberField extends StatelessWidget {
   final FocusNode? focusNode;
 
   @override
+  State<PhoneNumberField> createState() => _PhoneNumberFieldState();
+}
+
+class _PhoneNumberFieldState extends State<PhoneNumberField> {
+  @override
   Widget build(BuildContext context) {
     return TextFormField(
       decoration: InputDecoration(
@@ -32,13 +37,13 @@ class PhoneNumberField extends StatelessWidget {
         hintText: Locales.string(context, "phone_number_hint"),
         hintStyle: TextStyle(color: greyishLight),
       ),
-      inputFormatters: [MaskTextInputFormatter(mask: "+998 ## ### ## ##")],
+      inputFormatters: [MaskTextInputFormatter(mask: "+998 (##) ### ## ##")],
       keyboardType: TextInputType.number,
-      onFieldSubmitted: onFieldSubmitted,
-      onChanged: onChanged,
-      validator: validator,
-      controller: controller,
-      focusNode: focusNode,
+      onFieldSubmitted: widget.onFieldSubmitted,
+      onChanged: widget.onChanged,
+      validator: widget.validator,
+      controller: widget.controller,
+      focusNode: widget.focusNode,
     );
   }
 }

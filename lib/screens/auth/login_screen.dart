@@ -4,9 +4,11 @@ import 'package:dachaturizm/components/password_input.dart';
 import 'package:dachaturizm/components/phone_input.dart';
 import 'package:dachaturizm/components/text_link.dart';
 import 'package:dachaturizm/constants.dart';
+import 'package:dachaturizm/helpers/clear_phone_number.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/screens/app/navigational_app_screen.dart';
 import 'package:dachaturizm/screens/auth/register_screen.dart';
+import 'package:dachaturizm/screens/auth/reset_password_step1_screen.dart';
 import 'package:dachaturizm/styles/input.dart';
 import "package:flutter/material.dart";
 import 'package:flutter/services.dart';
@@ -86,6 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     SizedBox(height: 28),
                     PhoneNumberField(
+                      controller: _phoneController,
                       onFieldSubmitted: (value) {
                         FocusScope.of(context).requestFocus(_passwordFocusNode);
                       },
@@ -123,30 +126,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     SizedBox(height: defaultPadding),
                     FluidBigButton(Locales.string(context, "log_in"),
-                        onPress: () async {
-                      String phone = _phoneController.text.replaceAll(" ", "");
-                      String password = _passwordController.text;
-                      Provider.of<AuthProvider>(context, listen: false)
-                          .login(phone, password)
-                          .then((value) async {
-                        if (value.containsKey("status")) {
-                          setState(() {
-                            _wrongCredentials = true;
-                          });
-                        } else {
-                          SharedPreferences prefs =
-                              await SharedPreferences.getInstance();
-                          prefs.setBool("noAuth", true);
-                          Navigator.of(context)
-                            ..pop()
-                            ..pushReplacementNamed(
-                                NavigationalAppScreen.routeName);
-                        }
-                      });
-                    }),
+                        onPress: login),
                     SizedBox(height: 1.5 * defaultPadding),
-                    TextLinkButton(
-                        Locales.string(context, "forgot_password?"), () {}),
+                    TextLinkButton(Locales.string(context, "forgot_password?"),
+                        () {
+                      Navigator.of(context)
+                          .pushReplacementNamed(ResetPasswordStep1.routeName);
+                    }),
                     SizedBox(height: defaultPadding * 1.5),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -171,5 +157,27 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
+  }
+
+  login() {
+    String phone = clearPhoneNumber(_phoneController.text);
+    String password = _passwordController.text;
+    print(phone);
+    print(password);
+    Provider.of<AuthProvider>(context, listen: false)
+        .login(phone, password)
+        .then((value) async {
+      if (value.containsKey("status")) {
+        setState(() {
+          _wrongCredentials = true;
+        });
+      } else {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setBool("noAuth", true);
+        Navigator.of(context)
+          ..pop()
+          ..pushReplacementNamed(NavigationalAppScreen.routeName);
+      }
+    });
   }
 }

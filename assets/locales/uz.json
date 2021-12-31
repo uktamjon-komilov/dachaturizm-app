@@ -122,5 +122,10 @@
     "reset_password": "Parolni yangilash",
     "welcome": "Xush kelibsiz!",
     "wrong_login_and_password": "Login yoki parol noto'g'ri",
-    "new_profile_new_results": "Yangi profil bilan yangi natijalar"
+    "new_profile_new_results": "Yangi profil bilan yangi natijalar",
+    "enter_your_phone_number": "Telefon raqamingizni kiriting",
+    "wrong_phone_number": "Ushbu telefon raqami bizning tizimimizda ro'yxatdan o'tmagan",
+    "wrong_otp_code": "Kiritilgan kod xato",
+    "new_password": "Parolni tiklash",
+    "renew_profile_password": "Profilingiz parolini yangilang"
 }
