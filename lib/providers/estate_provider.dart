@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/helpers/locale_helper.dart';
 import 'package:dachaturizm/models/estate_model.dart';
-import 'package:dachaturizm/models/type_model.dart';
+import 'package:dachaturizm/models/category_model.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
@@ -41,32 +41,32 @@ class EstateProvider with ChangeNotifier {
     return response;
   }
 
-  Future<Map<int, List<EstateModel>>> _setTopEstates(
-      dynamic data, TypeModel type, Map<int, List<EstateModel>> result) async {
+  Future<Map<int, List<EstateModel>>> _setTopEstates(dynamic data,
+      CategoryModel category, Map<int, List<EstateModel>> result) async {
     await data["results"].forEach((item) async {
       EstateModel estate = await EstateModel.fromJson(item);
-      result[type.id]!.add(estate);
+      result[category.id]!.add(estate);
     });
     return result;
   }
 
   Future<Map<int, List<EstateModel>>> getTopEstates(
-      List<TypeModel> types) async {
+      List<CategoryModel> categories) async {
     Map<int, List<EstateModel>> estates = {};
     dynamic data;
-    for (int i = 0; i < types.length; i++) {
-      if (!estates.containsKey(types[i].slug)) {
-        estates[types[i].id] = [];
+    for (int i = 0; i < categories.length; i++) {
+      if (!estates.containsKey(categories[i].slug)) {
+        estates[categories[i].id] = [];
       }
-      String url = "${baseUrl}api/estate/${types[i].slug}/top/";
+      String url = "${baseUrl}api/estate/${categories[i].slug}/top/";
       Response response = await _fetch(url);
       if (response.statusCode as int >= 200 ||
           response.statusCode as int < 300) {
         data = response.data;
-        estates = await _setTopEstates(data, types[i], estates);
+        estates = await _setTopEstates(data, categories[i], estates);
         while (data["links"]["next"] != null) {
           data = await _fetch(data["links"]["next"]);
-          estates = await _setTopEstates(data, types[i], estates);
+          estates = await _setTopEstates(data, categories[i], estates);
         }
       }
     }
@@ -77,6 +77,46 @@ class EstateProvider with ChangeNotifier {
   // Top Estates
   // End
 
+  Future<Map<String, dynamic>> getEstatesByType(
+    CategoryModel? category,
+    String type,
+  ) async {
+    Map<String, dynamic> data = {};
+    final url = "${baseUrl}api/estate/${category!.slug}/${type}/";
+    List<EstateModel> estates = [];
+    try {
+      Response response = await _fetch(url);
+      data["next"] = response.data["links"]["next"];
+      await response.data["results"].forEach((item) async {
+        EstateModel estate = await EstateModel.fromJson(item);
+        estates.add(estate);
+      });
+    } catch (e) {}
+    data["estates"] = estates;
+    return data;
+  }
+
+  Future<Map<String, dynamic>> getNextPage(String url) async {
+    print(url);
+    Map<String, dynamic> data = {};
+    List<EstateModel> estates = [];
+    try {
+      Response response = await _fetch(url);
+      print(response);
+      data["next"] = response.data["links"]["next"];
+      await response.data["results"].forEach((item) async {
+        EstateModel estate = await EstateModel.fromJson(item);
+        estates.add(estate);
+      });
+    } catch (e) {
+      print(e);
+    }
+    data["estates"] = estates;
+    print(data);
+    return data;
+  }
+
+  // Get estate by ID
   Future<EstateModel> fetchEstateById(estateId) async {
     final url = "${baseUrl}api/estate/${estateId}/";
     var extractedData = await _fetch(url);

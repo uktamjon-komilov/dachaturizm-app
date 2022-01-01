@@ -41,7 +41,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
-import 'providers/type_provider.dart';
+import 'providers/category_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -158,7 +158,7 @@ class _MyAppState extends State<MyApp> {
                   NavigationalAppScreen(),
               ChooseLangugageScreen.routeName: (context) =>
                   ChooseLangugageScreen(),
-              // EstateListingScreen.routeName: (context) => EstateListingScreen(),
+              EstateListingScreen.routeName: (context) => EstateListingScreen(),
               EstateCreationPageScreen.routeName: (context) =>
                   EstateCreationPageScreen(),
               ServicesListScreen.routeName: (context) => ServicesListScreen(),

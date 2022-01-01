@@ -1,9 +1,8 @@
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/models/estate_model.dart';
-import 'package:dachaturizm/models/type_model.dart';
+import 'package:dachaturizm/models/category_model.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
-import "package:http/http.dart" as http;
 
 class BannerProvider with ChangeNotifier {
   final Dio dio;
@@ -39,7 +38,8 @@ class BannerProvider with ChangeNotifier {
     return topBanners;
   }
 
-  Future<Map<int, List<EstateModel>>> getBanners(List<TypeModel> types) async {
+  Future<Map<int, List<EstateModel>>> getBanners(
+      List<CategoryModel> types) async {
     Map<int, List<EstateModel>> banners = {};
     for (var i = 0; i < types.length; i++) {
       final url = "${baseUrl}api/banners/${types[i].slug}/";

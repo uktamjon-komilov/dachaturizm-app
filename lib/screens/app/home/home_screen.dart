@@ -5,11 +5,11 @@ import 'package:dachaturizm/components/search_bar_with_filter.dart';
 import 'package:dachaturizm/components/text_link.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/models/estate_model.dart';
-import 'package:dachaturizm/models/type_model.dart';
+import 'package:dachaturizm/models/category_model.dart';
 import 'package:dachaturizm/providers/banner_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
-import 'package:dachaturizm/providers/type_provider.dart';
+import 'package:dachaturizm/providers/category_provider.dart';
 import 'package:dachaturizm/screens/app/home/listing_screen.dart';
 import 'package:dachaturizm/screens/app/home/services_list_screen.dart';
 import 'package:dachaturizm/styles/text_styles.dart';
@@ -38,7 +38,9 @@ class _HomePageScreenState extends State<HomePageScreen> {
         _isLoading = true;
       });
       Provider.of<BannerProvider>(context, listen: false).getTopBanners();
-      Provider.of<EstateTypesProvider>(context, listen: false).getTypes().then(
+      Provider.of<EstateTypesProvider>(context, listen: false)
+          .getCategories()
+          .then(
         (types) {
           Future.wait([
             Provider.of<BannerProvider>(context, listen: false)
@@ -55,10 +57,10 @@ class _HomePageScreenState extends State<HomePageScreen> {
     });
   }
 
-  _navigateToCategory(BuildContext context, TypeModel type) {
+  _navigateToCategory(BuildContext context, CategoryModel category) {
     Navigator.of(context).pushNamed(
       EstateListingScreen.routeName,
-      arguments: type,
+      arguments: category,
     );
   }
 
@@ -86,7 +88,8 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
   @override
   Widget build(BuildContext context) {
-    List<TypeModel> types = Provider.of<EstateTypesProvider>(context).items;
+    List<CategoryModel> categories =
+        Provider.of<EstateTypesProvider>(context).categories;
     List<EstateModel> topBanners =
         Provider.of<BannerProvider>(context).topBanners;
 
@@ -103,7 +106,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                     child: SingleChildScrollView(
                       child: Column(
                         children: [
-                          _buidlCategoryRow(context, types),
+                          _buidlCategoryRow(context, categories),
                           SizedBox(height: defaultPadding * 1.5),
                           _buildSearchBar(context),
                           _buildTopBannerBlock(context, topBanners),
@@ -124,7 +127,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                             ),
                             child: Column(
                               children: [
-                                ...types
+                                ...categories
                                     .map((item) => _buildEstateTypeBlock(item))
                                     .toList(),
                               ],
@@ -203,11 +206,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
   Widget _buildBannerBlock(BuildContext context, List banners) {
     if (banners.length > 4) banners = banners.sublist(0, 4);
-
-    print(1);
-    print(banners);
-    print(2);
-
     return Visibility(
       visible: banners.length > 0,
       child: Container(
@@ -237,9 +235,10 @@ class _HomePageScreenState extends State<HomePageScreen> {
     );
   }
 
-  Widget _buildEstateTypeBlock(TypeModel type) {
-    List topEstates = Provider.of<EstateProvider>(context).topEstates[type.id];
-    List banners = Provider.of<BannerProvider>(context).banners[type.id];
+  Widget _buildEstateTypeBlock(CategoryModel category) {
+    List topEstates =
+        Provider.of<EstateProvider>(context).topEstates[category.id];
+    List banners = Provider.of<BannerProvider>(context).banners[category.id];
 
     return Visibility(
       visible: (topEstates.length > 0 || banners.length > 0),
@@ -252,11 +251,11 @@ class _HomePageScreenState extends State<HomePageScreen> {
               children: [
                 Text(
                   Locales.string(context, "top") +
-                      " ${type.title.toLowerCase()}",
+                      " ${category.title.toLowerCase()}",
                   style: TextStyles.display2(),
                 ),
                 TextLinkButton(Locales.string(context, "all"), () {
-                  _navigateToCategory(context, type);
+                  _navigateToCategory(context, category);
                 })
               ],
             ),
@@ -268,7 +267,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
     );
   }
 
-  Widget _buidlCategoryRow(BuildContext context, List types) {
+  Widget _buidlCategoryRow(BuildContext context, List categories) {
     return Container(
       height: 133,
       padding: EdgeInsets.symmetric(horizontal: defaultPadding),
@@ -286,7 +285,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                ...types.map((item) {
+                ...categories.map((item) {
                   return Container(
                     margin: EdgeInsets.only(right: 34),
                     child: CategoryItem(

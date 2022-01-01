@@ -1,7 +1,7 @@
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/helpers/locale_helper.dart';
 
-class TypeModel {
+class CategoryModel {
   final int id;
   final String title;
   final String slug;
@@ -9,7 +9,7 @@ class TypeModel {
   final String backgroundColor;
   final String icon;
 
-  TypeModel(
+  CategoryModel(
       {required this.id,
       required this.title,
       required this.slug,
@@ -17,7 +17,7 @@ class TypeModel {
       required this.foregroundColor,
       required this.backgroundColor});
 
-  static Future<TypeModel> fromJson(data) async {
+  static Future<CategoryModel> fromJson(data) async {
     String locale = await getCurrentLocale();
 
     final icon;
@@ -27,7 +27,7 @@ class TypeModel {
       icon = baseUrl + data["icon"];
     }
 
-    return TypeModel(
+    return CategoryModel(
       id: data["id"],
       title: data["translations"][locale]["title"],
       slug: data["slug"],

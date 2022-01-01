@@ -11,13 +11,13 @@ import 'package:dachaturizm/models/district_model.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/models/facility_model.dart';
 import 'package:dachaturizm/models/region_model.dart';
-import 'package:dachaturizm/models/type_model.dart';
+import 'package:dachaturizm/models/category_model.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/providers/currency_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/facility_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
-import 'package:dachaturizm/providers/type_provider.dart';
+import 'package:dachaturizm/providers/category_provider.dart';
 import 'package:dachaturizm/screens/app/estate/location_picker_screen.dart';
 import 'package:dachaturizm/screens/app/user/my_announcements_screen.dart';
 import 'package:flutter/cupertino.dart';
@@ -646,8 +646,8 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
   Widget build(BuildContext context) {
     List<FacilityModel> facilities =
         Provider.of<FacilityProvider>(context, listen: false).facilities;
-    List<TypeModel> sections =
-        Provider.of<EstateTypesProvider>(context, listen: false).items;
+    List<CategoryModel> categories =
+        Provider.of<EstateTypesProvider>(context, listen: false).categories;
     List<CurrencyModel> currencies =
         Provider.of<CurrencyProvider>(context, listen: false).currencies;
 
@@ -726,7 +726,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                           Text(Locales.string(context, "max_photo_count_8")),
                           VerticalHorizontalSizedBox(),
                           Text(Locales.string(context, "choose_section")),
-                          _buildSelectionRow(sections, _currentSectionId,
+                          _buildSelectionRow(categories, _currentSectionId,
                               Locales.string(context, "choose_section"),
                               onChanged: (value) {
                             setState(() {

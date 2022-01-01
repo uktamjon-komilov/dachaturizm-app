@@ -4,10 +4,10 @@ import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/helpers/get_ip_address.dart';
 import 'package:dachaturizm/helpers/get_my_location.dart';
 import 'package:dachaturizm/models/estate_model.dart';
-import 'package:dachaturizm/models/type_model.dart';
+import 'package:dachaturizm/models/category_model.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
-import 'package:dachaturizm/providers/type_provider.dart';
+import 'package:dachaturizm/providers/category_provider.dart';
 import 'package:dachaturizm/screens/app/estate/detail_builders.dart';
 import 'package:dachaturizm/screens/auth/login_screen.dart';
 import 'package:dio/dio.dart';
@@ -60,9 +60,10 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
     String share_url = "https://dachaturizm.uz/";
     String share_title = "Look I have discovered something!";
     try {
-      List<TypeModel> items =
-          Provider.of<EstateTypesProvider>(context, listen: false).items;
-      TypeModel type = items.where((item) => item.id == estate.typeId).first;
+      List<CategoryModel> categories =
+          Provider.of<EstateTypesProvider>(context, listen: false).categories;
+      CategoryModel type =
+          categories.where((item) => item.id == estate.typeId).first;
       share_url = "https://dachaturizm.uz/estate/${type.slug}/${estate.id}/";
     } catch (e) {
       share_url = "https://dachaturizm.uz/";

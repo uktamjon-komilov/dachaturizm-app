@@ -5,11 +5,13 @@ import 'package:dachaturizm/components/no_result.dart';
 import 'package:dachaturizm/components/search_bar_with_filter.dart';
 import 'package:dachaturizm/components/small_button.dart';
 import 'package:dachaturizm/constants.dart';
-import 'package:dachaturizm/models/type_model.dart';
+import 'package:dachaturizm/models/category_model.dart';
+import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class EstateListingScreen extends StatefulWidget {
   const EstateListingScreen({Key? key}) : super(key: key);
@@ -22,38 +24,92 @@ class EstateListingScreen extends StatefulWidget {
 
 class _EstateListingScreenState extends State<EstateListingScreen> {
   bool _isLoading = true;
+  bool _paginationLoading = false;
   bool _isInit = true;
   bool _showTop = true;
-  TypeModel? _estateType;
+  CategoryModel? _category;
+
   List? _topEstates;
   List? _simpleEstates;
   List? _currentEstates;
 
+  String? _topNextLink;
+  String? _simpleNextLink;
+
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void didChangeDependencies() async {
     super.didChangeDependencies();
     if (_isInit) {
       _isInit = false;
+      _category = ModalRoute.of(context)!.settings.arguments as CategoryModel;
       await _refreshAction();
-      final TypeModel _estateType =
-          ModalRoute.of(context)!.settings.arguments as TypeModel;
+      await _listenScroller(context);
     }
   }
 
-  Future<void> _refreshAction() async {
-    setState(() {
-      _isLoading = true;
+  Future<void> _listenScroller(BuildContext context) async {
+    _scrollController.addListener(() {
+      ScrollPosition position = _scrollController.position;
+      if (position.pixels > position.maxScrollExtent - 80 &&
+          !_paginationLoading) {
+        if (_showTop && _topNextLink != null) {
+          setState(() {
+            _paginationLoading = true;
+          });
+          Provider.of<EstateProvider>(context, listen: false)
+              .getNextPage(_topNextLink as String)
+              .then((value) {
+            setState(() {
+              _topEstates!.addAll(value["estates"]);
+              _paginationLoading = false;
+              _topNextLink = value["next"];
+            });
+          });
+        } else if (!_showTop && _simpleNextLink != null) {
+          setState(() {
+            _paginationLoading = true;
+          });
+          Provider.of<EstateProvider>(context, listen: false)
+              .getNextPage(_simpleNextLink as String)
+              .then((value) {
+            setState(() {
+              _simpleEstates!.addAll(value["estates"]);
+              _paginationLoading = false;
+              _simpleNextLink = value["next"];
+            });
+          });
+        }
+      }
     });
-    // Provider.of<EstateProvider>(context, listen: false)
-    //     .fetchAllAndSetEstates()
-    //     .then((value) {
-    //   setState(() {
-    //     _isLoading = false;
-    //   });
-    // });
+  }
+
+  Future<void> _refreshAction() async {
+    await Future.wait([
+      Provider.of<EstateProvider>(context, listen: false)
+          .getEstatesByType(_category, "top")
+          .then((value) {
+        setState(() {
+          _topEstates = value["estates"];
+          _topNextLink = value["next"];
+        });
+      }),
+      Provider.of<EstateProvider>(context, listen: false)
+          .getEstatesByType(_category, "simple")
+          .then((value) {
+        setState(() {
+          _simpleEstates = value["estates"];
+          _simpleNextLink = value["next"];
+        });
+      }),
+    ]);
+    setState(() {
+      _currentEstates = _topEstates;
+      _isLoading = false;
+    });
   }
 
   @override
@@ -65,7 +121,7 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
         return true;
       },
       child: Scaffold(
-        appBar: buildNavigationalAppBar(context, _estateType!.title, () {
+        appBar: buildNavigationalAppBar(context, _category!.title, () {
           Provider.of<NavigationScreenProvider>(context, listen: false)
               .refreshHomePage = true;
         }),
@@ -81,6 +137,7 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
                           ? 100.h - 4 * defaultPadding
                           : null,
                   child: SingleChildScrollView(
+                    controller: _scrollController,
                     physics: AlwaysScrollableScrollPhysics(),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -147,6 +204,18 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
                           ),
                         ),
                         SizedBox(height: defaultPadding),
+                        Visibility(
+                          visible: _paginationLoading,
+                          child: Container(
+                            padding: EdgeInsets.only(bottom: 20),
+                            height: 60,
+                            child: Center(
+                              child: SpinKitFadingCircle(
+                                color: normalOrange,
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -163,6 +232,7 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
   void dispose() {
     _searchFocusNode.dispose();
     _searchController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
