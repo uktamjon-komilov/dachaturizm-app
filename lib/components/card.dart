@@ -24,8 +24,6 @@ class EstateCard extends StatefulWidget {
 
 class _EstateCardState extends State<EstateCard> {
   bool _isLiked = false;
-  final CurrencyTextInputFormatter _formatter = CurrencyTextInputFormatter(
-      symbol: "", decimalDigits: 0, customPattern: "### ### ###");
 
   @override
   void initState() {
@@ -117,9 +115,7 @@ class _EstateCardState extends State<EstateCard> {
                               },
                             ),
                             Text(
-                              _formatter.format(
-                                      widget.estate.weekdayPrice.toString()) +
-                                  " ${widget.estate.priceType}",
+                              "${widget.estate.weekdayPrice} ${widget.estate.priceType}",
                               style: TextStyles.display4()
                                   .copyWith(color: normalOrange),
                             )

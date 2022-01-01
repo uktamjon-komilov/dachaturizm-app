@@ -46,6 +46,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
 
   @override
   void didChangeDependencies() async {
+    super.didChangeDependencies();
     bool shouldRefresh =
         Provider.of<NavigationScreenProvider>(context).refreshChatsScreen;
     if (shouldRefresh) {
@@ -53,7 +54,6 @@ class _ChatListScreenState extends State<ChatListScreen> {
           .refreshChatsScreen = false;
       await _refreshMyChats();
     }
-    super.didChangeDependencies();
   }
 
   @override

@@ -1,3 +1,5 @@
+import 'package:dachaturizm/components/app_bar.dart';
+import 'package:dachaturizm/components/bottom_navbar.dart';
 import 'package:dachaturizm/components/card.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/models/estate_model.dart';
@@ -10,7 +12,7 @@ import 'package:provider/provider.dart';
 class WishlistScreen extends StatefulWidget {
   const WishlistScreen({Key? key}) : super(key: key);
 
-  static String routeName = "/wishlist";
+  static const String routeName = "/wishlist";
 
   @override
   _WishlistScreenState createState() => _WishlistScreenState();
@@ -48,11 +50,10 @@ class _WishlistScreenState extends State<WishlistScreen> {
       },
       child: SafeArea(
         child: Scaffold(
-          appBar: AppBar(
-            title: Text(
-              Locales.string(context, "wishlist"),
-            ),
-          ),
+          appBar: buildNavigationalAppBar(context, "wishlist"),
+          bottomNavigationBar: buildBottomNavigation(context, () {
+            Navigator.of(context).pop();
+          }),
           body: Container(
             padding: EdgeInsets.all(defaultPadding),
             child: SingleChildScrollView(
@@ -67,11 +68,15 @@ class _WishlistScreenState extends State<WishlistScreen> {
                           ),
                         )
                       : ((_estates.length == 0)
-                          ? Container(
-                              height: 100,
+                          ? Expanded(
                               child: Center(
-                                child: Text(
-                                  Locales.string(context, "no_wishlist_items"),
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      Locales.string(
+                                          context, "no_wishlist_items"),
+                                    ),
+                                  ],
                                 ),
                               ),
                             )

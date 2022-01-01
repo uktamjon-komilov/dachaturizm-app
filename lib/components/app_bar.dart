@@ -3,7 +3,7 @@ import 'package:dachaturizm/styles/text_styles.dart';
 import 'package:flutter/material.dart';
 
 AppBar buildNavigationalAppBar(BuildContext context, String title,
-    [Function? refreshNavigationCallback]) {
+    [Function? refreshNavigationCallback, List<Widget>? actions]) {
   return AppBar(
     leading: IconButton(
       onPressed: () {
@@ -22,5 +22,6 @@ AppBar buildNavigationalAppBar(BuildContext context, String title,
       title,
       style: TextStyles.display2().copyWith(fontWeight: FontWeight.w700),
     ),
+    actions: actions,
   );
 }

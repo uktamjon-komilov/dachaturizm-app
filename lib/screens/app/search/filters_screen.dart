@@ -30,6 +30,7 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
   List? _sortingTypes;
   String? _currentSort;
   int? _currentCurrencyId;
+  void Function()? onFilterCallback;
 
   TextEditingController _addressController = TextEditingController();
   TextEditingController _minPriceController = TextEditingController();
@@ -91,6 +92,8 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
         .filtersSorting(_currentSort as String);
 
     if (_currentCurrencyId != 0) {
+      print("working");
+      print(_currentCurrencyId);
       Provider.of<EstateProvider>(context, listen: false)
           .filtersPriceType(_currentCurrencyId as int);
     }
@@ -119,6 +122,11 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
       _isInit = false;
       await _fetchData();
       _listenControllers();
+      Map<String, dynamic> modalData =
+          ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+      if (modalData.containsKey("onFilterCallback")) {
+        onFilterCallback = modalData["onFilterCallback"];
+      }
     }
   }
 
@@ -161,7 +169,17 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
           appBar: buildNavigationalAppBar(
               context, Locales.string(context, "filters"), () {
             _clearFilters();
-          }),
+          }, [
+            IconButton(
+              onPressed: () {
+                _clearFilters();
+                onFilterCallback!();
+                Navigator.of(context).pop();
+              },
+              icon: Icon(Icons.refresh_rounded),
+              color: greyishLight,
+            ),
+          ]),
           body: _isLoading
               ? Center(
                   child: CircularProgressIndicator(),
@@ -317,6 +335,7 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
             child: ElevatedButton(
               onPressed: () {
                 _setAllFilters();
+                onFilterCallback!();
                 Navigator.of(context).pop();
               },
               style: ElevatedButton.styleFrom(

@@ -32,12 +32,15 @@ class EstateProvider with ChangeNotifier {
     return {..._topEstates};
   }
 
-  _fetch(String url) async {
+  Future<Response> _fetch(String url) async {
+    print(100);
     Map<String, dynamic> headers = await getHeaders();
+    print(200);
     Response response = await dio.get(
       url,
       options: Options(headers: headers),
     );
+    print(300);
     return response;
   }
 
@@ -99,12 +102,10 @@ class EstateProvider with ChangeNotifier {
 
   // Get any data from the next page
   Future<Map<String, dynamic>> getNextPage(String url) async {
-    print(url);
     Map<String, dynamic> data = {};
     List<EstateModel> estates = [];
     try {
       Response response = await _fetch(url);
-      print(response);
       data["next"] = response.data["links"]["next"];
       await response.data["results"].forEach((item) async {
         EstateModel estate = await EstateModel.fromJson(item);
@@ -129,6 +130,35 @@ class EstateProvider with ChangeNotifier {
 
   Map<String, dynamic> get filters {
     return {..._filters};
+  }
+
+  String getQueryStringFromFilters(
+      {String? term,
+      CategoryModel? category,
+      Map<String, dynamic>? extraArgs}) {
+    String queryString = Uri(
+      host: "",
+      scheme: "",
+      path: "",
+      queryParameters: {
+        "estate_type":
+            category == null ? null.toString() : category.id.toString(),
+        "sorting": _filters["sorting"],
+        "address": _filters["address"],
+        "term": term ?? "",
+        "min_price": _filters["minPrice"].toString(),
+        "max_price": _filters["maxPrice"].toString(),
+        "price_type": _filters["priceType"].toString(),
+        "facility_ids": _filters["facilities"].join(","),
+        "is_top": extraArgs!.containsKey("top")
+            ? extraArgs["top"].toString()
+            : "false",
+        "is_simple": extraArgs.containsKey("simple")
+            ? extraArgs["simple"].toString()
+            : "false",
+      },
+    ).query;
+    return queryString;
   }
 
   List<String> get sorting {
@@ -176,6 +206,31 @@ class EstateProvider with ChangeNotifier {
   }
   // Search
   // End
+
+  // Search and return results
+  Future<Map<String, dynamic>> getSearchedResults({
+    String? term,
+    CategoryModel? category,
+    Map<String, dynamic>? extraArgs,
+  }) async {
+    Map<String, dynamic> data = {};
+    List<EstateModel> estates = [];
+    String queryString = getQueryStringFromFilters(
+      term: term,
+      category: category,
+      extraArgs: extraArgs,
+    );
+    final url = "${baseUrl}api/estate/?${queryString}";
+    print(url);
+    final response = await _fetch(url);
+    await response.data["results"].forEach((item) async {
+      EstateModel estate = await EstateModel.fromJson(item);
+      estates.add(estate);
+    });
+    data["estates"] = estates;
+    data["next"] = response.data["links"]["next"];
+    return data;
+  }
 
   // Get estate by ID
   Future<EstateModel> fetchEstateById(estateId) async {
@@ -445,7 +500,9 @@ class EstateProvider with ChangeNotifier {
         });
         return estates;
       }
-    } catch (e) {}
+    } catch (e) {
+      print(e);
+    }
     return estates;
   }
 

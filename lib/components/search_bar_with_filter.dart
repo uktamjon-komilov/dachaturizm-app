@@ -13,11 +13,13 @@ class SearchBarWithFilter extends StatelessWidget {
     this.onFilterTap,
     this.autofocus = false,
     this.focusNode,
+    this.onFilterCallback,
   }) : super(key: key);
 
   final TextEditingController controller;
   final Function onSubmit;
   final Function? onChange;
+  final Function? onFilterCallback;
   final Function? onFilterTap;
   final bool autofocus;
   final FocusNode? focusNode;
@@ -79,7 +81,8 @@ class SearchBarWithFilter extends StatelessWidget {
           ]),
           child: TextButton(
             onPressed: () {
-              Navigator.of(context).pushNamed(SearchFilersScreen.routeName);
+              Navigator.of(context).pushNamed(SearchFilersScreen.routeName,
+                  arguments: {"onFilterCallback": onFilterCallback});
               if (onFilterTap == null) {
                 onFilterTap!();
               }

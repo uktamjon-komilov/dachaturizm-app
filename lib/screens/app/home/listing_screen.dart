@@ -87,7 +87,30 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
     });
   }
 
+  _search() async {
+    Provider.of<EstateProvider>(context, listen: false).getSearchedResults(
+        term: _searchController.text,
+        category: _category,
+        extraArgs: {
+          "top": _showTop,
+          "simple": !_showTop,
+        }).then((data) {
+      if (_showTop) {
+        setState(() {
+          _topEstates = data["estates"];
+          _currentEstates = _topEstates;
+        });
+      } else {
+        setState(() {
+          _simpleEstates = data["estates"];
+          _currentEstates = _simpleEstates;
+        });
+      }
+    });
+  }
+
   Future<void> _refreshAction() async {
+    _searchController.text = "";
     await Future.wait([
       Provider.of<EstateProvider>(context, listen: false)
           .getEstatesByType(_category, "top")
@@ -125,7 +148,13 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
         appBar: buildNavigationalAppBar(context, _category!.title, () {
           Provider.of<NavigationScreenProvider>(context, listen: false)
               .refreshHomePage = true;
-        }),
+        }, [
+          IconButton(
+            onPressed: () => _refreshAction(),
+            icon: Icon(Icons.refresh_rounded),
+            color: greyishLight,
+          ),
+        ]),
         body: _isLoading
             ? Center(
                 child: CircularProgressIndicator(),
@@ -153,17 +182,11 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
                             controller: _searchController,
                             focusNode: _searchFocusNode,
                             onSubmit: (value) {
-                              // _search(
-                              //     _estateType != null
-                              //         ? _estateType!.slug
-                              //         : "dacha",
-                              //     value);
-                            },
-                            onChange: (value) {
-                              if (value == "") {
-                                _refreshAction();
+                              if (value != "") {
+                                _search();
                               }
                             },
+                            onFilterCallback: () => _search(),
                           ),
                         ),
                         Visibility(
