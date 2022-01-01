@@ -127,5 +127,14 @@
     "wrong_phone_number": "Ushbu telefon raqami bizning tizimimizda ro'yxatdan o'tmagan",
     "wrong_otp_code": "Kiritilgan kod xato",
     "new_password": "Parolni tiklash",
-    "renew_profile_password": "Profilingiz parolini yangilang"
+    "renew_profile_password": "Profilingiz parolini yangilang",
+    "filters": "Filtrlar",
+    "sort_by": "Saralash turi",
+    "latest": "Eng so'ngilari",
+    "cheapest": "Eng arzonlari",
+    "expensive": "Eng qimmatlari",
+    "address": "Manzil",
+    "set_price": "Narx oralig'ini belgilang",
+    "extra_filters": "Qo'shimcha filterlar",
+    "show_results": "Natijalarni ko'rsatish"
 }

@@ -127,5 +127,14 @@
     "wrong_phone_number": "This phone number is not registered in our system",
     "wrong_otp_code": "OTP code is wrong",
     "new_password": "Reset password",
-    "renew_profile_password": "Update your profile password"
+    "renew_profile_password": "Update your profile password",
+    "filters": "Filters",
+    "sort_by": "Sort by",
+    "latest": "Latest",
+    "cheapest": "Cheapest",
+    "expensive": "Most expensive",
+    "address": "Address",
+    "set_price": "Set price range",
+    "extra_filters": "Extra filters",
+    "show_results": "Show results"
 }

@@ -1,11 +1,8 @@
-import 'dart:convert';
-
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/models/facility_model.dart';
 import 'package:dachaturizm/models/region_model.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import "package:http/http.dart" as http;
 
 class FacilityProvider with ChangeNotifier {
   final Dio dio;
@@ -17,7 +14,7 @@ class FacilityProvider with ChangeNotifier {
     return [..._facilities];
   }
 
-  Future<List<FacilityModel>> fetchAndSetFacilities() async {
+  Future<List<FacilityModel>> getFacilities() async {
     const url = "${baseUrl}api/facilities/";
     final response = await dio.get(url);
     List<FacilityModel> facilities = [];

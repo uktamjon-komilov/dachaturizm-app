@@ -118,6 +118,7 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
       onWillPop: () async {
         Provider.of<NavigationScreenProvider>(context, listen: false)
             .refreshHomePage = true;
+        Provider.of<EstateProvider>(context, listen: false).filtersClear();
         return true;
       },
       child: Scaffold(

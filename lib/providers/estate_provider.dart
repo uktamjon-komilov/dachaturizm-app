@@ -77,6 +77,7 @@ class EstateProvider with ChangeNotifier {
   // Top Estates
   // End
 
+  // Get estates by category and type
   Future<Map<String, dynamic>> getEstatesByType(
     CategoryModel? category,
     String type,
@@ -96,6 +97,7 @@ class EstateProvider with ChangeNotifier {
     return data;
   }
 
+  // Get any data from the next page
   Future<Map<String, dynamic>> getNextPage(String url) async {
     print(url);
     Map<String, dynamic> data = {};
@@ -108,13 +110,72 @@ class EstateProvider with ChangeNotifier {
         EstateModel estate = await EstateModel.fromJson(item);
         estates.add(estate);
       });
-    } catch (e) {
-      print(e);
-    }
+    } catch (e) {}
     data["estates"] = estates;
-    print(data);
     return data;
   }
+
+  // Begin
+  // Search
+  List _sorting = ["latest", "cheapest", "expensive"];
+  Map<String, dynamic> _filters = {
+    "sorting": "latest",
+    "address": "",
+    "minPrice": 0.0,
+    "maxPrice": 0.0,
+    "priceType": null,
+    "facilities": []
+  };
+
+  Map<String, dynamic> get filters {
+    return {..._filters};
+  }
+
+  List<String> get sorting {
+    return [..._sorting];
+  }
+
+  filtersSorting(String sort) {
+    _filters["sorting"] = sort;
+    notifyListeners();
+  }
+
+  filtersAddress(String address) {
+    _filters["address"] = address;
+  }
+
+  filtersMinPrice(double price) {
+    _filters["minPrice"] = price;
+  }
+
+  filtersMaxPrice(double price) {
+    _filters["maxPrice"] = price;
+  }
+
+  filtersPriceType(int priceType) {
+    _filters["priceType"] = priceType;
+  }
+
+  filtersToggleFacility(int id) {
+    if (_filters["facilities"].contains(id))
+      _filters["facilities"].remove(id);
+    else
+      _filters["facilities"].add(id);
+  }
+
+  filtersClear() {
+    _filters = {
+      "sorting": "latest",
+      "address": "",
+      "minPrice": 0.0,
+      "maxPrice": 0.0,
+      "priceType": null,
+      "facilities": []
+    };
+    notifyListeners();
+  }
+  // Search
+  // End
 
   // Get estate by ID
   Future<EstateModel> fetchEstateById(estateId) async {
