@@ -1,21 +1,25 @@
 import 'dart:async';
-
 import 'package:dachaturizm/components/app_bar.dart';
+import 'package:dachaturizm/components/fluid_big_button.dart';
 import 'package:dachaturizm/components/horizontal_ad.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/helpers/call_with_auth.dart';
 import 'package:dachaturizm/helpers/get_ip_address.dart';
-import 'package:dachaturizm/helpers/get_my_location.dart';
+import 'package:dachaturizm/helpers/parse_datetime.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/models/category_model.dart';
+import 'package:dachaturizm/models/estate_rating_model.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/category_provider.dart';
+import 'package:dachaturizm/screens/app/cards_block.dart';
 import 'package:dachaturizm/screens/app/estate/detail_builders.dart';
-import 'package:dachaturizm/screens/auth/login_screen.dart';
+import 'package:dachaturizm/screens/app/estate/rating_results.dart';
+import 'package:dachaturizm/styles/text_styles.dart';
 import 'package:dio/dio.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_locales/flutter_locales.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:share/share.dart';
@@ -38,11 +42,27 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
   int _userId = 0;
   bool _isLiked = false;
   EstateModel? _banner;
-  List<EstateModel> _userEstates = [];
+  List<EstateModel> _similarEstates = [];
+  EstateRatingModel? _estateRating;
+  double _rating = 0;
 
   void showCalendar() {
     setState(() {
       _showCalendar = !_showCalendar;
+    });
+  }
+
+  _saveRating() async {
+    Provider.of<EstateProvider>(context, listen: false)
+        .saveRating(detail.id, _rating)
+        .then((_) {
+      Provider.of<EstateProvider>(context, listen: false)
+          .getEstateRatings(detail.id)
+          .then((value) {
+        setState(() {
+          _estateRating = value;
+        });
+      });
     });
   }
 
@@ -57,7 +77,7 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
             .getUserId()
             .then((userId) {
           if (userId != null) {
-            _userId = int.parse(userId);
+            _userId = userId;
           }
         }),
         Provider.of<EstateProvider>(context, listen: false)
@@ -70,14 +90,24 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
             detail = estate;
             _isLiked = estate.isLiked;
             _detailBuilder = DetailBuilder(detail);
-            Future.delayed(Duration(seconds: 1)).then(
-              (_) => setState(() {
-                isLoading = false;
-              }),
-            );
           });
         }),
+        Provider.of<EstateProvider>(context, listen: false)
+            .getEstateRatings(args["id"])
+            .then((value) {
+          _estateRating = value;
+        }),
+        Provider.of<EstateProvider>(context, listen: false)
+            .getSimilarEstates(args["id"])
+            .then((value) {
+          _similarEstates = value;
+        }),
       ]).then((_) async {
+        Future.delayed(Duration(seconds: 1)).then(
+          (_) => setState(() {
+            isLoading = false;
+          }),
+        );
         Dio dio = Provider.of<AuthProvider>(context, listen: false).dio;
         final ip = await getPublicIP(dio);
         if (ip == null) {
@@ -119,7 +149,11 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
                         children: [
                           Visibility(
                             visible: _banner != null,
-                            child: HorizontalAd(_banner as EstateModel),
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.only(top: defaultPadding),
+                              child: HorizontalAd(_banner as EstateModel),
+                            ),
                           ),
                           _detailBuilder.buildSlideShow(),
                           Padding(
@@ -132,11 +166,11 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
                                 _detailBuilder.buildTitle(),
                                 _detailBuilder.buildRatingRow(context),
                                 _detailBuilder.buildPriceRow(
-                                    context, showCalendar),
-                                _showCalendar
-                                    ? _detailBuilder
-                                        .buildCustomCalendar(context)
-                                    : SizedBox(),
+                                  context,
+                                  showCalendar,
+                                ),
+                                _detailBuilder.buildCustomCalendar(
+                                    context, _showCalendar),
                                 _detailBuilder.drawDivider(),
                                 SizedBox(height: defaultPadding),
                                 _detailBuilder.buildDescription(context),
@@ -146,15 +180,13 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
                                 ),
                                 _detailBuilder.buildChips(),
                                 _detailBuilder.buildAnnouncerBox(context),
-                                Visibility(
-                                  visible: _userEstates.length > 0,
-                                  child: Column(
-                                    children: [
-                                      Text(Locales.string(
-                                          context, "similar_estates"))
-                                    ],
-                                  ),
-                                ),
+                                buildRatingResults(context, _estateRating),
+                                SizedBox(height: 20),
+                                _buildRatingSaver(context),
+                                SizedBox(height: 10),
+                                _buildSimilarEstates(context),
+                                SizedBox(height: 10),
+                                _buildExtraInfo(context)
                               ],
                             ),
                           ),
@@ -166,6 +198,80 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
                 ],
               ),
       ),
+    );
+  }
+
+  Widget _buildExtraInfo(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          "${Locales.string(context, 'id_number')} ${detail.id}",
+          style: TextStyles.display8(),
+        ),
+        Text(
+          "${Locales.string(context, 'placed')} ${parseDateTime(detail.created)}",
+          style: TextStyles.display8(),
+        ),
+        Text(
+          "${Locales.string(context, 'views')} ${detail.views}",
+          style: TextStyles.display8(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSimilarEstates(BuildContext context) {
+    return Visibility(
+      visible: true,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            Locales.string(context, "similar_estates"),
+            style: TextStyles.display7(),
+          ),
+          SizedBox(height: 10),
+          buildCardsBlock(context, _similarEstates, padding: EdgeInsets.all(0)),
+        ],
+      ),
+    );
+  }
+
+  Column _buildRatingSaver(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        RatingBar.builder(
+          initialRating: 0,
+          minRating: 1,
+          direction: Axis.horizontal,
+          allowHalfRating: false,
+          itemCount: 5,
+          itemSize: 30,
+          itemBuilder: (context, _) => Icon(
+            Icons.star_rounded,
+            color: Colors.amber,
+          ),
+          onRatingUpdate: (rating) {
+            _rating = rating;
+          },
+        ),
+        SizedBox(height: 10),
+        FluidBigButton(
+          onPress: _saveRating,
+          text: Locales.string(context, "send"),
+          size: Size(180, 36),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+        SizedBox(height: 10),
+        Divider(
+          height: 1,
+          color: lightGrey,
+        )
+      ],
     );
   }
 

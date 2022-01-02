@@ -7,6 +7,7 @@ import 'package:dachaturizm/models/user_model.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/screens/app/navigational_app_screen.dart';
+import 'package:dachaturizm/screens/app/user_extra_details.dart';
 import 'package:dachaturizm/styles/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
@@ -76,7 +77,7 @@ class _UserEstatesScreenState extends State<UserEstatesScreen> {
             : SingleChildScrollView(
                 child: Column(
                   children: [
-                    buildUserDetails(_user),
+                    buildUserDetails(context, _user),
                     Container(
                       width: 100.w,
                       padding: EdgeInsets.fromLTRB(
@@ -126,79 +127,6 @@ class _UserEstatesScreenState extends State<UserEstatesScreen> {
                 ),
               ),
       ),
-    );
-  }
-
-  Widget buildUserDetails(UserModel? user) {
-    return Container(
-      height: 150,
-      padding: EdgeInsets.symmetric(horizontal: defaultPadding),
-      child: Row(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(38),
-            child: Container(
-              width: 75,
-              height: 75,
-              child: user!.photo.length > 0
-                  ? Image.network(
-                      user.photo,
-                      fit: BoxFit.cover,
-                    )
-                  : Image.asset(
-                      "assets/images/user.png",
-                      fit: BoxFit.cover,
-                    ),
-            ),
-          ),
-          SizedBox(width: defaultPadding),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _user!.fullname,
-                  style: TextStyles.display2().copyWith(
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                SizedBox(height: defaultPadding * 3 / 4),
-                _buildUserDetailPair(
-                  Locales.string(context, "id_number"),
-                  "# ${user.id}",
-                ),
-                SizedBox(height: defaultPadding / 2),
-                _buildUserDetailPair(
-                  "${Locales.string(context, 'phone')}:",
-                  "+" + user.phone,
-                ),
-                SizedBox(height: defaultPadding / 2),
-                _buildUserDetailPair(
-                  Locales.string(context, "number_of_ads"),
-                  user.adsCount.toString(),
-                ),
-              ],
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-  Widget _buildUserDetailPair(String title, String value) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          title,
-          style: TextStyles.display8(),
-        ),
-        Text(
-          value,
-          style: TextStyles.display8(),
-        ),
-      ],
     );
   }
 }

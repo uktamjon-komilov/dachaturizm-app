@@ -1,41 +1,50 @@
+import 'package:dachaturizm/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:sizer/sizer.dart';
-import '../constants.dart';
 
 class FluidBigButton extends StatelessWidget {
-  const FluidBigButton(
-    this.text, {
-    required this.onPress,
+  const FluidBigButton({
     Key? key,
+    required this.onPress,
+    this.text,
     this.disabled = false,
+    this.size,
+    this.child,
+    this.shape,
   }) : super(key: key);
 
-  final String text;
-  final VoidCallback onPress;
+  final String? text;
+  final void Function()? onPress;
   final bool disabled;
+  final Size? size;
+  final Widget? child;
+  final OutlinedBorder? shape;
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: disabled ? null : onPress,
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: 14,
-          color: Colors.white,
-          fontWeight: FontWeight.w500,
-          letterSpacing: 0.2,
-          height: 1.28,
-        ),
-      ),
+      onPressed: disabled ? () {} : onPress,
+      child: child ??
+          Text(
+            text ?? "",
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.white,
+              fontWeight: FontWeight.w500,
+              letterSpacing: 0.2,
+              height: 1.28,
+              overflow: TextOverflow.ellipsis,
+            ),
+            maxLines: 1,
+          ),
       style: ElevatedButton.styleFrom(
         primary: normalOrange,
         elevation: 0,
         shadowColor: Colors.transparent,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
-        ),
-        minimumSize: Size(double.infinity, 48),
+        shape: shape ??
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+        minimumSize: size ?? Size(double.infinity, 48),
       ),
     );
   }

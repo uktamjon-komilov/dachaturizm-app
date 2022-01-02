@@ -125,7 +125,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     SizedBox(height: defaultPadding),
-                    FluidBigButton(Locales.string(context, "log_in"),
+                    FluidBigButton(
+                        text: Locales.string(context, "log_in"),
                         onPress: login),
                     SizedBox(height: 1.5 * defaultPadding),
                     TextLinkButton(Locales.string(context, "forgot_password?"),

@@ -111,7 +111,7 @@ class _ResetPasswordStep3State extends State<ResetPasswordStep3> {
                       controller: _confirmPasswordController,
                     ),
                     FluidBigButton(
-                      Locales.string(context, "create_profile"),
+                      text: Locales.string(context, "create_profile"),
                       onPress: () =>
                           resetPassword3(context, data["phone"], data["code"]),
                     ),

@@ -176,39 +176,39 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                     Visibility(
                       visible: _agreeTerms,
                       child: FluidBigButton(
-                          Locales.string(context, "create_profile"),
+                          text: Locales.string(context, "create_profile"),
                           onPress: () {
-                        if (_form.currentState!.validate()) {
-                          setState(() {
-                            _somethingWrong = false;
-                          });
-                          if (_userAlreadyExists) {
-                            Navigator.of(context).pop();
-                          }
-                          Provider.of<AuthProvider>(context, listen: false)
-                              .signUp(
-                                  phone,
-                                  _newPasswordController.text,
-                                  _firstNameController.text,
-                                  _lastNameController.text)
-                              .then((value) {
-                            if (value.containsKey("status") &&
-                                value["status"] == false) {
+                            if (_form.currentState!.validate()) {
                               setState(() {
-                                _somethingWrong = true;
+                                _somethingWrong = false;
                               });
-                            } else if (value.containsKey("id") &&
-                                value["id"] > 0) {
-                              Navigator.of(context)
-                                  .popAndPushNamed(LoginScreen.routeName);
-                            } else {
-                              setState(() {
-                                _userAlreadyExists = true;
+                              if (_userAlreadyExists) {
+                                Navigator.of(context).pop();
+                              }
+                              Provider.of<AuthProvider>(context, listen: false)
+                                  .signUp(
+                                      phone,
+                                      _newPasswordController.text,
+                                      _firstNameController.text,
+                                      _lastNameController.text)
+                                  .then((value) {
+                                if (value.containsKey("status") &&
+                                    value["status"] == false) {
+                                  setState(() {
+                                    _somethingWrong = true;
+                                  });
+                                } else if (value.containsKey("id") &&
+                                    value["id"] > 0) {
+                                  Navigator.of(context)
+                                      .popAndPushNamed(LoginScreen.routeName);
+                                } else {
+                                  setState(() {
+                                    _userAlreadyExists = true;
+                                  });
+                                }
                               });
                             }
-                          });
-                        }
-                      }),
+                          }),
                     ),
                   ],
                 ),

@@ -59,7 +59,7 @@ class _ChooseLangugageScreenState extends State<ChooseLangugageScreen> {
               ),
               SizedBox(height: 52),
               FluidBigButton(
-                Locales.string(context, "next"),
+                text: Locales.string(context, "next"),
                 onPress: () async {
                   if (chosenLang == "") return;
                   changeLocale(context, chosenLang);

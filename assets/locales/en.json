@@ -14,6 +14,7 @@
     "my_favourites": "Favourites",
     "my_profile": "My profile",
     "my_estates": "Announcements",
+    "my_balance": "My balance",
     "my_account_balance": "Balance",
     "messages": "Messages",
     "profile_logout": "Log out",
@@ -140,5 +141,8 @@
     "announcers_other_ads": "All posts by this author",
     "announcer": "Announcer",
     "id_number": "ID number:",
-    "number_of_ads": "Number of ads:"
+    "number_of_ads": "Number of ads:",
+    "rating": "Rating",
+    "send": "Send",
+    "similar_estates": "Similar estates"
 }

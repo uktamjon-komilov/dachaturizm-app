@@ -2,6 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:dachaturizm/components/booked_days_hint.dart';
 import 'package:dachaturizm/components/chips.dart';
+import 'package:dachaturizm/components/fluid_big_button.dart';
+import 'package:dachaturizm/components/fluid_outlined_button.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/helpers/calculate_distance.dart';
 import 'package:dachaturizm/helpers/call_with_auth.dart';
@@ -111,7 +113,7 @@ class DetailBuilder {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Image.asset(
-                      "assets/images/default_map_placeholder.png.png",
+                      "assets/images/default_map_placeholder.png",
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -152,7 +154,7 @@ class DetailBuilder {
     );
   }
 
-  Widget buildCustomCalendar(context) {
+  Widget buildCustomCalendar(context, bool show) {
     final Set<BookingDay> _selectedDays = Set<BookingDay>();
     for (int i = 0; i < detail.bookedDays.length; i++) {
       _selectedDays.add(detail.bookedDays[i]);
@@ -161,47 +163,50 @@ class DetailBuilder {
     DateTime now = DateTime.now();
     DateTime _focusedDay = DateTime.now();
 
-    return Column(
-      children: [
-        drawDivider(),
-        TableCalendar(
-          firstDay: now,
-          lastDay: DateTime.utc(now.year + 1, 12, 31),
-          focusedDay: _focusedDay,
-          locale: Locales.currentLocale(context).toString(),
-          headerStyle: HeaderStyle(
-            formatButtonVisible: false,
-            titleCentered: true,
-            titleTextStyle: TextStyle(
-              color: darkPurple,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
+    return Visibility(
+      visible: show,
+      child: Column(
+        children: [
+          drawDivider(),
+          TableCalendar(
+            firstDay: now,
+            lastDay: DateTime.utc(now.year + 1, 12, 31),
+            focusedDay: _focusedDay,
+            locale: Locales.currentLocale(context).toString(),
+            headerStyle: HeaderStyle(
+              formatButtonVisible: false,
+              titleCentered: true,
+              titleTextStyle: TextStyle(
+                color: darkPurple,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+              titleTextFormatter: (date, locale) =>
+                  "${DateFormat.y(locale).format(date)}, ${DateFormat.MMMM(locale).format(date)}",
             ),
-            titleTextFormatter: (date, locale) =>
-                "${DateFormat.y(locale).format(date)}, ${DateFormat.MMMM(locale).format(date)}",
+            calendarStyle: CalendarStyle(
+              cellMargin: EdgeInsets.all(3),
+              selectedDecoration: BoxDecoration(
+                color: normalOrange,
+                borderRadius: BorderRadius.circular(5),
+              ),
+              todayDecoration: BoxDecoration(
+                color: lightPurple,
+                borderRadius: BorderRadius.circular(5),
+              ),
+              todayTextStyle: TextStyle(
+                color: Colors.white,
+              ),
+            ),
+            selectedDayPredicate: (day) {
+              return _selectedDays.contains(BookingDay.toObj(day));
+              // return true;
+            },
+            startingDayOfWeek: StartingDayOfWeek.monday,
           ),
-          calendarStyle: CalendarStyle(
-            cellMargin: EdgeInsets.all(3),
-            selectedDecoration: BoxDecoration(
-              color: normalOrange,
-              borderRadius: BorderRadius.circular(5),
-            ),
-            todayDecoration: BoxDecoration(
-              color: lightPurple,
-              borderRadius: BorderRadius.circular(5),
-            ),
-            todayTextStyle: TextStyle(
-              color: Colors.white,
-            ),
-          ),
-          selectedDayPredicate: (day) {
-            return _selectedDays.contains(BookingDay.toObj(day));
-            // return true;
-          },
-          startingDayOfWeek: StartingDayOfWeek.monday,
-        ),
-        BookedDaysHint(),
-      ],
+          BookedDaysHint(),
+        ],
+      ),
     );
   }
 
@@ -248,7 +253,7 @@ class DetailBuilder {
             itemCount: 5,
             itemSize: 14,
             itemBuilder: (context, _) => Icon(
-              Icons.star,
+              Icons.star_rounded,
               color: Colors.amber,
             ),
             onRatingUpdate: (rating) {},
@@ -400,71 +405,75 @@ class DetailBuilder {
   }
 
   Widget buildContactBox(context, fromChat, userId) {
-    return userId == detail.userId
-        ? Container()
-        : Container(
-            height: 70,
-            padding: EdgeInsets.symmetric(
-              horizontal: 16,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () {
-                      if (fromChat) {
-                        Navigator.of(context).pop();
-                      } else {
-                        callWithAuth(context, () {
-                          Navigator.of(context)
-                              .pushNamed(ChatScreen.routeName, arguments: {
-                            "estate": detail,
-                            "sender": UserModel(
-                              id: detail.userId,
-                              adsCount: 0,
-                              balance: 0,
-                              firstName: "",
-                              lastName: "",
-                              phone: "",
-                              photo: "",
-                            )
-                          });
-                        });
-                      }
-                    },
-                    style: OutlinedButton.styleFrom(
-                      primary: normalOrange,
-                      backgroundColor: Colors.white,
-                      side: BorderSide(
-                        width: 1,
-                        color: normalOrange,
-                      ),
-                      padding: EdgeInsets.symmetric(vertical: 10),
-                      minimumSize: Size(50.w - 1.5 * defaultPadding, 50),
-                    ),
-                    child: Text(
-                        Locales.string(context, "messaging_with_announcer")),
+    return Visibility(
+      visible: userId != detail.userId,
+      child: Container(
+        height: 70,
+        padding: EdgeInsets.symmetric(
+          horizontal: 16,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              child: FluidOutlinedButton(
+                child: Text(
+                  Locales.string(context, "messaging_with_announcer"),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: normalOrange,
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: 0.1,
+                    height: 1.28,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                SizedBox(
-                  width: 15,
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: normalOrange,
-                    onPrimary: Colors.white,
-                    elevation: 0,
-                    shadowColor: Colors.transparent,
-                    padding: EdgeInsets.symmetric(vertical: 10),
-                    minimumSize: Size(50.w - 1.5 * defaultPadding, 50),
-                  ),
-                  onPressed: () => UrlLauncher.launch("tel://${detail.phone}"),
-                  child: Text(Locales.string(context, "direct_call")),
-                )
-              ],
+                onPress: () {
+                  if (fromChat) {
+                    Navigator.of(context).pop();
+                  } else {
+                    callWithAuth(context, () {
+                      Navigator.of(context)
+                          .pushNamed(ChatScreen.routeName, arguments: {
+                        "estate": detail,
+                        "sender": UserModel(
+                          id: detail.userId,
+                          adsCount: 0,
+                          balance: 0,
+                          firstName: "",
+                          lastName: "",
+                          phone: "",
+                          photo: "",
+                        )
+                      });
+                    });
+                  }
+                },
+              ),
             ),
-          );
+            SizedBox(
+              width: 15,
+            ),
+            Expanded(
+              child: FluidBigButton(
+                onPress: () => UrlLauncher.launch("tel://${detail.phone}"),
+                child: Text(
+                  Locales.string(context, "direct_call"),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: 0.2,
+                    height: 1.28,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
   }
 }

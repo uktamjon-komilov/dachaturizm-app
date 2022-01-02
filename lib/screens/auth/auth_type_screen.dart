@@ -36,14 +36,14 @@ class _AuthTypeScreenState extends State<AuthTypeScreen> {
               ),
               SizedBox(height: 90),
               FluidBigButton(
-                Locales.string(context, "register"),
+                text: Locales.string(context, "register"),
                 onPress: () {
                   Navigator.of(context).pushNamed(RegisterScreen.routeName);
                 },
               ),
               SizedBox(height: 12),
               FluidOutlinedButton(
-                Locales.string(context, "log_in"),
+                text: Locales.string(context, "log_in"),
                 onPress: () {
                   Navigator.of(context).pushNamed(LoginScreen.routeName);
                 },

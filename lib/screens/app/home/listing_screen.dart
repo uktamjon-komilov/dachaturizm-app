@@ -8,6 +8,7 @@ import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/models/category_model.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
+import 'package:dachaturizm/screens/app/cards_block.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
@@ -214,7 +215,7 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
                             ),
                           ),
                         ),
-                        _buildCardsBlock(context, _currentEstates),
+                        buildCardsBlock(context, _currentEstates),
                         Visibility(
                           visible: _currentEstates!.length == 0,
                           child: Padding(
@@ -258,26 +259,5 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
     _searchController.dispose();
     _scrollController.dispose();
     super.dispose();
-  }
-
-  Widget _buildCardsBlock(BuildContext context, List? estates) {
-    return estates!.length == 0
-        ? Container()
-        : Container(
-            width: 100.w,
-            padding: EdgeInsets.fromLTRB(
-              defaultPadding,
-              0,
-              defaultPadding,
-              0,
-            ),
-            child: Wrap(
-              alignment: WrapAlignment.spaceBetween,
-              runSpacing: 6,
-              children: [
-                ...estates.map((estate) => EstateCard(estate: estate)).toList(),
-              ],
-            ),
-          );
   }
 }

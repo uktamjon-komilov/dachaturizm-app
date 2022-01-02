@@ -14,7 +14,8 @@
     "my_favourites": "Yoqtirganlarim",
     "my_profile": "Mening profilim",
     "my_estates": "E'lonlarim",
-    "my_account_balance": "Balans",
+    "my_balance": "Balansim",
+    "my_account_balance": "Balans:",
     "messages": "Xabarlar",
     "profile_logout": "Chiqish",
     "change_language": "Tilni o'zgartirish",
@@ -76,7 +77,7 @@
     "advertise": "Reklama qilish",
     "edit": "Tahrirlash",
     "my_announcements": "Mening e'lonlarim",
-    "placed": "Joylashtirilgan:",
+    "placed": "Joylandi:",
     "views": "Koʻrildi:",
     "ad": "Reklama",
     "banner": "Banner",
@@ -140,5 +141,8 @@
     "announcers_other_ads": "Muallifning barcha e’lonlari",
     "announcer": "E’lon beruvchi",
     "id_number": "ID raqam:",
-    "number_of_ads": "E'lonlar soni:"
+    "number_of_ads": "E'lonlar soni:",
+    "rating": "Baholash",
+    "send": "Yuborish",
+    "similar_estates": "O’xshash e’lonlar"
 }

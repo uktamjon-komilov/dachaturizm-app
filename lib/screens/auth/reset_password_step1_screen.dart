@@ -91,7 +91,7 @@ class _ResetPasswordStep1State extends State<ResetPasswordStep1> {
                         ),
                         SizedBox(height: defaultPadding),
                         FluidBigButton(
-                          Locales.string(context, "next"),
+                          text: Locales.string(context, "next"),
                           onPress: () => resetPasswordStep1(context),
                         ),
                         SizedBox(height: defaultPadding * 1.5),

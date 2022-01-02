@@ -4,6 +4,7 @@ import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/helpers/locale_helper.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/models/category_model.dart';
+import 'package:dachaturizm/models/estate_rating_model.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
@@ -244,6 +245,42 @@ class EstateProvider with ChangeNotifier {
     if (response.data.length == 0) return null;
     EstateModel estate = await EstateModel.fromJson(response.data);
     return estate;
+  }
+
+  // Get estate ratings
+  Future<EstateRatingModel> getEstateRatings(int estateId) async {
+    final url = "${baseUrl}api/ratings/${estateId}/related/";
+    Response response = await dio.get(url);
+    return EstateRatingModel.fromJson(response.data);
+  }
+
+  // Save estate rating
+  Future saveRating(int estateId, double rating) async {
+    const url = "${baseUrl}api/ratings/";
+    final userId = await auth.getUserId();
+    final access = await auth.getAccessToken();
+    Map<String, dynamic> data = {
+      "estate": estateId,
+      "user": userId,
+      "rating": rating,
+    };
+    final response = await dio.post(
+      url,
+      data: data,
+      options: Options(headers: {"Authorization": "Bearer ${access}"}),
+    );
+  }
+
+  // Get similar estates
+  Future<List<EstateModel>> getSimilarEstates(int estateId) async {
+    List<EstateModel> estates = [];
+    final url = "${baseUrl}api/estate/${estateId}/similar/";
+    final response = await dio.get(url);
+    await response.data.forEach((item) async {
+      EstateModel estate = await EstateModel.fromJson(item);
+      estates.add(estate);
+    });
+    return estates.sublist(0, 2);
   }
 
   // Get user's estates

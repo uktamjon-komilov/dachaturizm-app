@@ -72,7 +72,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         SizedBox(height: defaultPadding),
                         FluidBigButton(
-                          Locales.string(context, "next"),
+                          text: Locales.string(context, "next"),
                           onPress: () {
                             String phone =
                                 _phoneController.text.replaceAll(" ", "");

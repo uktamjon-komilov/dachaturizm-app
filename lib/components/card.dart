@@ -43,7 +43,7 @@ class _EstateCardState extends State<EstateCard> {
       decoration: BoxDecoration(boxShadow: [
         BoxShadow(
           offset: Offset(0, 2),
-          blurRadius: 4,
+          blurRadius: 15,
           color: Colors.black.withOpacity(0.07),
         )
       ]),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 const darkPurple = Color(0xFF3B2F43);
+const purplish = Color(0xFF323232);
 const lightPurple = Color(0xAA3B2F43);
 const yellowish = Color(0xFFFFC833);
 const normalOrange = Color(0xFFF17C31);
@@ -14,3 +15,15 @@ const favouriteRed = Color(0xFFEB5757);
 const double defaultPadding = 20.0;
 const baseUrl = "https://dachaturzm.uz/";
 const baseFrontUrl = "https://dachaturizm.uz/";
+const ratingColor1 = Color(0xFF76DC99);
+const ratingColor2 = Color(0xFFB7EA83);
+const ratingColor3 = Color(0xFFF6D757);
+const ratingColor4 = Color(0xFFFBA625);
+const ratingColor5 = Color(0xFFF17C31);
+const ratingColors = [
+  ratingColor1,
+  ratingColor2,
+  ratingColor3,
+  ratingColor4,
+  ratingColor5
+];
