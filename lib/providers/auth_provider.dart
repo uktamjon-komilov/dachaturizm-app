@@ -69,7 +69,7 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  dynamic getUserId() async {
+  Future getUserId() async {
     if (_userId != 0) {
       final result = _userId;
       return result;
@@ -339,6 +339,13 @@ class AuthProvider with ChangeNotifier {
       print(e);
     }
     return data;
+  }
+
+  Future<UserModel> getUser(int userId) async {
+    final url = "${baseUrl}api/users/${userId}";
+    final response = await dio.get(url);
+    UserModel user = UserModel.fromJson(response.data);
+    return user;
   }
 
   Future<Map<String, bool>> resetPasswordBase(String url, dynamic data) async {

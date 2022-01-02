@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dachaturizm/components/booked_days_hint.dart';
 import 'package:dachaturizm/components/normal_input.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/helpers/call_with_auth.dart';
@@ -1007,29 +1008,5 @@ class VerticalHorizontalSizedBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(height: defaultPadding);
-  }
-}
-
-class BookedDaysHint extends StatelessWidget {
-  const BookedDaysHint({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 20,
-          height: 20,
-          decoration: BoxDecoration(
-            color: normalOrange,
-            borderRadius: BorderRadius.circular(5),
-          ),
-        ),
-        SizedBox(width: 10),
-        Text(Locales.string(context, "booked_days")),
-      ],
-    );
   }
 }

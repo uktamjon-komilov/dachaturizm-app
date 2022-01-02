@@ -2,21 +2,20 @@ import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/screens/app/estate/estate_detail_screen.dart';
 import "package:flutter/material.dart";
+import 'package:sizer/sizer.dart';
 
 class HorizontalAd extends StatelessWidget {
   const HorizontalAd(
     this.estate, {
     Key? key,
-    this.width = null,
+    this.width,
   }) : super(key: key);
 
   final EstateModel estate;
-  final width;
+  final double? width;
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-
     return GestureDetector(
       onTap: () {
         Navigator.of(context).pushNamed(EstateDetailScreen.routeName,
@@ -24,8 +23,7 @@ class HorizontalAd extends StatelessWidget {
       },
       child: Container(
         height: 150,
-        width: width == null ? (size.width - 2 * defaultPadding) : width,
-        margin: EdgeInsets.symmetric(vertical: 20),
+        width: width == null ? (100.w - 2 * defaultPadding) : width,
         decoration:
             BoxDecoration(borderRadius: BorderRadius.circular(10), boxShadow: [
           BoxShadow(

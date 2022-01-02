@@ -33,14 +33,11 @@ class EstateProvider with ChangeNotifier {
   }
 
   Future<Response> _fetch(String url) async {
-    print(100);
     Map<String, dynamic> headers = await getHeaders();
-    print(200);
     Response response = await dio.get(
       url,
       options: Options(headers: headers),
     );
-    print(300);
     return response;
   }
 
@@ -233,11 +230,33 @@ class EstateProvider with ChangeNotifier {
   }
 
   // Get estate by ID
-  Future<EstateModel> fetchEstateById(estateId) async {
+  Future<EstateModel> getEstateById(int estateId) async {
     final url = "${baseUrl}api/estate/${estateId}/";
-    var extractedData = await _fetch(url);
-    var estate = await EstateModel.fromJson(extractedData);
+    Response response = await _fetch(url);
+    var estate = await EstateModel.fromJson(response.data);
     return estate;
+  }
+
+  // Get detail page ad
+  Future<EstateModel?> getAd() async {
+    const url = "${baseUrl}api/estate/ads/";
+    Response response = await _fetch(url);
+    if (response.data.length == 0) return null;
+    EstateModel estate = await EstateModel.fromJson(response.data);
+    return estate;
+  }
+
+  // Get user's estates
+  Future<List<EstateModel>> getUserEstates(int userId) async {
+    List<EstateModel> estates = [];
+    const url = "${baseUrl}api/users/estates/";
+    Map<String, dynamic> data = {"user": userId};
+    final response = await dio.post(url, data: data);
+    await response.data.forEach((item) async {
+      EstateModel estate = await EstateModel.fromJson(item);
+      estates.add(estate);
+    });
+    return estates;
   }
 
   // Prepare data for creation/updating

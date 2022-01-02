@@ -1,6 +1,9 @@
 import 'dart:async';
 
+import 'package:dachaturizm/components/app_bar.dart';
+import 'package:dachaturizm/components/horizontal_ad.dart';
 import 'package:dachaturizm/constants.dart';
+import 'package:dachaturizm/helpers/call_with_auth.dart';
 import 'package:dachaturizm/helpers/get_ip_address.dart';
 import 'package:dachaturizm/helpers/get_my_location.dart';
 import 'package:dachaturizm/models/estate_model.dart';
@@ -13,9 +16,8 @@ import 'package:dachaturizm/screens/auth/login_screen.dart';
 import 'package:dio/dio.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_locales/flutter_locales.dart';
-import 'package:location/location.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:sizer/sizer.dart';
 import 'package:share/share.dart';
 
 class EstateDetailScreen extends StatefulWidget {
@@ -35,20 +37,8 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
   var _location;
   int _userId = 0;
   bool _isLiked = false;
-
-  _showLoginScreen() async {
-    await Navigator.of(context).pushNamed(LoginScreen.routeName);
-  }
-
-  Future callWithAuth([Function? callback]) async {
-    final access = await Provider.of<AuthProvider>(context, listen: false)
-        .getAccessToken();
-    if (access != "") {
-      if (callback != null) callback();
-    } else {
-      await _showLoginScreen();
-    }
-  }
+  EstateModel? _banner;
+  List<EstateModel> _userEstates = [];
 
   void showCalendar() {
     setState(() {
@@ -56,37 +46,138 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
     });
   }
 
-  PreferredSizeWidget _buildAppBar(EstateModel estate) {
-    String share_url = "https://dachaturizm.uz/";
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final Map args = ModalRoute.of(context)?.settings.arguments as Map;
+
+    Future.delayed(Duration.zero).then((_) async {
+      Future.wait([
+        Provider.of<AuthProvider>(context, listen: false)
+            .getUserId()
+            .then((userId) {
+          if (userId != null) {
+            _userId = int.parse(userId);
+          }
+        }),
+        Provider.of<EstateProvider>(context, listen: false)
+            .getAd()
+            .then((value) => _banner = value),
+        Provider.of<EstateProvider>(context, listen: false)
+            .getEstateById(args["id"])
+            .then((estate) async {
+          setState(() {
+            detail = estate;
+            _isLiked = estate.isLiked;
+            _detailBuilder = DetailBuilder(detail);
+            Future.delayed(Duration(seconds: 1)).then(
+              (_) => setState(() {
+                isLoading = false;
+              }),
+            );
+          });
+        }),
+      ]).then((_) async {
+        Dio dio = Provider.of<AuthProvider>(context, listen: false).dio;
+        final ip = await getPublicIP(dio);
+        if (ip == null) {
+        } else {
+          Provider.of<EstateProvider>(context, listen: false)
+              .addEstateView(ip, detail.id);
+        }
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final Map args = ModalRoute.of(context)?.settings.arguments as Map;
+    bool fromChat = args.containsKey("fromChat");
+
+    String share_url = "${baseFrontUrl}";
     String share_title = "Look I have discovered something!";
     try {
       List<CategoryModel> categories =
           Provider.of<EstateTypesProvider>(context, listen: false).categories;
       CategoryModel type =
-          categories.where((item) => item.id == estate.typeId).first;
-      share_url = "https://dachaturizm.uz/estate/${type.slug}/${estate.id}/";
-    } catch (e) {
-      share_url = "https://dachaturizm.uz/";
-    }
+          categories.where((item) => item.id == detail.typeId).first;
+      share_url += "estate/${type.slug}/${detail.id}/";
+    } catch (e) {}
 
-    return AppBar(
-      elevation: 0.5,
-      backgroundColor: Colors.white,
-      iconTheme: IconThemeData(
-        color: darkPurple,
+    return SafeArea(
+      child: Scaffold(
+        appBar: _buildAppBar(context, share_url, share_title),
+        body: isLoading
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          Visibility(
+                            visible: _banner != null,
+                            child: HorizontalAd(_banner as EstateModel),
+                          ),
+                          _detailBuilder.buildSlideShow(),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: defaultPadding,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _detailBuilder.buildTitle(),
+                                _detailBuilder.buildRatingRow(context),
+                                _detailBuilder.buildPriceRow(
+                                    context, showCalendar),
+                                _showCalendar
+                                    ? _detailBuilder
+                                        .buildCustomCalendar(context)
+                                    : SizedBox(),
+                                _detailBuilder.drawDivider(),
+                                SizedBox(height: defaultPadding),
+                                _detailBuilder.buildDescription(context),
+                                _detailBuilder.buildAddressBox(
+                                  context,
+                                  _location,
+                                ),
+                                _detailBuilder.buildChips(),
+                                _detailBuilder.buildAnnouncerBox(context),
+                                Visibility(
+                                  visible: _userEstates.length > 0,
+                                  child: Column(
+                                    children: [
+                                      Text(Locales.string(
+                                          context, "similar_estates"))
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  _detailBuilder.buildContactBox(context, fromChat, _userId),
+                ],
+              ),
       ),
-      title: Text(
-        Locales.string(context, "detail"),
-        style: TextStyle(color: darkPurple),
-      ),
-      centerTitle: true,
-      leading: IconButton(
-        onPressed: () {
-          Navigator.of(context).pop();
-        },
-        icon: Icon(Icons.arrow_back),
-      ),
-      actions: [
+    );
+  }
+
+  AppBar _buildAppBar(
+      BuildContext context, String share_url, String share_title) {
+    return buildNavigationalAppBar(
+      context,
+      Locales.string(context, "detail"),
+      () {
+        Navigator.of(context).pop();
+      },
+      [
         IconButton(
           onPressed: () {
             Share.share(
@@ -94,19 +185,20 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
               subject: share_title,
             );
           },
-          icon: Icon(
-            Icons.send_rounded,
+          icon: SvgPicture.asset(
+            "assets/icons/share.svg",
+            color: darkPurple,
           ),
         ),
         IconButton(
           onPressed: () async {
             bool original = _isLiked;
-            await callWithAuth(() async {
+            await callWithAuth(context, () async {
               setState(() {
                 _isLiked = !_isLiked;
               });
               Provider.of<EstateProvider>(context, listen: false)
-                  .toggleWishlist(estate.id, original)
+                  .toggleWishlist(detail.id, original)
                   .then((value) {
                 if (value == null) {
                   setState(() {
@@ -122,102 +214,10 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
           },
           icon: Icon(
             _isLiked ? Icons.favorite : Icons.favorite_border_rounded,
-            color: _isLiked ? Colors.red : Colors.black,
+            color: _isLiked ? favouriteRed : darkPurple,
           ),
         ),
       ],
-    );
-  }
-
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    final Map args = ModalRoute.of(context)?.settings.arguments as Map;
-
-    // Future.delayed(Duration.zero).then((_) async {
-    //   getLocation().then((location) {
-    //     _location = location;
-    //   });
-    //   Provider.of<EstateProvider>(context, listen: false)
-    //       .fetchEstateById(args["id"])
-    //       .then((estate) async {
-    //     _userId =
-    //         await Provider.of<AuthProvider>(context, listen: false).getUserId();
-    //     setState(() {
-    //       detail = estate;
-    //       _isLiked = estate.isLiked;
-    //       _detailBuilder = DetailBuilder(detail);
-
-    //       Future.delayed(Duration(seconds: 1)).then(
-    //         (_) => setState(() {
-    //           isLoading = false;
-    //         }),
-    //       );
-    //     });
-    //     Dio dio = Provider.of<AuthProvider>(context, listen: false).dio;
-    //     final ip = await getPublicIP(dio);
-    //     if (ip == null) {
-    //     } else {
-    //       Provider.of<EstateProvider>(context, listen: false)
-    //           .addEstateView(ip, detail.id);
-    //     }
-    //   });
-    // });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final Map args = ModalRoute.of(context)?.settings.arguments as Map;
-    final int estateId = args["id"];
-    bool fromChat = args.containsKey("fromChat");
-
-    return SafeArea(
-      child: Scaffold(
-        appBar: _buildAppBar(detail),
-        body: isLoading
-            ? Center(
-                child: CircularProgressIndicator(),
-              )
-            : Column(
-                children: [
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          _detailBuilder.buildSlideShow(),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: defaultPadding,
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _detailBuilder.buildTitle(),
-                                _detailBuilder.buildRatingRow(context),
-                                _detailBuilder.buildPriceRow(
-                                    context, showCalendar),
-                                _detailBuilder.drawDivider(),
-                                _showCalendar
-                                    ? _detailBuilder
-                                        .buildCustomCalendar(context)
-                                    : SizedBox(),
-                                _detailBuilder.drawDivider(),
-                                _detailBuilder.buildDescription(context),
-                                _detailBuilder.buildAddressBox(
-                                    context, _location),
-                                _detailBuilder.buildChips(),
-                                _detailBuilder.buildAnnouncerBox(context),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  _detailBuilder.buildContactBox(context, fromChat, _userId),
-                ],
-              ),
-      ),
     );
   }
 }

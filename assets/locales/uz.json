@@ -136,5 +136,9 @@
     "address": "Manzil",
     "set_price": "Narx oralig'ini belgilang",
     "extra_filters": "Qo'shimcha filterlar",
-    "show_results": "Natijalarni ko'rsatish"
+    "show_results": "Natijalarni ko'rsatish",
+    "announcers_other_ads": "Muallifning barcha e’lonlari",
+    "announcer": "E’lon beruvchi",
+    "id_number": "ID raqam:",
+    "number_of_ads": "E'lonlar soni:"
 }

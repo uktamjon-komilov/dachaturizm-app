@@ -2,6 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:dachaturizm/constants.dart';
 
 class TextStyles {
+  static TextStyle display8() {
+    return TextStyle(
+      fontSize: 12,
+      height: 1.33,
+      color: darkPurple,
+      fontWeight: FontWeight.w400,
+    );
+  }
+
+  static TextStyle display7() {
+    return TextStyle(
+      fontSize: 16,
+      color: darkPurple,
+      fontWeight: FontWeight.w600,
+    );
+  }
+
   static TextStyle display6() {
     return TextStyle(
       color: Colors.white,

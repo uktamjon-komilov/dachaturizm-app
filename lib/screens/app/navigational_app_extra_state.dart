@@ -7,6 +7,7 @@ import 'package:dachaturizm/screens/app/user/user_screen.dart';
 class NavigationalExtraState {
   final screens = [
     HomePageScreen(),
+    HomePageScreen(),
     // SearchPageScreen(),
     EstateCreationPageScreen(),
     ChatListScreen(),

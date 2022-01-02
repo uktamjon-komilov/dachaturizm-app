@@ -136,5 +136,9 @@
     "address": "Address",
     "set_price": "Set price range",
     "extra_filters": "Extra filters",
-    "show_results": "Show results"
+    "show_results": "Show results",
+    "announcers_other_ads": "All posts by this author",
+    "announcer": "Announcer",
+    "id_number": "ID number:",
+    "number_of_ads": "Number of ads:"
 }

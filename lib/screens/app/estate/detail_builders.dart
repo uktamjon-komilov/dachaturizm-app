@@ -1,4 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
+import 'package:dachaturizm/components/booked_days_hint.dart';
 import 'package:dachaturizm/components/chips.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/helpers/calculate_distance.dart';
@@ -8,6 +10,8 @@ import 'package:dachaturizm/models/booking_day.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/models/user_model.dart';
 import 'package:dachaturizm/screens/app/chat/chat_screen.dart';
+import 'package:dachaturizm/screens/app/estate/user_estates_screen.dart';
+import 'package:dachaturizm/styles/text_styles.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
 import 'package:flutter_locales/flutter_locales.dart';
@@ -42,100 +46,99 @@ class DetailBuilder {
           location.latitude, location.longitude);
     }
 
-    return (detail.longtitute == 0.0 && detail.latitute == 0.0)
-        ? Container()
-        : Container(
-            padding: EdgeInsets.all(10),
-            margin: EdgeInsets.symmetric(vertical: 20),
-            height: 100,
-            decoration: BoxDecoration(
-              color: lightGrey,
-              borderRadius: BorderRadius.circular(20),
+    return Visibility(
+      visible: (detail.longtitute != 0.0 && detail.latitute != 0.0),
+      child: Container(
+        padding: EdgeInsets.all(10),
+        margin: EdgeInsets.symmetric(vertical: 20),
+        height: 100,
+        decoration: BoxDecoration(
+          color: lightGrey,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Visibility(
+              visible: detail.address.length > 0,
+              child: Expanded(
+                flex: 2,
+                child: Icon(Icons.share_location_rounded, size: 25),
+              ),
             ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: Icon(Icons.share_location_rounded, size: 25),
-                ),
-                Expanded(
-                  flex: 9,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        detail.address,
-                        style: TextStyle(
-                            fontSize: 12,
-                            height: 1.33,
-                            fontWeight: FontWeight.w600,
-                            color: darkPurple),
-                      ),
-                      (location == null || distance == 0.0)
-                          ? Container()
-                          : Text(
-                              "${Locales.string(context, 'km_from_you_1')} ${distance} ${Locales.string(context, 'km_from_you_2')}",
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w400,
-                                color: darkPurple,
-                              ),
-                            )
-                    ],
-                  ),
-                ),
-                Expanded(
-                  flex: 10,
-                  child: GestureDetector(
-                    onTap: () {
-                      UrlLauncher.launch(
-                          "https://www.google.com/maps/search/?api=1&query=${detail.longtitute},${detail.latitute}");
-                    },
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Image.network(
-                          "https://www.google.com/maps/d/u/0/thumbnail?mid=1gCp14XBdnEqKjRPIYCzR6MU9oMo&hl=en",
-                          fit: BoxFit.cover,
-                        ),
+            Visibility(
+              visible: detail.address.length > 0,
+              child: Expanded(
+                flex: 9,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      detail.address,
+                      style: TextStyle(
+                        fontSize: 12,
+                        height: 1.33,
+                        fontWeight: FontWeight.w600,
+                        color: darkPurple,
                       ),
                     ),
-                  ),
-                )
-              ],
+                    Visibility(
+                      visible: (location != null || distance != 0.0),
+                      child: Text(
+                        "${Locales.string(context, 'km_from_you_1')} ${distance} ${Locales.string(context, 'km_from_you_2')}",
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w400,
+                          color: darkPurple,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
             ),
-          );
+            Expanded(
+              child: GestureDetector(
+                onTap: () {
+                  UrlLauncher.launch(
+                      "https://www.google.com/maps/search/?api=1&query=${detail.longtitute},${detail.latitute}");
+                },
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Image.asset(
+                      "assets/images/default_map_placeholder.png.png",
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
   }
 
   Column buildDescription(context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              Locales.string(context, "detail"),
-              style: TextStyle(
-                  fontSize: 16, color: darkPurple, fontWeight: FontWeight.w600),
-            ),
-            Text("ID: #${detail.id}"),
-          ],
+        Text(
+          Locales.string(context, "detail"),
+          style: TextStyles.display7(),
         ),
-        SizedBox(
-          height: 10,
-        ),
+        SizedBox(height: defaultPadding),
         Text(
           detail.description,
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w400,
-            height: 1.5,
+            height: 1.4,
           ),
         ),
       ],
@@ -149,7 +152,7 @@ class DetailBuilder {
     );
   }
 
-  TableCalendar<dynamic> buildCustomCalendar(context) {
+  Widget buildCustomCalendar(context) {
     final Set<BookingDay> _selectedDays = Set<BookingDay>();
     for (int i = 0; i < detail.bookedDays.length; i++) {
       _selectedDays.add(detail.bookedDays[i]);
@@ -158,50 +161,58 @@ class DetailBuilder {
     DateTime now = DateTime.now();
     DateTime _focusedDay = DateTime.now();
 
-    return TableCalendar(
-      firstDay: now,
-      lastDay: DateTime.utc(now.year + 1, 12, 31),
-      focusedDay: _focusedDay,
-      locale: Locales.currentLocale(context).toString(),
-      headerStyle: HeaderStyle(
-        formatButtonVisible: false,
-        titleCentered: true,
-        titleTextStyle: TextStyle(
-          color: darkPurple,
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
+    return Column(
+      children: [
+        drawDivider(),
+        TableCalendar(
+          firstDay: now,
+          lastDay: DateTime.utc(now.year + 1, 12, 31),
+          focusedDay: _focusedDay,
+          locale: Locales.currentLocale(context).toString(),
+          headerStyle: HeaderStyle(
+            formatButtonVisible: false,
+            titleCentered: true,
+            titleTextStyle: TextStyle(
+              color: darkPurple,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+            titleTextFormatter: (date, locale) =>
+                "${DateFormat.y(locale).format(date)}, ${DateFormat.MMMM(locale).format(date)}",
+          ),
+          calendarStyle: CalendarStyle(
+            cellMargin: EdgeInsets.all(3),
+            selectedDecoration: BoxDecoration(
+              color: normalOrange,
+              borderRadius: BorderRadius.circular(5),
+            ),
+            todayDecoration: BoxDecoration(
+              color: lightPurple,
+              borderRadius: BorderRadius.circular(5),
+            ),
+            todayTextStyle: TextStyle(
+              color: Colors.white,
+            ),
+          ),
+          selectedDayPredicate: (day) {
+            return _selectedDays.contains(BookingDay.toObj(day));
+            // return true;
+          },
+          startingDayOfWeek: StartingDayOfWeek.monday,
         ),
-        titleTextFormatter: (date, locale) =>
-            "${DateFormat.y(locale).format(date)}, ${DateFormat.MMMM(locale).format(date)}",
-      ),
-      calendarStyle: CalendarStyle(
-        cellMargin: EdgeInsets.all(3),
-        selectedDecoration: BoxDecoration(
-          color: normalOrange,
-          borderRadius: BorderRadius.circular(5),
-        ),
-        todayDecoration: BoxDecoration(
-          color: lightPurple,
-          borderRadius: BorderRadius.circular(5),
-        ),
-        todayTextStyle: TextStyle(
-          color: Colors.white,
-        ),
-      ),
-      selectedDayPredicate: (day) {
-        return _selectedDays.contains(BookingDay.toObj(day));
-        // return true;
-      },
-      startingDayOfWeek: StartingDayOfWeek.monday,
+        BookedDaysHint(),
+      ],
     );
   }
 
   Row buildPriceRow(context, callback) {
+    final NumberFormat formatter = NumberFormat("#,##0.00", "en_US");
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          "${detail.weekdayPrice} ${detail.priceType}",
+          "${formatter.format(detail.weekdayPrice)} ${detail.priceType}",
           style: TextStyle(
             color: normalOrange,
             fontSize: 16,
@@ -235,7 +246,7 @@ class DetailBuilder {
             direction: Axis.horizontal,
             allowHalfRating: true,
             itemCount: 5,
-            itemSize: 25.0,
+            itemSize: 14,
             itemBuilder: (context, _) => Icon(
               Icons.star,
               color: Colors.amber,
@@ -245,7 +256,14 @@ class DetailBuilder {
           SizedBox(
             width: 10,
           ),
-          Text("${detail.rating} ${Locales.string(context, 'reviews')}")
+          Text(
+            "${detail.rating} ${Locales.string(context, 'reviews')}",
+            style: TextStyle(
+              fontSize: 12,
+              letterSpacing: 0.2,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
         ],
       ),
     );
@@ -255,106 +273,128 @@ class DetailBuilder {
     return Text(
       detail.title,
       style: TextStyle(
-          color: darkPurple, fontSize: 22, fontWeight: FontWeight.bold),
+        color: darkPurple,
+        fontSize: 18,
+        height: 1.44,
+        letterSpacing: 0.1,
+        fontWeight: FontWeight.w600,
+      ),
     );
   }
 
   Widget buildSlideShow() {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
-      child: ImageSlideshow(
-        width: double.infinity,
-        height: 300,
-        initialPage: 0,
-        indicatorColor: normalOrange,
-        indicatorBackgroundColor: lightGrey,
-        children: [
-          CachedNetworkImage(
-            imageUrl: detail.photo,
-            fit: BoxFit.cover,
-          ),
-          ...detail.photos
-              .map((item) => CachedNetworkImage(
-                    imageUrl: item.photo,
-                    fit: BoxFit.cover,
-                  ))
-              .toList()
-        ],
-        onPageChanged: (value) {
-          print('Page changed: $value');
-        },
-        // autoPlayInterval: 3000,
-        isLoop: true,
+      padding: const EdgeInsets.all(defaultPadding),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: ImageSlideshow(
+          width: double.infinity,
+          height: 300,
+          initialPage: 0,
+          indicatorColor: normalOrange,
+          indicatorBackgroundColor: lightGrey,
+          children: [
+            CachedNetworkImage(
+              imageUrl: detail.photo,
+              fit: BoxFit.cover,
+              placeholder: (context, _) => Image.asset(
+                "assets/images/placeholder.png",
+                fit: BoxFit.cover,
+              ),
+            ),
+            ...detail.photos
+                .map((item) => CachedNetworkImage(
+                      imageUrl: item.photo,
+                      fit: BoxFit.cover,
+                      placeholder: (context, _) => Image.asset(
+                        "assets/images/placeholder.png",
+                        fit: BoxFit.cover,
+                      ),
+                    ))
+                .toList()
+          ],
+          onPageChanged: (value) {
+            print('Page changed: $value');
+          },
+          // autoPlayInterval: 3000,
+          isLoop: true,
+        ),
       ),
     );
   }
 
-  Container buildAnnouncerBox(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(10),
-      margin: EdgeInsets.symmetric(vertical: 20),
-      height: 70,
-      decoration: BoxDecoration(
-        color: lightGrey,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(25),
-            child: Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(25),
-              ),
-              child: detail.userPhoto != ""
-                  ? Image.network(
-                      fixMediaUrl(detail.userPhoto),
-                      fit: BoxFit.cover,
-                    )
-                  : Image.asset("assets/images/user.png"),
-            ),
-          ),
-          SizedBox(
-            width: 20,
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                detail.announcer,
-                style: TextStyle(
-                  color: darkPurple,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
+  Widget buildAnnouncerBox(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).pushNamed(UserEstatesScreen.routeName,
+            arguments: {"userId": detail.userId});
+      },
+      child: Container(
+        padding: EdgeInsets.all(10),
+        margin: EdgeInsets.symmetric(vertical: 20),
+        height: 70,
+        decoration: BoxDecoration(
+          color: lightGrey,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(25),
+              child: Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(25),
                 ),
+                child: detail.userPhoto != ""
+                    ? Image.network(
+                        fixMediaUrl(detail.userPhoto),
+                        fit: BoxFit.cover,
+                      )
+                    : Image.asset("assets/images/user.png"),
               ),
-              SizedBox(
-                height: 3,
-              ),
-              Text(
-                "${detail.userAdsCount} ${Locales.string(context, 'ads_count')}",
-                style: TextStyle(
-                  color: darkPurple,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ],
-          ),
-          Spacer(),
-          IconButton(
-            onPressed: () {
-              print("hi");
-            },
-            icon: Icon(
-              Icons.arrow_forward_ios_rounded,
-              color: normalGrey,
             ),
-          )
-        ],
+            SizedBox(
+              width: 20,
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  detail.announcer,
+                  style: TextStyle(
+                    color: darkPurple,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                SizedBox(
+                  height: 3,
+                ),
+                Text(
+                  "${detail.userAdsCount} ${Locales.string(context, 'ads_count')}",
+                  style: TextStyle(
+                    color: darkPurple,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
+            Spacer(),
+            IconButton(
+              onPressed: () {
+                print("hi");
+              },
+              icon: Icon(
+                Icons.arrow_forward_ios_rounded,
+                color: normalGrey,
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

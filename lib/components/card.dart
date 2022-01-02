@@ -54,11 +54,13 @@ class _EstateCardState extends State<EstateCard> {
         ),
         child: InkWell(
           onTap: () {
-            Navigator.of(context).pushNamed(EstateDetailScreen.routeName,
-                arguments: {
-                  "id": widget.estate.id,
-                  "typeId": widget.estate.typeId
-                });
+            Navigator.of(context).pushNamed(
+              EstateDetailScreen.routeName,
+              arguments: {
+                "id": widget.estate.id,
+                "typeId": widget.estate.typeId
+              },
+            );
           },
           child: Column(
             children: [
