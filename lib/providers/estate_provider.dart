@@ -467,8 +467,14 @@ class EstateProvider with ChangeNotifier {
   }
 
   // Getting my estates
-  Future getMyEstates() async {
-    const url = "${baseUrl}api/estate/myestates/";
+  Future<List<EstateModel>> getMyEstates([String? term]) async {
+    String url = "";
+    if (term == null) {
+      url = "${baseUrl}api/estate/myestates/";
+    } else {
+      url = "${baseUrl}api/estate/myestates/?term=${term}";
+    }
+    print(url);
     final access = await auth.getAccessToken();
     try {
       final response = await dio.get(
@@ -487,7 +493,9 @@ class EstateProvider with ChangeNotifier {
         });
         return estates;
       }
-    } catch (e) {}
+    } catch (e) {
+      print(e);
+    }
 
     return [];
   }

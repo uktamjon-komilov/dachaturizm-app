@@ -1,5 +1,10 @@
 import 'dart:ui';
 
+import 'package:dachaturizm/components/app_bar.dart';
+import 'package:dachaturizm/components/fluid_big_button.dart';
+import 'package:dachaturizm/components/no_result_univesal.dart';
+import 'package:dachaturizm/components/search_bar_with_filter.dart';
+import 'package:dachaturizm/components/small_button.dart';
 import 'package:dachaturizm/components/small_grey_text.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/helpers/call_with_auth.dart';
@@ -8,8 +13,10 @@ import 'package:dachaturizm/models/ads_plan.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/providers/currency_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
+import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/screens/app/estate/create_estate_screen.dart';
 import 'package:dachaturizm/screens/app/estate/estate_detail_screen.dart';
+import 'package:dachaturizm/screens/app/navigational_app_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -26,11 +33,287 @@ class MyAnnouncements extends StatefulWidget {
 }
 
 class _MyAnnouncementsState extends State<MyAnnouncements> {
-  List<EstateModel> _estates = [];
+  List<EstateModel> _allEstates = [];
+  List<EstateModel> _simpleEstates = [];
+  List<EstateModel> _topEstates = [];
+  List<EstateModel> _bannerEstates = [];
+  List<EstateModel> _topBannerEstates = [];
+  List<EstateModel> _adEstates = [];
+  List<EstateModel> _currentEstates = [];
+  Map<String, bool> _show = {
+    "all": true,
+    "simple": false,
+    "top": false,
+    "banner": false,
+    "topbanner": false,
+    "ad": false,
+  };
+
   List<AdPlan> _plans = [];
   bool _isLoading = false;
   List<Map<String, dynamic>> _actions = [];
   String _adPlan = "";
+  TextEditingController _searchController = TextEditingController();
+
+  void _chooseAction(EstateModel estate, String action) async {
+    final chosenAction =
+        _actions.firstWhere((_action) => _action["key"] == action);
+    callWithAuth(context, () {
+      chosenAction["callback"](estate.id.toString());
+    });
+  }
+
+  void _refresh() {
+    setState(() {
+      _isLoading = true;
+    });
+    Future.wait([
+      _fetchEstates(),
+      Provider.of<CurrencyProvider>(context, listen: false)
+          .fetchAdPlans()
+          .then((value) {
+        setState(() {
+          _plans = value;
+        });
+      }),
+    ]).then((_) {
+      setState(() {
+        _isLoading = false;
+        _currentEstates = _allEstates;
+      });
+    });
+  }
+
+  Future _fetchEstates([String? term]) async {
+    await Provider.of<EstateProvider>(context, listen: false)
+        .getMyEstates(term)
+        .then((value) {
+      _setValues(value);
+    });
+  }
+
+  _setValues(List<EstateModel> value) {
+    setState(() {
+      _allEstates = value;
+      _simpleEstates = value
+          .where(
+            (element) => (element.isSimple &&
+                !(element.isAd ||
+                    element.isTopBanner ||
+                    element.isBanner ||
+                    element.isTopBanner)),
+          )
+          .toList();
+      _topEstates = value.where((element) => element.isTop).toList();
+      _bannerEstates = value.where((element) => element.isBanner).toList();
+      _topBannerEstates =
+          value.where((element) => element.isTopBanner).toList();
+      _adEstates = value.where((element) => element.isAd).toList();
+    });
+  }
+
+  _changeShow(String key) {
+    Map<String, bool> temp = {
+      "all": false,
+      "simple": false,
+      "top": false,
+      "banner": false,
+      "topbanner": false,
+      "ad": false,
+    };
+    temp[key] = true;
+    setState(() {
+      _show = temp;
+    });
+
+    if (_show["all"] as bool) {
+      _currentEstates = _allEstates;
+    } else if (_show["simple"] as bool) {
+      _currentEstates = _simpleEstates;
+    } else if (_show["top"] as bool) {
+      _currentEstates = _topEstates;
+    } else if (_show["banner"] as bool) {
+      _currentEstates = _bannerEstates;
+    } else if (_show["topbanner"] as bool) {
+      _currentEstates = _topBannerEstates;
+    } else if (_show["ad"] as bool) {
+      _currentEstates = _adEstates;
+    }
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration.zero).then((_) async {
+      _refresh();
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    _actions = [
+      {
+        "key": "edit",
+        "value": Locales.string(context, "edit"),
+        "callback": ([String? id]) {
+          _navigateToEditScreen(id);
+        },
+        "hot": false,
+      },
+      {
+        "key": "advertise",
+        "value": Locales.string(context, "advertise"),
+        "callback": ([String? id]) {
+          _openAdsPriceList(id);
+        },
+        "hot": true,
+      },
+    ];
+    super.didChangeDependencies();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Scaffold(
+        appBar: buildNavigationalAppBar(
+          context,
+          Locales.string(
+            context,
+            "my_announcements",
+          ),
+        ),
+        body: _isLoading
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : Container(
+                padding: EdgeInsets.all(defaultPadding),
+                child: RefreshIndicator(onRefresh: () async {
+                  _refresh();
+                }, child: LayoutBuilder(
+                  builder: (context, _) {
+                    if (_allEstates.length > 0) {
+                      return Column(
+                        children: [
+                          SearchBarWithFilter(
+                            controller: _searchController,
+                            showFilters: false,
+                            onSubmit: (value) async {
+                              if (_searchController.text == "") return;
+                              await _fetchEstates(_searchController.text);
+                              setState(() {
+                                _currentEstates = _allEstates;
+                              });
+                            },
+                          ),
+                          SizedBox(height: defaultPadding / 4),
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: [
+                                ..._show.keys
+                                    .map(
+                                      (key) => SmallButton(
+                                        Locales.string(context, key),
+                                        enabled: _show[key] as bool,
+                                        onPressed: () {
+                                          _changeShow(key);
+                                        },
+                                      ),
+                                    )
+                                    .toList(),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: defaultPadding / 4),
+                          ..._estateBlockList()
+                        ],
+                      );
+                    } else {
+                      return Column(
+                        children: [
+                          NoResult(
+                            text:
+                                Locales.string(context, "no_your_own_estates"),
+                            photoPath: "assets/images/no_estates.png",
+                          ),
+                          FluidBigButton(
+                            onPress: () {
+                              Provider.of<NavigationScreenProvider>(context,
+                                      listen: false)
+                                  .changePageIndex(2);
+                              Navigator.of(context).popUntil(
+                                  ModalRoute.withName(
+                                      NavigationalAppScreen.routeName));
+                            },
+                            text: "E'lon joylashtirish",
+                          )
+                        ],
+                      );
+                    }
+                  },
+                )),
+              ),
+      ),
+    );
+  }
+
+  List _estateBlockList() {
+    if (_currentEstates.length > 0) {
+      return _currentEstates
+          .map(
+            (estate) => GestureDetector(
+              onTap: () {
+                Navigator.of(context).pushNamed(EstateDetailScreen.routeName,
+                    arguments: {"id": estate.id, "typeId": estate.typeId});
+              },
+              child: Card(
+                shadowColor: Colors.transparent,
+                color: disabledOrange,
+                child: Container(
+                  width: 100.w,
+                  height: 100,
+                  padding: EdgeInsets.all(defaultPadding / 2),
+                  child: Stack(
+                    children: [
+                      Row(
+                        children: [
+                          _buildImageBox(estate),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Expanded(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildTitleWithStars(estate),
+                                _buildLocation(estate),
+                                _buildDateAndViews(estate),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      _buildThreeDots(estate),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          )
+          .toList();
+    } else {
+      return [
+        NoResult(
+          text: Locales.string(context, "no_your_own_estates"),
+          photoPath: "assets/images/no_estates.png",
+        )
+      ];
+    }
+  }
 
   _showStatusSnackBar(bool value) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -237,66 +520,6 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
     );
   }
 
-  void _chooseAction(EstateModel estate, String action) async {
-    final chosenAction =
-        _actions.firstWhere((_action) => _action["key"] == action);
-    callWithAuth(context, () {
-      chosenAction["callback"](estate.id.toString());
-    });
-  }
-
-  void _refresh() {
-    setState(() {
-      _isLoading = true;
-    });
-    Provider.of<EstateProvider>(context, listen: false)
-        .getMyEstates()
-        .then((value) {
-      setState(() {
-        _estates = value;
-      });
-      Provider.of<CurrencyProvider>(context, listen: false)
-          .fetchAdPlans()
-          .then((value) {
-        setState(() {
-          _plans = value;
-          _isLoading = false;
-        });
-      });
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(Duration.zero).then((_) async {
-      _refresh();
-    });
-  }
-
-  @override
-  void didChangeDependencies() {
-    _actions = [
-      {
-        "key": "edit",
-        "value": Locales.string(context, "edit"),
-        "callback": ([String? id]) {
-          _navigateToEditScreen(id);
-        },
-        "hot": false,
-      },
-      {
-        "key": "advertise",
-        "value": Locales.string(context, "advertise"),
-        "callback": ([String? id]) {
-          _openAdsPriceList(id);
-        },
-        "hot": true,
-      },
-    ];
-    super.didChangeDependencies();
-  }
-
   Widget _buildDateAndViews(EstateModel estate) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -364,7 +587,8 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
             estate.title,
             style: TextStyle(
               color: darkPurple,
-              fontWeight: FontWeight.bold,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
               overflow: TextOverflow.ellipsis,
             ),
             maxLines: 1,
@@ -403,8 +627,18 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
       type = Locales.string(context, "simple");
     }
 
+    String heading = "";
+
+    int daysLeft = estate.expiryDate.difference(DateTime.now()).inDays;
+
+    if (daysLeft > 0) {
+      heading = "${type}: ${daysLeft} ${Locales.string(context, 'days')}";
+    } else {
+      heading = "${type}: 0 ${Locales.string(context, 'day')}";
+    }
+
     return ClipRRect(
-      borderRadius: BorderRadius.circular(10),
+      borderRadius: BorderRadius.circular(5),
       child: Container(
         width: 80,
         height: 80,
@@ -420,16 +654,19 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
             ),
             Positioned(
               child: Container(
-                padding: EdgeInsets.symmetric(vertical: 3, horizontal: 5),
+                width: 100.w,
+                padding: EdgeInsets.symmetric(vertical: 3),
                 decoration: BoxDecoration(
-                  color: normalOrange,
-                  borderRadius: BorderRadius.only(
-                    bottomRight: Radius.circular(10),
-                  ),
+                  color: daysLeft > 0 ? normalOrange : favouriteRed,
                 ),
                 child: Text(
-                  type,
-                  style: TextStyle(fontSize: 10, color: Colors.white),
+                  heading,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 7,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
             ),
@@ -490,88 +727,6 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
               )
               .toList(),
         ],
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            Locales.string(
-              context,
-              "my_announcements",
-            ),
-          ),
-        ),
-        body: _isLoading
-            ? Center(
-                child: CircularProgressIndicator(),
-              )
-            : Container(
-                padding: EdgeInsets.all(defaultPadding),
-                child: RefreshIndicator(
-                  onRefresh: () async {
-                    _refresh();
-                  },
-                  child: Column(
-                    children: [
-                      ..._estates
-                          .map(
-                            (estate) => GestureDetector(
-                              onTap: () {
-                                Navigator.of(context).pushNamed(
-                                    EstateDetailScreen.routeName,
-                                    arguments: {
-                                      "id": estate.id,
-                                      "typeId": estate.typeId
-                                    });
-                              },
-                              child: Card(
-                                shadowColor: Colors.transparent,
-                                color: Colors.white,
-                                child: Container(
-                                  width: 100.w,
-                                  height: 100,
-                                  padding: EdgeInsets.all(defaultPadding / 2),
-                                  child: Stack(
-                                    children: [
-                                      Row(
-                                        children: [
-                                          _buildImageBox(estate),
-                                          SizedBox(
-                                            width: 10,
-                                          ),
-                                          Expanded(
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                _buildTitleWithStars(estate),
-                                                _buildLocation(estate),
-                                                _buildDateAndViews(estate),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      _buildThreeDots(estate),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          )
-                          .toList()
-                    ],
-                  ),
-                ),
-              ),
       ),
     );
   }

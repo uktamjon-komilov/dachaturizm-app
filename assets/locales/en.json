@@ -48,7 +48,7 @@
     "something_went_wrong_form_text": "Something went wrong. Please, try again.",
     "user_already_exists_with_this_phone": "User already exists with this phone number.",
     "search": "Search",
-    "all": "See all",
+    "see_all": "See all",
     "top_estates": "Top estates",
     "simple_estates": "Simple estates",
     "no_results": "We couldn't find any results",
@@ -79,6 +79,7 @@
     "my_announcements": "My announcements",
     "placed": "Placed:",
     "views": "Viewed:",
+    "all": "All",
     "ad": "Ad",
     "banner": "Banner",
     "topbanner": "Top Banner",
@@ -144,5 +145,8 @@
     "number_of_ads": "Number of ads:",
     "rating": "Rating",
     "send": "Send",
-    "similar_estates": "Similar estates"
+    "similar_estates": "Similar estates",
+    "days": "days",
+    "day": "day",
+    "no_your_own_estates": "You don't have announcements in this type"
 }

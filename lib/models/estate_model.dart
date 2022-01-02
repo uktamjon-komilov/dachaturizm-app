@@ -36,6 +36,7 @@ class EstateModel {
   final bool isAd;
   final DateTime? created;
   final DateTime? updated;
+  final DateTime expiryDate;
   bool isLiked;
 
   EstateModel({
@@ -70,6 +71,7 @@ class EstateModel {
     this.isAd = false,
     this.created,
     this.updated,
+    required this.expiryDate,
     this.isLiked = false,
   });
 
@@ -126,6 +128,7 @@ class EstateModel {
       isAd: data["is_ads"],
       created: DateTime.parse(data["created_at"].toString().substring(0, 10)),
       updated: DateTime.parse(data["updated_at"].toString().substring(0, 10)),
+      expiryDate: DateTime.parse(data["expires_in"]),
       isLiked: data["is_liked"],
     );
   }
@@ -134,13 +137,13 @@ class EstateModel {
     String locale = await getCurrentLocale();
 
     return EstateModel(
-      id: data["id"],
-      title: data["translations"][locale]["title"],
-      description: data["translations"][locale]["description"],
-      priceType: data["price_type"]["translations"][locale]["title"],
-      weekdayPrice: data["weekday_price"],
-      weekendPrice: data["weekend_price"],
-      photo: fixMediaUrl(data["photo"]),
-    );
+        id: data["id"],
+        title: data["translations"][locale]["title"],
+        description: data["translations"][locale]["description"],
+        priceType: data["price_type"]["translations"][locale]["title"],
+        weekdayPrice: data["weekday_price"],
+        weekendPrice: data["weekend_price"],
+        photo: fixMediaUrl(data["photo"]),
+        expiryDate: DateTime.now());
   }
 }

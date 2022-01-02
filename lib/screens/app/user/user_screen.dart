@@ -1,7 +1,6 @@
+import 'package:dachaturizm/components/profile_item.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/helpers/call_with_auth.dart';
-import 'package:dachaturizm/helpers/url_helper.dart';
-import 'package:dachaturizm/models/user_model.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/screens/app/user/balance_screen.dart';
@@ -157,7 +156,7 @@ class _UserPageScreenState extends State<UserPageScreen> {
         Visibility(
           visible: userExists,
           child: ProfileListItem(
-            title: Locales.string(context, "balance"),
+            title: Locales.string(context, "my_balance"),
             iconData: Icons.account_balance_wallet_rounded,
             callback: () {
               callWithAuth(context, () {
@@ -255,64 +254,6 @@ class ColumnTitle extends StatelessWidget {
       child: Text(
         text,
         style: TextStyles.display8(),
-      ),
-    );
-  }
-}
-
-class ProfileListItem extends StatelessWidget {
-  const ProfileListItem({
-    Key? key,
-    required this.title,
-    required this.iconData,
-    required this.callback,
-  }) : super(key: key);
-
-  final String title;
-  final IconData iconData;
-  final Function callback;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(
-        vertical: defaultPadding / 3,
-        horizontal: defaultPadding,
-      ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: () {
-          callback();
-        },
-        child: Container(
-          width: double.infinity,
-          child: Row(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: lightGrey,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                width: 30,
-                height: 30,
-                child: Icon(
-                  iconData,
-                  color: purplish,
-                  size: 14,
-                ),
-              ),
-              SizedBox(
-                width: 10,
-              ),
-              Text(
-                title,
-                style: TextStyles.display1().copyWith(height: 1.5),
-              ),
-              Spacer(),
-              Icon(Icons.keyboard_arrow_right_rounded)
-            ],
-          ),
-        ),
       ),
     );
   }

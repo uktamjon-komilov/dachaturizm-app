@@ -186,7 +186,8 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
                                 SizedBox(height: 10),
                                 _buildSimilarEstates(context),
                                 SizedBox(height: 10),
-                                _buildExtraInfo(context)
+                                _buildExtraInfo(context),
+                                SizedBox(height: 10),
                               ],
                             ),
                           ),
