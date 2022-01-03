@@ -5,6 +5,8 @@ import 'package:dachaturizm/helpers/parse_datetime.dart';
 import 'package:dachaturizm/models/transaction_model.dart';
 import 'package:dachaturizm/models/user_model.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
+import 'package:dachaturizm/providers/navigation_screen_provider.dart';
+import 'package:dachaturizm/screens/app/user/fill_balance_screen.dart';
 import 'package:dachaturizm/styles/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
@@ -28,6 +30,20 @@ class _MyBalanceScreenState extends State<MyBalanceScreen> {
   List<TransactionModel> _inTransactions = [];
   List<TransactionModel> _outTransactions = [];
 
+  Future _refresh() async {
+    await Future.wait([
+      Provider.of<AuthProvider>(context, listen: false)
+          .getUserData()
+          .then((user) => _user = user),
+      Provider.of<AuthProvider>(context, listen: false)
+          .getTransactions("in")
+          .then((transactions) => _inTransactions = transactions),
+      Provider.of<AuthProvider>(context, listen: false)
+          .getTransactions("out")
+          .then((transactions) => _outTransactions = transactions),
+    ]);
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -36,22 +52,13 @@ class _MyBalanceScreenState extends State<MyBalanceScreen> {
       setState(() {
         _isLoading = true;
       });
-      Future.wait([
-        Provider.of<AuthProvider>(context, listen: false)
-            .getUserData()
-            .then((user) => _user = user),
-        Provider.of<AuthProvider>(context, listen: false)
-            .getTransactions("in")
-            .then((transactions) => _inTransactions = transactions),
-        Provider.of<AuthProvider>(context, listen: false)
-            .getTransactions("out")
-            .then((transactions) => _outTransactions = transactions),
-      ]).then((_) {
+      _refresh().then((_) {
         setState(() {
           _isLoading = false;
           _date = DateTime.now();
         });
       });
+      ;
     }
   }
 
@@ -121,6 +128,29 @@ class _MyBalanceScreenState extends State<MyBalanceScreen> {
             "assets/images/balance-card.png",
             fit: BoxFit.cover,
           ),
+          Positioned(
+            right: 28,
+            bottom: 28,
+            child: IconButton(
+              onPressed: () async {
+                await _refresh();
+              },
+              splashColor: normalOrange,
+              icon: Container(
+                width: 30,
+                height: 30,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Icon(
+                  Icons.refresh_rounded,
+                  color: normalOrange,
+                  size: 20,
+                ),
+              ),
+            ),
+          ),
           Container(
             padding: EdgeInsets.all(28),
             child: Column(
@@ -145,7 +175,10 @@ class _MyBalanceScreenState extends State<MyBalanceScreen> {
                   ),
                 ),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(BalanceScreen.routeName,
+                        arguments: {"user": _user});
+                  },
                   style: ElevatedButton.styleFrom(
                     elevation: 0,
                     shadowColor: Colors.transparent,

@@ -46,7 +46,6 @@ class NavigationScreenProvider with ChangeNotifier {
 
   set unreadMessagesCount(value) {
     _unreadMessagesCount = value;
-    print(_unreadMessagesCount);
     notifyListeners();
   }
 
@@ -76,9 +75,6 @@ class NavigationScreenProvider with ChangeNotifier {
   }
 
   visitSearchPage(String term) {
-    _data = {
-      "search_term": term,
-    };
     notifyListeners();
     changePageIndex(1);
   }

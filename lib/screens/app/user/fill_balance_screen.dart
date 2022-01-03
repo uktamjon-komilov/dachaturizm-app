@@ -1,11 +1,13 @@
-import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
+import 'package:dachaturizm/components/app_bar.dart';
+import 'package:dachaturizm/components/fluid_big_button.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/providers/currency_provider.dart';
-import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/screens/auth/login_screen.dart';
+import 'package:dachaturizm/styles/input.dart';
 import 'package:dachaturizm/styles/text_styles.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_locales/flutter_locales.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
@@ -21,18 +23,12 @@ class BalanceScreen extends StatefulWidget {
 
 class _BalanceScreenState extends State<BalanceScreen>
     with WidgetsBindingObserver {
-  bool _isLoading = false;
-  bool _somethingWrong = false;
-  double _balance = 0.0;
+  String _activePayment = defaultPaymentMethod;
 
   GlobalKey<FormState> _form = GlobalKey<FormState>();
   TextEditingController _amountController = TextEditingController();
-  FocusNode _amountFocusNode = FocusNode();
 
-  final CurrencyTextInputFormatter _formatter =
-      CurrencyTextInputFormatter(symbol: "", decimalDigits: 0);
-
-  _getPaymentUrl(String type, double amount) async {
+  _getPaymentUrl(double amount) async {
     if (_form.currentState!.validate()) {
       dynamic userId =
           await Provider.of<AuthProvider>(context, listen: false).getUserId();
@@ -42,177 +38,213 @@ class _BalanceScreenState extends State<BalanceScreen>
           ..pushNamed(LoginScreen.routeName);
       }
       String url = await Provider.of<CurrencyProvider>(context, listen: false)
-          .getPaymentLinks(type, int.parse(userId.toString()), amount);
+          .getPaymentLinks(
+              _activePayment, int.parse(userId.toString()), amount);
       if (url == "") {
-        setState(() {
-          _somethingWrong = true;
-        });
         return "";
       }
       return url;
     }
   }
 
-  _refreshBalance() async {
-    Future.delayed(Duration.zero).then((_) {
-      setState(() {
-        _isLoading = true;
-      });
-      Provider.of<AuthProvider>(context, listen: false)
-          .getUserData()
-          .then((user) {
-        if (user != null) {
-          setState(() {
-            _balance = user.balance;
-            _isLoading = false;
-          });
-        }
-      });
-    });
-  }
-
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_somethingWrong) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("Something went wrong!")));
-      setState(() {
-        _somethingWrong = false;
-      });
-    }
+  void initState() {
+    WidgetsBinding.instance!.addObserver(this);
+    super.initState();
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state == AppLifecycleState.resumed) {
-      await _refreshBalance();
+      print("working");
+      print(context);
+      Navigator.of(context).pop();
     }
   }
 
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance!.addObserver(this);
-    Future.delayed(Duration.zero).then((_) async {
-      await _refreshBalance();
-    });
-  }
-
-  @override
   void dispose() {
+    _amountController.dispose();
     WidgetsBinding.instance!.removeObserver(this);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        Provider.of<NavigationScreenProvider>(context, listen: false)
-            .changePageIndex(4);
-        return true;
-      },
-      child: SafeArea(
-          child: Scaffold(
-        appBar: AppBar(
-          title: Text("Balans"),
+    return SafeArea(
+      child: Scaffold(
+        appBar: buildNavigationalAppBar(
+            context, Locales.string(context, "payment"), () {
+          Navigator.of(context).pop();
+        }),
+        floatingActionButton: Container(
+          width: 100.w - 1.8 * defaultPadding,
+          child: FluidBigButton(
+            text: "Tayyor",
+            onPress: () async {
+              double? amount = double.tryParse(_amountController.text
+                  .toString()
+                  .replaceAll(",", "")
+                  .replaceAll(".", ""));
+              print(_amountController.text);
+              if (amount != null) {
+                String? url = await _getPaymentUrl(amount);
+                if (url != null && await UrlLauncher.canLaunch(url)) {
+                  UrlLauncher.launch(url);
+                }
+              }
+            },
+          ),
         ),
-        body: _isLoading
-            ? Center(
-                child: CircularProgressIndicator(),
-              )
-            : Container(
-                padding: EdgeInsets.all(defaultPadding),
-                child: Form(
-                  key: _form,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Balans: ${_balance} so'm",
-                        style: TextStyles.display2(),
-                      ),
-                      SizedBox(height: 10),
-                      TextFormField(
-                        controller: _amountController,
-                        focusNode: _amountFocusNode,
-                        maxLines: 1,
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [_formatter],
-                        decoration: InputDecoration(
-                          hintText: "Masalan, 150 000 so'm",
-                          hintStyle:
-                              TextStyle(color: normalGrey.withAlpha(150)),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: BorderSide(color: normalOrange)),
-                          contentPadding: EdgeInsets.all(defaultPadding / 2),
-                        ),
-                        style: TextStyle(fontSize: 18),
-                        onFieldSubmitted: (value) {},
-                        onChanged: (value) {
-                          _form.currentState!.validate();
-                        },
-                        validator: (value) {
-                          int? temp = int.tryParse(value
-                              .toString()
-                              .replaceAll(",", "")
-                              .replaceAll(".", ""));
-                          if (temp != null && temp < 5000) {
-                            return "Minimal to'lov summasi 5000 so'm";
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(height: defaultPadding),
-                      Wrap(
-                        children: [
-                          _buildPaymentButton("payme"),
-                          _buildPaymentButton("click"),
-                        ],
-                      ),
-                    ],
-                  ),
+        body: Container(
+          padding: EdgeInsets.fromLTRB(
+            defaultPadding,
+            defaultPadding,
+            defaultPadding,
+            0,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CustomText(Locales.string(context, "amount")),
+              SizedBox(height: defaultPadding * 3 / 4),
+              _buildInputField(),
+              Text(
+                Locales.string(context, "enter_payment_amount"),
+                style: TextStyle(
+                  fontSize: 10,
+                  height: 1.5,
+                  letterSpacing: 0.3,
+                  fontWeight: FontWeight.w600,
+                  color: greyishLight,
                 ),
               ),
-      )),
+              SizedBox(height: 1.5 * defaultPadding),
+              CustomText(Locales.string(context, "payment_method")),
+              SizedBox(height: defaultPadding * 3 / 4),
+              ...paymentMethods
+                  .map((method) => PaymentButton(
+                        title: method,
+                        active: _activePayment == method,
+                        onPressed: () {
+                          setState(() {
+                            _activePayment = method;
+                          });
+                        },
+                      ))
+                  .toList(),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
-  Widget _buildPaymentButton(String type) {
-    return GestureDetector(
-      onTap: () async {
-        double? amount = double.tryParse(_amountController.text
-            .toString()
-            .replaceAll(",", "")
-            .replaceAll(".", ""));
-        if (amount == null) {
-          setState(() {
-            _somethingWrong = true;
-          });
-        } else {
-          String url = await _getPaymentUrl(type, amount);
-          print(url);
-          if (await UrlLauncher.canLaunch(url)) {
-            UrlLauncher.launch(url);
-          } else {
-            setState(() {
-              _somethingWrong = true;
-            });
+  Widget _buildInputField() {
+    return Form(
+      key: _form,
+      child: TextFormField(
+        controller: _amountController,
+        keyboardType: TextInputType.number,
+        maxLines: 1,
+        decoration: InputDecoration(
+          border: InputStyles.inputBorder(),
+          enabledBorder: InputStyles.enabledBorder(),
+          focusedBorder: InputStyles.focusBorder(),
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: defaultPadding / 2,
+            vertical: 0,
+          ),
+          hintText: "To'lov miqdori kiriting",
+          hintStyle: TextStyle(
+            fontSize: 13,
+            letterSpacing: 1.2,
+            fontWeight: FontWeight.w500,
+            color: greyishLight,
+          ),
+        ),
+        validator: (value) {
+          if (value == null) {
+            return "Payment amount cannot be empty";
+          } else if (double.parse(value) < 5000) {
+            return "Payment amount must be greater than 5000 sum.";
           }
-        }
-      },
+          return null;
+        },
+      ),
+    );
+  }
+}
+
+class PaymentButton extends StatelessWidget {
+  const PaymentButton({
+    Key? key,
+    required this.title,
+    required this.active,
+    required this.onPressed,
+  }) : super(key: key);
+
+  final String title;
+  final bool active;
+  final void Function()? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onPressed,
       child: Container(
-        width: 50.w - defaultPadding,
-        padding: EdgeInsets.symmetric(vertical: defaultPadding),
-        child: Center(
-          child: Image.asset("assets/images/${type}.png"),
+        width: 100.w,
+        margin: EdgeInsets.only(bottom: 8),
+        padding: EdgeInsets.symmetric(
+          vertical: 19,
+          horizontal: defaultPadding,
+        ),
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(15),
+            border: Border.all(
+              color: active ? normalOrange : inputGrey,
+            )),
+        child: Row(
+          children: [
+            Container(
+              width: 42,
+              child: Image.asset(
+                "assets/images/${title}.png",
+                fit: BoxFit.contain,
+              ),
+            ),
+            SizedBox(width: defaultPadding),
+            Text(
+              title.substring(0, 1).toUpperCase() +
+                  title.substring(1, title.length),
+              style: TextStyle(
+                color: active ? normalOrange : greyishLight,
+                fontSize: 13,
+                height: 1.2,
+                fontWeight: FontWeight.w500,
+              ),
+            )
+          ],
         ),
       ),
+    );
+  }
+}
+
+class CustomText extends StatelessWidget {
+  const CustomText(
+    this.text, {
+    Key? key,
+  }) : super(key: key);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: TextStyles.display2().copyWith(letterSpacing: 0.3),
     );
   }
 }

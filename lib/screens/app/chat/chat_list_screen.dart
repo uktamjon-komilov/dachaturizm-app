@@ -62,9 +62,9 @@ class _ChatListScreenState extends State<ChatListScreen> {
     Future.delayed(Duration.zero).then((_) async {
       _userId =
           await Provider.of<AuthProvider>(context, listen: false).getUserId();
-      Timer.periodic(Duration(seconds: 5), (timer) async {
-        await _refreshMyChats();
-      });
+      // Timer.periodic(Duration(seconds: 5), (timer) async {
+      //   await _refreshMyChats();
+      // });
     });
   }
 

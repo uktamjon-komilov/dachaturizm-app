@@ -27,3 +27,5 @@ const ratingColors = [
   ratingColor4,
   ratingColor5
 ];
+const paymentMethods = ["payme", "click"];
+const defaultPaymentMethod = "payme";

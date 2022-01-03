@@ -148,5 +148,11 @@
     "similar_estates": "Similar estates",
     "days": "days",
     "day": "day",
-    "no_your_own_estates": "You don't have announcements in this type"
+    "no_your_own_estates": "You don't have announcements in this type",
+    "payment": "Payment",
+    "amount": "Amount",
+    "payment_amount_must_be_uzs": "Payment amount must be in UZS",
+    "enter_payment_amount": "Enter payment amount",
+    "payment_method": "Payment method",
+    "ready": "Ready"
 }

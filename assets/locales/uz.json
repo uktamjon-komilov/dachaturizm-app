@@ -148,5 +148,11 @@
     "similar_estates": "O’xshash e’lonlar",
     "days": "kun",
     "day": "kun",
-    "no_your_own_estates": "Sizda e'lonlar mavjud emas"
+    "no_your_own_estates": "Sizda e'lonlar mavjud emas",
+    "payment": "To‘lov",
+    "amount": "Miqdor",
+    "payment_amount_must_be_uzs": "Miqdor UZS bo‘lishi shart",
+    "enter_payment_amount": "To‘lov miqdorini kiriting",
+    "payment_method": "To‘lov turi",
+    "ready": "Tayyor"
 }

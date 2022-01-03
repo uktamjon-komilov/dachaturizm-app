@@ -148,5 +148,11 @@
     "similar_estates": "Похожие объявления",
     "days": "дней",
     "day": "день",
-    "no_your_own_estates": "У вас нет объявлений этого типа"
+    "no_your_own_estates": "У вас нет объявлений этого типа",
+    "payment": "Оплата",
+    "amount": "Количество",
+    "payment_amount_must_be_uzs": "Количество должно быть UZS",
+    "enter_payment_amount": "Введите сумму платежа",
+    "payment_method": "Тип платежа",
+    "ready": "Готовый"
 }
