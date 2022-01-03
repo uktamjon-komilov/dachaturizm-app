@@ -219,8 +219,8 @@ class EstateProvider with ChangeNotifier {
       extraArgs: extraArgs,
     );
     final url = "${baseUrl}api/estate/?${queryString}";
-    print(url);
     final response = await _fetch(url);
+    print(url);
     await response.data["results"].forEach((item) async {
       EstateModel estate = await EstateModel.fromJson(item);
       estates.add(estate);
@@ -294,6 +294,21 @@ class EstateProvider with ChangeNotifier {
       estates.add(estate);
     });
     return estates;
+  }
+
+  // Get extrimal prices
+  Future<Map<String, dynamic>> getExtrimalPrices(int priceTypeId,
+      {int? categoryId}) async {
+    const url = "${baseUrl}api/extrimal-prices/";
+    Map<String, int> data = {"price_type": priceTypeId};
+    if (categoryId != null) {
+      data["category"] = categoryId;
+    }
+    print(url);
+    print(data);
+    final response = await dio.post(url, data: data);
+    print(response.data);
+    return response.data;
   }
 
   // Prepare data for creation/updating

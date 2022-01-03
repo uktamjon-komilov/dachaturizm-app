@@ -2,6 +2,7 @@ import 'package:dachaturizm/components/app_bar.dart';
 import 'package:dachaturizm/components/small_button.dart';
 import 'package:dachaturizm/components/text_input.dart';
 import 'package:dachaturizm/constants.dart';
+import 'package:dachaturizm/models/category_model.dart';
 import 'package:dachaturizm/models/currency_model.dart';
 import 'package:dachaturizm/models/facility_model.dart';
 import 'package:dachaturizm/providers/currency_provider.dart';
@@ -23,14 +24,16 @@ class SearchFilersScreen extends StatefulWidget {
 }
 
 class _SearchFilersScreenState extends State<SearchFilersScreen> {
-  final RangeValues _sumConstraints = RangeValues(0, 999999);
-  RangeValues? _selectedRange;
+  RangeValues _priceConstraints = RangeValues(0, 10000);
+  int? _divisions;
+  RangeValues _selectedRange = RangeValues(0, 10000);
   bool _isInit = true;
   bool _isLoading = true;
   List? _sortingTypes;
   String? _currentSort;
   int? _currentCurrencyId;
   void Function()? onFilterCallback;
+  int? _categoryId;
 
   TextEditingController _addressController = TextEditingController();
   TextEditingController _minPriceController = TextEditingController();
@@ -41,24 +44,37 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
       _isLoading = true;
     });
 
+    try {
+      Map data = ModalRoute.of(context)!.settings.arguments as Map;
+      if (data.containsKey("category")) {
+        _categoryId = data["category"];
+      }
+    } catch (e) {
+      print(e);
+    }
+
     await Future.wait([
       Provider.of<FacilityProvider>(context, listen: false).getFacilities(),
-      Provider.of<CurrencyProvider>(context, listen: false).getCurrencies(),
+      Provider.of<CurrencyProvider>(context, listen: false)
+          .getCurrencies()
+          .then((value) async {
+        await _changePriceRange(value[0].id);
+      }),
     ]);
 
-    double minPrice =
-        Provider.of<EstateProvider>(context, listen: false).filters["minPrice"];
-    double maxPrice =
-        Provider.of<EstateProvider>(context, listen: false).filters["maxPrice"];
+    // double minPrice =
+    //     Provider.of<EstateProvider>(context, listen: false).filters["minPrice"];
+    // double maxPrice =
+    //     Provider.of<EstateProvider>(context, listen: false).filters["maxPrice"];
 
-    _minPriceController.text = minPrice.toString();
-    if (maxPrice == 0.0) {
-      _maxPriceController.text = "10000";
-      _selectedRange = RangeValues(minPrice, 10000);
-    } else {
-      _maxPriceController.text = maxPrice.toString();
-      _selectedRange = RangeValues(minPrice, maxPrice);
-    }
+    // _minPriceController.text = minPrice.toString();
+    // if (maxPrice == 0.0) {
+    //   _maxPriceController.text = "10000";
+    //   _selectedRange = RangeValues(minPrice, 10000);
+    // } else {
+    //   _maxPriceController.text = maxPrice.toString();
+    //   _selectedRange = RangeValues(minPrice, maxPrice);
+    // }
 
     _sortingTypes = Provider.of<EstateProvider>(context, listen: false).sorting;
     _currentSort =
@@ -69,6 +85,30 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
     setState(() {
       _isLoading = false;
     });
+  }
+
+  _changePriceRange(int? currencyId) async {
+    if (currencyId == null) {
+      currencyId = _currentCurrencyId;
+    }
+    await Provider.of<EstateProvider>(context, listen: false)
+        .getExtrimalPrices(currencyId as int, categoryId: _categoryId)
+        .then((value) {
+      setState(() {
+        _priceConstraints = RangeValues(value["min"], value["max"]);
+        _selectedRange = RangeValues(value["min"], value["max"]);
+        _minPriceController.text = _selectedRange.start.toString();
+        _maxPriceController.text = _selectedRange.end.toString();
+        _divisions = value["divisions"];
+      });
+    });
+  }
+
+  _changeCurrency(int id) async {
+    setState(() {
+      _currentCurrencyId = id;
+    });
+    await _changePriceRange(_currentCurrencyId);
   }
 
   _setAllFilters() {
@@ -92,8 +132,6 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
         .filtersSorting(_currentSort as String);
 
     if (_currentCurrencyId != 0) {
-      print("working");
-      print(_currentCurrencyId);
       Provider.of<EstateProvider>(context, listen: false)
           .filtersPriceType(_currentCurrencyId as int);
     }
@@ -109,7 +147,7 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
       double? maxValue = double.tryParse(_maxPriceController.text);
       if (minValue != null && maxValue != null && minValue < maxValue) {
         setState(() {
-          _selectedRange = RangeValues(minValue, _selectedRange!.end);
+          _selectedRange = RangeValues(minValue, _selectedRange.end);
         });
       }
     });
@@ -121,7 +159,7 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
     if (_isInit) {
       _isInit = false;
       await _fetchData();
-      _listenControllers();
+      // _listenControllers();
       Map<String, dynamic> modalData =
           ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
       if (modalData.containsKey("onFilterCallback")) {
@@ -229,7 +267,7 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
                                 child: TextInput(
                                   controller: _minPriceController,
                                   hintText:
-                                      _selectedRange!.start.toStringAsFixed(1),
+                                      _selectedRange.start.toStringAsFixed(1),
                                 ),
                               ),
                               Container(
@@ -237,7 +275,7 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
                                 child: TextInput(
                                   controller: _maxPriceController,
                                   hintText:
-                                      _selectedRange!.end.toStringAsFixed(1),
+                                      _selectedRange.end.toStringAsFixed(1),
                                 ),
                               ),
                             ],
@@ -256,10 +294,8 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
 
                               return Expanded(
                                 child: ElevatedButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      _currentCurrencyId = currency.id;
-                                    });
+                                  onPressed: () async {
+                                    _changeCurrency(currency.id);
                                   },
                                   style: ElevatedButton.styleFrom(
                                     primary:
@@ -358,11 +394,14 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
   }
 
   Widget _buildRangeSlider() {
+    print(_priceConstraints);
+    print(_priceConstraints);
+    print(_selectedRange);
     return RangeSlider(
-      min: _sumConstraints.start,
-      max: _sumConstraints.end,
-      divisions: (_sumConstraints.end ~/ 5),
-      values: _selectedRange as RangeValues,
+      min: _priceConstraints.start,
+      max: _priceConstraints.end,
+      divisions: _divisions,
+      values: _selectedRange,
       onChanged: (RangeValues newRange) {
         _minPriceController.text = newRange.start.toStringAsFixed(1);
         _maxPriceController.text = newRange.end.toStringAsFixed(1);

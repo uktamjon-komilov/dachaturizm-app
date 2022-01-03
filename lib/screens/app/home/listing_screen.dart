@@ -6,6 +6,7 @@ import 'package:dachaturizm/components/search_bar_with_filter.dart';
 import 'package:dachaturizm/components/small_button.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/models/category_model.dart';
+import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/screens/app/cards_block.dart';
@@ -30,9 +31,10 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
   bool _showTop = true;
   CategoryModel? _category;
 
-  List? _topEstates;
-  List? _simpleEstates;
-  List? _currentEstates;
+  List<EstateModel> _allEstates = [];
+  List<EstateModel> _topEstates = [];
+  List<EstateModel> _simpleEstates = [];
+  List<EstateModel> _currentEstates = [];
 
   String? _topNextLink;
   String? _simpleNextLink;
@@ -65,7 +67,7 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
               .getNextPage(_topNextLink as String)
               .then((value) {
             setState(() {
-              _topEstates!.addAll(value["estates"]);
+              _topEstates.addAll(value["estates"]);
               _paginationLoading = false;
               _topNextLink = value["next"];
             });
@@ -78,7 +80,7 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
               .getNextPage(_simpleNextLink as String)
               .then((value) {
             setState(() {
-              _simpleEstates!.addAll(value["estates"]);
+              _simpleEstates.addAll(value["estates"]);
               _paginationLoading = false;
               _simpleNextLink = value["next"];
             });
@@ -89,21 +91,41 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
   }
 
   _search() async {
-    Provider.of<EstateProvider>(context, listen: false).getSearchedResults(
-        term: _searchController.text,
-        category: _category,
-        extraArgs: {
-          "top": _showTop,
-          "simple": !_showTop,
-        }).then((data) {
+    await Future.wait([
+      Provider.of<EstateProvider>(context, listen: false).getSearchedResults(
+          term: _searchController.text,
+          category: _category,
+          extraArgs: {
+            "top": true,
+            "simple": false,
+          }).then((data) {
+        setState(() {
+          print(data);
+          _topEstates = data["estates"];
+          _topNextLink = data["next"];
+        });
+      }),
+      Provider.of<EstateProvider>(context, listen: false).getSearchedResults(
+          term: _searchController.text,
+          category: _category,
+          extraArgs: {
+            "top": false,
+            "simple": true,
+          }).then((data) {
+        setState(() {
+          print(data);
+          _simpleEstates = data["estates"];
+          _simpleNextLink = data["next"];
+        });
+      }),
+    ]).then((_) {
+      _allEstates = [..._topEstates, ..._simpleEstates];
       if (_showTop) {
         setState(() {
-          _topEstates = data["estates"];
           _currentEstates = _topEstates;
         });
       } else {
         setState(() {
-          _simpleEstates = data["estates"];
           _currentEstates = _simpleEstates;
         });
       }
@@ -131,8 +153,13 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
       }),
     ]);
     setState(() {
-      _currentEstates = _topEstates;
+      _allEstates = [..._topEstates, ..._simpleEstates];
       _isLoading = false;
+      if (_showTop) {
+        _currentEstates = _topEstates;
+      } else {
+        _currentEstates = _simpleEstates;
+      }
     });
   }
 
@@ -163,10 +190,9 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
             : RefreshIndicator(
                 onRefresh: _refreshAction,
                 child: Container(
-                  height:
-                      (_topEstates!.length == 0 && _simpleEstates!.length == 0)
-                          ? 100.h - 4 * defaultPadding
-                          : null,
+                  height: _allEstates.length == 0
+                      ? 100.h - 4 * defaultPadding
+                      : null,
                   child: SingleChildScrollView(
                     controller: _scrollController,
                     physics: AlwaysScrollableScrollPhysics(),
@@ -191,7 +217,7 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
                           ),
                         ),
                         Visibility(
-                          visible: _currentEstates!.length > 0,
+                          visible: _allEstates.length > 0,
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: defaultPadding),
@@ -215,19 +241,17 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
                             ),
                           ),
                         ),
-                        buildCardsBlock(context, _currentEstates),
-                        Visibility(
-                          visible: _currentEstates!.length == 0,
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(
-                              2 * defaultPadding,
-                              100,
-                              2 * defaultPadding,
-                              0,
-                            ),
-                            child: NoResult(),
-                          ),
-                        ),
+                        _currentEstates.length > 0
+                            ? buildCardsBlock(context, _currentEstates)
+                            : Padding(
+                                padding: const EdgeInsets.fromLTRB(
+                                  2 * defaultPadding,
+                                  100,
+                                  2 * defaultPadding,
+                                  0,
+                                ),
+                                child: NoResult(),
+                              ),
                         SizedBox(height: defaultPadding),
                         Visibility(
                           visible: _paginationLoading,
