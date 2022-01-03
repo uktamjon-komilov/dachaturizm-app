@@ -49,19 +49,19 @@ class _UserPageScreenState extends State<UserPageScreen> {
         builder: (context) => page,
       ),
     ) as Map;
-    if (result != null && result.containsKey("change")) {
-      setState(() {
-        _someChange = true;
-      });
-    }
+    // if (result != null && result.containsKey("change")) {
+    //   setState(() {
+    //     _someChange = true;
+    //   });
+    // }
   }
 
   @override
   void initState() {
-    Future.delayed(Duration.zero).then((_) {
-      _refreshUser();
-    });
     super.initState();
+    Future.delayed(Duration.zero).then((_) async {
+      await _refreshUser();
+    });
   }
 
   @override
@@ -101,7 +101,7 @@ class _UserPageScreenState extends State<UserPageScreen> {
 
   Widget _buildUserDetails(BuildContext context, UserModel? user) {
     return Visibility(
-      visible: !_userLoading && user != null,
+      visible: user != null,
       child: Container(
         decoration: BoxDecoration(
           color: disabledOrange,
@@ -200,7 +200,8 @@ class _UserPageScreenState extends State<UserPageScreen> {
   }
 
   Widget _buildSettingsList() {
-    bool userExists = Provider.of<AuthProvider>(context).user != null;
+    bool userExists =
+        Provider.of<AuthProvider>(context, listen: false).user != null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

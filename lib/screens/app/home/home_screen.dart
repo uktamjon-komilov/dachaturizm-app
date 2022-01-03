@@ -166,27 +166,32 @@ class _HomePageScreenState extends State<HomePageScreen> {
     );
   }
 
-  Widget _buildCardsBlock(BuildContext context, List estates) {
-    if (estates.length > 4) estates = estates.sublist(0, 4);
-
-    return Visibility(
-      visible: estates.length > 0,
-      child: Container(
-        width: 100.w,
-        padding: EdgeInsets.only(top: defaultPadding),
-        child: Wrap(
-          alignment: WrapAlignment.spaceBetween,
-          runSpacing: 6,
-          children: [
-            ...estates.map((estate) => EstateCard(estate: estate)).toList(),
-          ],
+  Widget _buildCardsBlock(BuildContext context, List? estates) {
+    try {
+      if (estates != null && estates.length > 4)
+        estates = estates.sublist(0, 4);
+      return Visibility(
+        visible: estates != null,
+        child: Container(
+          width: 100.w,
+          padding: EdgeInsets.only(top: defaultPadding),
+          child: Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            runSpacing: 6,
+            children: [
+              ...estates!.map((estate) => EstateCard(estate: estate)).toList(),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    } catch (e) {
+      print(e);
+      return Visibility(visible: false, child: Container());
+    }
   }
 
-  Widget _buildTopBannerBlock(BuildContext context, List banners) {
-    if (banners.length > 4) banners = banners.sublist(0, 4);
+  Widget _buildTopBannerBlock(BuildContext context, List? banners) {
+    if (banners!.length > 4) banners = banners.sublist(0, 4);
 
     return Visibility(
       visible: banners.length == 0,
@@ -204,8 +209,9 @@ class _HomePageScreenState extends State<HomePageScreen> {
     );
   }
 
-  Widget _buildBannerBlock(BuildContext context, List banners) {
-    if (banners.length > 4) banners = banners.sublist(0, 4);
+  Widget _buildBannerBlock(BuildContext context, List? banners) {
+    if (banners!.length > 4) banners = banners.sublist(0, 4);
+
     return Visibility(
       visible: banners.length > 0,
       child: Container(
@@ -236,9 +242,10 @@ class _HomePageScreenState extends State<HomePageScreen> {
   }
 
   Widget _buildEstateTypeBlock(CategoryModel category) {
-    List topEstates =
-        Provider.of<EstateProvider>(context).topEstates[category.id];
-    List banners = Provider.of<BannerProvider>(context).banners[category.id];
+    List topEstates = Provider.of<EstateProvider>(context, listen: false)
+        .topEstates[category.id];
+    List banners = Provider.of<BannerProvider>(context, listen: false)
+        .banners[category.id];
 
     return Visibility(
       visible: (topEstates.length > 0 || banners.length > 0),
@@ -260,7 +267,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
               ],
             ),
             _buildCardsBlock(context, topEstates),
-            _buildBannerBlock(context, banners)
+            // _buildBannerBlock(context, banners)
           ],
         ),
       ),

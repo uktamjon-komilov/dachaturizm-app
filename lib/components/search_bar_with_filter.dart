@@ -80,13 +80,15 @@ class SearchBarWithFilter extends StatelessWidget {
             children: [
               SizedBox(width: 12),
               Container(
-                decoration: BoxDecoration(boxShadow: [
-                  BoxShadow(
-                    color: Color(0xFFF17C31).withOpacity(0.15),
-                    blurRadius: 25,
-                    offset: Offset(0, 4),
-                  ),
-                ]),
+                decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color(0xFFF17C31).withOpacity(0.15),
+                      blurRadius: 25,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
                 child: TextButton(
                   onPressed: () {
                     Navigator.of(context).pushNamed(
