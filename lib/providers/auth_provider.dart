@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/models/message_model.dart';
+import 'package:dachaturizm/models/transaction_model.dart';
 import 'package:dachaturizm/models/user_model.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -243,7 +244,7 @@ class AuthProvider with ChangeNotifier {
     return {"status": false};
   }
 
-  Future getUserData() async {
+  Future<UserModel?> getUserData() async {
     int userId = await getUserId();
     if (userId != null) {
       final url = "${baseUrl}api/users/${userId}/";
@@ -257,7 +258,7 @@ class AuthProvider with ChangeNotifier {
       }
     }
 
-    return {"status": false};
+    return null;
   }
 
   Future getMyChats() async {
@@ -381,5 +382,19 @@ class AuthProvider with ChangeNotifier {
       "new_password": newPassword
     };
     return await resetPasswordBase(url, data);
+  }
+
+  Future<List<TransactionModel>> getTransactions(String type) async {
+    List<TransactionModel> transactions = [];
+    final url = "${baseUrl}api/transactions/${type}/";
+    String access = await getAccessToken();
+    Map<String, String> headers = {"Authorization": "Bearer ${access}"};
+    try {
+      final response = await dio.get(url, options: Options(headers: headers));
+      response.data.forEach((item) {
+        transactions.add(TransactionModel.fromJson(item));
+      });
+    } catch (e) {}
+    return transactions;
   }
 }

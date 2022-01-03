@@ -22,18 +22,27 @@ class WishlistScreen extends StatefulWidget {
 }
 
 class _WishlistScreenState extends State<WishlistScreen> {
+  bool _isLoading = true;
   List<EstateModel> _estates = [];
+
+  _refresh() async {
+    setState(() {
+      _isLoading = true;
+    });
+    Provider.of<EstateProvider>(context, listen: false)
+        .myWishlist()
+        .then((value) {
+      setState(() {
+        _estates = value;
+        _isLoading = false;
+      });
+    });
+  }
 
   @override
   void initState() {
-    Future.delayed(Duration.zero).then((_) {
-      Provider.of<EstateProvider>(context, listen: false)
-          .myWishlist()
-          .then((value) {
-        setState(() {
-          _estates = value;
-        });
-      });
+    Future.delayed(Duration.zero).then((_) async {
+      await _refresh();
     });
     super.initState();
   }
@@ -55,28 +64,43 @@ class _WishlistScreenState extends State<WishlistScreen> {
           bottomNavigationBar: buildBottomNavigation(context, () {
             Navigator.of(context).pop();
           }),
-          body: Container(
-            padding: EdgeInsets.all(defaultPadding),
-            child: SingleChildScrollView(
-              physics: BouncingScrollPhysics(),
-              child: Column(
-                children: [
-                  (_estates.length == 0)
-                      ? NoResult(
-                          photoPath: "assets/images/e-commerce.png",
-                          text: Locales.string(context, "no_wishlist_items"),
-                        )
-                      : Wrap(
-                          children: [
-                            ..._estates
-                                .map((estate) => EstateCard(estate: estate))
-                                .toList(),
-                          ],
-                        ),
-                ],
-              ),
-            ),
-          ),
+          body: _isLoading
+              ? Center(
+                  child: CircularProgressIndicator(),
+                )
+              : RefreshIndicator(
+                  onRefresh: () async => await _refresh(),
+                  child: Container(
+                    width: 100.w,
+                    height: 100.h,
+                    child: SingleChildScrollView(
+                      physics: AlwaysScrollableScrollPhysics(),
+                      child: Column(
+                        children: [
+                          (_estates.length == 0)
+                              ? NoResult(
+                                  photoPath: "assets/images/e-commerce.png",
+                                  text: Locales.string(
+                                      context, "no_wishlist_items"),
+                                )
+                              : Container(
+                                  padding: EdgeInsets.all(defaultPadding),
+                                  width: 100.w,
+                                  child: Wrap(
+                                    alignment: WrapAlignment.start,
+                                    children: [
+                                      ..._estates
+                                          .map((estate) =>
+                                              EstateCard(estate: estate))
+                                          .toList(),
+                                    ],
+                                  ),
+                                ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
         ),
       ),
     );

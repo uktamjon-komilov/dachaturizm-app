@@ -61,9 +61,7 @@ class _BalanceScreenState extends State<BalanceScreen>
       Provider.of<AuthProvider>(context, listen: false)
           .getUserData()
           .then((user) {
-        try {
-          if (user.containsKey("status")) {}
-        } catch (e) {
+        if (user != null) {
           setState(() {
             _balance = user.balance;
             _isLoading = false;

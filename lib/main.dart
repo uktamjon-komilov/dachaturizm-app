@@ -20,10 +20,11 @@ import 'package:dachaturizm/screens/app/home/service_screen.dart';
 import 'package:dachaturizm/screens/app/home/services_list_screen.dart';
 import 'package:dachaturizm/screens/app/navigational_app_screen.dart';
 import 'package:dachaturizm/screens/app/search/filters_screen.dart';
-import 'package:dachaturizm/screens/app/user/balance_screen.dart';
+import 'package:dachaturizm/screens/app/user/fill_balance_screen.dart';
 import 'package:dachaturizm/screens/app/user/change_language.dart';
 import 'package:dachaturizm/screens/app/user/edit_profile_screen.dart';
 import 'package:dachaturizm/screens/app/user/my_announcements_screen.dart';
+import 'package:dachaturizm/screens/app/user/my_balance_screen.dart';
 import 'package:dachaturizm/screens/app/user/wishlist_screen.dart';
 import 'package:dachaturizm/screens/auth/auth_type_screen.dart';
 import 'package:dachaturizm/screens/auth/create_profile_screen.dart';
@@ -173,6 +174,7 @@ class _MyAppState extends State<MyApp> {
               ChatScreen.routeName: (context) => ChatScreen(),
               MyAnnouncements.routeName: (context) => MyAnnouncements(),
               WishlistScreen.routeName: (context) => WishlistScreen(),
+              MyBalanceScreen.routeName: (context) => MyBalanceScreen(),
               BalanceScreen.routeName: (context) => BalanceScreen(),
               ChangeLanguage.routeName: (context) => ChangeLanguage(),
             },

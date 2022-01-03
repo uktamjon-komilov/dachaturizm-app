@@ -1,12 +1,13 @@
 import 'package:dachaturizm/components/profile_item.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/helpers/call_with_auth.dart';
+import 'package:dachaturizm/models/user_model.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
-import 'package:dachaturizm/screens/app/user/balance_screen.dart';
 import 'package:dachaturizm/screens/app/user/change_language.dart';
 import 'package:dachaturizm/screens/app/user/edit_profile_screen.dart';
 import 'package:dachaturizm/screens/app/user/my_announcements_screen.dart';
+import 'package:dachaturizm/screens/app/user/my_balance_screen.dart';
 import 'package:dachaturizm/screens/app/user/wishlist_screen.dart';
 import 'package:dachaturizm/screens/app/user_extra_details.dart';
 import 'package:dachaturizm/screens/auth/login_screen.dart';
@@ -14,7 +15,6 @@ import 'package:dachaturizm/styles/text_styles.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:provider/provider.dart';
-import 'package:sizer/sizer.dart';
 
 class UserPageScreen extends StatefulWidget {
   const UserPageScreen({Key? key}) : super(key: key);
@@ -26,14 +26,19 @@ class UserPageScreen extends StatefulWidget {
 class _UserPageScreenState extends State<UserPageScreen> {
   bool _userLoading = false;
   bool _someChange = false;
+  UserModel? _user;
 
   Future _refreshUser() async {
     setState(() {
       _userLoading = true;
     });
-    await Provider.of<AuthProvider>(context, listen: false).getUserData();
-    setState(() {
-      _userLoading = false;
+    Provider.of<AuthProvider>(context, listen: false)
+        .getUserData()
+        .then((user) {
+      setState(() {
+        _user = user;
+        _userLoading = false;
+      });
     });
   }
 
@@ -76,29 +81,27 @@ class _UserPageScreenState extends State<UserPageScreen> {
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
-          child: Consumer<AuthProvider>(
-            builder: (context, auth, _) => Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildUserDetails(context, auth),
-                SizedBox(height: 1.5 * defaultPadding),
-                ColumnTitle("Mening profilim"),
-                _buildProfileList(),
-                SizedBox(height: 1.5 * defaultPadding),
-                ColumnTitle("Sozlamalar"),
-                _buildSettingsList(),
-                // Divider(),
-              ],
-            ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildUserDetails(context, _user),
+              SizedBox(height: 1.5 * defaultPadding),
+              ColumnTitle("Mening profilim"),
+              _buildProfileList(),
+              SizedBox(height: 1.5 * defaultPadding),
+              ColumnTitle("Sozlamalar"),
+              _buildSettingsList(),
+              // Divider(),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget _buildUserDetails(BuildContext context, AuthProvider auth) {
+  Widget _buildUserDetails(BuildContext context, UserModel? user) {
     return Visibility(
-      visible: !_userLoading,
+      visible: !_userLoading && user != null,
       child: Container(
         decoration: BoxDecoration(
           color: disabledOrange,
@@ -107,13 +110,13 @@ class _UserPageScreenState extends State<UserPageScreen> {
             bottomRight: Radius.circular(20),
           ),
         ),
-        child: buildUserDetails(context, auth.user, true),
+        child: buildUserDetails(context, user, true),
       ),
     );
   }
 
   Widget _buildProfileList() {
-    bool userExists = Provider.of<AuthProvider>(context).user != null;
+    bool userExists = _user != null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -160,7 +163,7 @@ class _UserPageScreenState extends State<UserPageScreen> {
             iconData: Icons.account_balance_wallet_rounded,
             callback: () {
               callWithAuth(context, () {
-                Navigator.of(context).pushNamed(BalanceScreen.routeName);
+                Navigator.of(context).pushNamed(MyBalanceScreen.routeName);
               });
             },
           ),
