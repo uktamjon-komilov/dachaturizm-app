@@ -133,7 +133,7 @@ class EstateProvider with ChangeNotifier {
   String getQueryStringFromFilters(
       {String? term,
       CategoryModel? category,
-      Map<String, dynamic>? extraArgs}) {
+      Map<String, dynamic>? extraArgs = const {}}) {
     String queryString = Uri(
       host: "",
       scheme: "",
@@ -209,7 +209,7 @@ class EstateProvider with ChangeNotifier {
   Future<Map<String, dynamic>> getSearchedResults({
     String? term,
     CategoryModel? category,
-    Map<String, dynamic>? extraArgs,
+    Map<String, dynamic>? extraArgs = const {},
   }) async {
     Map<String, dynamic> data = {};
     List<EstateModel> estates = [];
@@ -218,6 +218,7 @@ class EstateProvider with ChangeNotifier {
       category: category,
       extraArgs: extraArgs,
     );
+    print("worked");
     final url = "${baseUrl}api/estate/?${queryString}";
     final response = await _fetch(url);
     print(url);

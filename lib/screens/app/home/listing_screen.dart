@@ -100,7 +100,6 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
             "simple": false,
           }).then((data) {
         setState(() {
-          print(data);
           _topEstates = data["estates"];
           _topNextLink = data["next"];
         });
@@ -113,7 +112,6 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
             "simple": true,
           }).then((data) {
         setState(() {
-          print(data);
           _simpleEstates = data["estates"];
           _simpleNextLink = data["next"];
         });
