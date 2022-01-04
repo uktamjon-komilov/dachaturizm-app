@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dachaturizm/components/booked_days_hint.dart';
+import 'package:dachaturizm/components/fluid_big_button.dart';
 import 'package:dachaturizm/components/normal_input.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/helpers/call_with_auth.dart';
@@ -20,7 +21,9 @@ import 'package:dachaturizm/providers/facility_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/providers/category_provider.dart';
 import 'package:dachaturizm/screens/app/estate/location_picker_screen.dart';
+import 'package:dachaturizm/screens/app/search/filters_screen.dart';
 import 'package:dachaturizm/screens/app/user/my_announcements_screen.dart';
+import 'package:dachaturizm/styles/text_styles.dart';
 import 'package:flutter/cupertino.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_locales/flutter_locales.dart';
@@ -29,6 +32,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:find_dropdown/find_dropdown.dart';
 
 class EstateCreationPageScreen extends StatefulWidget {
   const EstateCreationPageScreen({Key? key}) : super(key: key);
@@ -50,6 +54,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
   EstateModel? _estate;
   List<RegionModel> _regions = [];
   List<DistrictModel> _districts = [];
+  List<CategoryModel> _categories = [];
   String errors = "";
   GlobalKey<FormState> _form = GlobalKey<FormState>();
   ScrollController _scrollController = ScrollController();
@@ -62,9 +67,9 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
   FocusNode _weekdayPriceFocusNode = FocusNode();
   FocusNode _weekendPriceFocusNode = FocusNode();
 
-  var _mainImage = null;
+  dynamic? _mainImage;
   List _extraImages = List.generate(8, (_) => null);
-  int _currentSectionId = 0;
+  String _currentSection = "0";
   TextEditingController _titleController = TextEditingController();
   TextEditingController _descriptionController = TextEditingController();
   TextEditingController _announcerController = TextEditingController();
@@ -73,8 +78,8 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
   TextEditingController _weekdayPriceController = TextEditingController();
   TextEditingController _weekendPriceController = TextEditingController();
   int _currentCurrencyId = 0;
-  int _currentRegionId = 0;
-  int _currentDistrictId = 0;
+  String _currentRegion = "0";
+  String _currentDistrict = "0";
   List<int> _facilities = [];
   double _longtitude = 0.0;
   double _latitute = 0.0;
@@ -83,7 +88,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
   void _resetInputs() {
     _mainImage = null;
     _extraImages = List.generate(8, (_) => null);
-    _currentSectionId = 0;
+    _currentSection = "0";
     _titleController.text = "";
     _descriptionController.text = "";
     _announcerController.text = "";
@@ -92,8 +97,8 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     _weekdayPriceController.text = "";
     _weekendPriceController.text = "";
     _currentCurrencyId = 0;
-    _currentRegionId = 0;
-    _currentDistrictId = 0;
+    _currentRegion = "0";
+    _currentDistrict = "0";
     _facilities = [];
     _longtitude = 0.0;
     _latitute = 0.0;
@@ -107,10 +112,10 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
   beforeSending() {
     if (!_form.currentState!.validate() ||
         _mainImage == null ||
-        _currentSectionId == 0 ||
-        _currentCurrencyId == 0 ||
-        _currentRegionId == 0 ||
-        _currentDistrictId == 0) {
+        _currentSection == 0 ||
+        _currentCurrencyId == "0" ||
+        _currentRegion == "0" ||
+        _currentDistrict == "0") {
       _scrollController.animateTo(
         0,
         duration: Duration(milliseconds: 500),
@@ -119,24 +124,31 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
       setState(() {
         _isSubmitted = true;
       });
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
           content:
-              Text(Locales.string(context, "there_is_error_in_filling_in"))));
+              Text(Locales.string(context, "there_is_error_in_filling_in")),
+        ),
+      );
       return {"status": false};
     }
+    print(1);
     Map<String, dynamic> data = {};
     data["photo"] = _mainImage;
     data["photos"] = _extraImages.where((image) => image != null).toList();
-    data["estate_type"] = _currentSectionId.toString();
+    data["estate_type"] = _categories
+        .firstWhere((element) => element.title == _currentSection.toString())
+        .id;
     data["title"] = _titleController.text;
-    data["region"] =
-        _regions.firstWhere((region) => region.id == _currentRegionId);
-    data["district"] =
-        _districts.firstWhere((district) => district.id == _currentDistrictId);
+    data["region"] = _regions
+        .firstWhere((region) => region.title.toString() == _currentRegion);
+    data["district"] = _districts.firstWhere(
+        (district) => district.title.toString() == _currentDistrict);
     data["address"] = _addressController.text;
     data["longtitute"] = _longtitude;
     data["latitute"] = _latitute;
     data["description"] = _descriptionController.text;
+    print(2);
     data["booked_days"] = _bookedDays;
     data["facilities"] = _facilities;
     data["announcer"] = _announcerController.text;
@@ -149,12 +161,15 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     data["pool"] = "0";
     data["people"] = "0";
     data["is_published"] = "true";
+    print(3);
     return data;
   }
 
   Future<dynamic> sendData() async {
     Map<String, dynamic> data = beforeSending();
+    print(4);
     if (data.containsKey("status")) return;
+    print(4);
     setState(() {
       _isUploading = true;
       _isSubmitted = false;
@@ -162,13 +177,14 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     Provider.of<EstateProvider>(context, listen: false)
         .createEstate(data)
         .then((value) async {
+      print(7);
       print(value);
       _resetInputs();
       setState(() {
         _isUploading = false;
       });
       Provider.of<NavigationScreenProvider>(context, listen: false)
-          .changePageIndex(5);
+          .changePageIndex(4);
       await callWithAuth(context, () async {
         Navigator.of(context).pushNamed(MyAnnouncements.routeName);
       });
@@ -225,7 +241,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
   Future<dynamic> _selectImage() async {
     final ImagePicker _picker = ImagePicker();
     final XFile? imageFile =
-        await _picker.pickImage(source: ImageSource.gallery);
+        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 20);
     return imageFile == null ? null : imageFile.path;
   }
 
@@ -259,22 +275,22 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     }
   }
 
-  Widget _buildMainImagePicker(
-      {image = null,
-      callback = null,
-      double width = 0.0,
-      double height = 250,
-      bool disabled = true,
-      double iconScale = 1}) {
-    width = width == 0.0 ? 100.w : width;
-
-    print(image);
+  Widget _buildMainImagePicker({
+    dynamic? photo,
+    Function? callback,
+    double? width,
+    double? height,
+    bool disabled = true,
+    double iconScale = 1,
+  }) {
+    if (height == null) height = 40.w;
+    if (width == null) width = height;
 
     return GestureDetector(
       onTap: () {
         if (disabled)
           return;
-        else {
+        else if (callback != null) {
           callback();
         }
       },
@@ -288,7 +304,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
             decoration: BoxDecoration(
               color: disabled ? lightGrey : lessNormalGrey,
             ),
-            child: image == null
+            child: photo == null
                 ? Center(
                     child: Image.asset(
                       "assets/images/fi-rr-camera.png",
@@ -297,11 +313,11 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                   )
                 : _isEditing
                     ? Image.network(
-                        fixMediaUrl(image),
+                        fixMediaUrl(photo),
                         fit: BoxFit.cover,
                       )
                     : Image.file(
-                        image,
+                        photo as File,
                         fit: BoxFit.cover,
                       ),
           ),
@@ -320,7 +336,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
           (index) => _buildMainImagePicker(
             width: (100.w - 3.5 * defaultPadding) / 4,
             height: (100.w - 3.5 * defaultPadding) / 4,
-            image: _extraImages[index],
+            photo: _extraImages[index],
             callback: () => _selectExtraImage(index),
             disabled: index > _currentExtraImageIndex,
             iconScale: 1.5,
@@ -330,31 +346,59 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     );
   }
 
-  Widget _buildSelectionRow(List<dynamic> values, value, String placeHolder,
-      {Function? onChanged}) {
-    return DropdownButton<int>(
-      borderRadius: BorderRadius.circular(10),
-      elevation: 1,
-      isExpanded: true,
-      value: value,
-      items: [
-        DropdownMenuItem<int>(
-          value: 0,
-          child: Text(placeHolder),
+  Widget _buildSelectionRow(List<String> values, value, String placeHolder,
+      {void Function(String?)? onChanged}) {
+    return Container(
+      height: 45,
+      margin: EdgeInsets.only(top: 10),
+      child: SingleChildScrollView(
+        physics: NeverScrollableScrollPhysics(),
+        child: FindDropdown<String>(
+          items: values,
+          label: "Choose one",
+          labelVisible: false,
+          selectedItem: "",
+          onChanged: onChanged ??
+              (value) {
+                print(value);
+              },
+          validate: (String? item) {
+            if (item == null)
+              return "Required field";
+            else if (!value.contains(item))
+              return "Invalid item";
+            else
+              return null;
+          },
         ),
-        ...values.map((value) {
-          return DropdownMenuItem<int>(
-            value: value.id,
-            child: Text(value.title),
-          );
-        }).toList()
-      ],
-      onChanged: (value) {
-        if (onChanged != null) {
-          onChanged(value);
-        }
-      },
+      ),
     );
+    // return Container(
+    //   child: DropdownButton(
+    //     borderRadius: BorderRadius.circular(10),
+    //     elevation: 1,
+    //     isExpanded: true,
+    //     value: value,
+    //     menuMaxHeight: 40.h,
+    //     items: [
+    //       DropdownMenuItem(
+    //         value: 0,
+    //         child: Text(placeHolder),
+    //       ),
+    //       ...values.map((value) {
+    //         return DropdownMenuItem(
+    //           value: value.id,
+    //           child: Text(value.title),
+    //         );
+    //       }).toList()
+    //     ],
+    //     onChanged: (value) {
+    //       if (onChanged != null) {
+    //         onChanged(value);
+    //       }
+    //     },
+    //   ),
+    // );
   }
 
   _showGoogleMap(BuildContext context) async {
@@ -447,27 +491,18 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
       children: [
         ...facilities.map((facility) {
           int index = facilities.indexOf(facility);
-          return Container(
-            width: 170,
-            child: CheckboxListTile(
-              value: _facilities.contains(facility.id),
-              controlAffinity: ListTileControlAffinity.leading,
-              contentPadding: EdgeInsets.all(0),
-              dense: false,
-              activeColor: normalOrange,
-              selectedTileColor: lightPurple,
-              onChanged: (change) {
-                setState(() {
+          return CustomCheckbox(
+            value: _facilities.contains(facility.id),
+            title: facilities[index].title,
+            onTap: () {
+              setState(() {
+                if (_facilities.contains(facility.id)) {
+                  _facilities.remove(facility.id);
+                } else {
                   _facilities.add(facility.id);
-                });
-              },
-              title: Text(
-                facilities[index].title,
-                style: TextStyle(
-                  fontSize: 14,
-                ),
-              ),
-            ),
+                }
+              });
+            },
           );
         }).toList()
       ],
@@ -509,7 +544,6 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
       ),
       selectedDayPredicate: (day) {
         return _selectedDays.contains(BookingDay.toObj(day));
-        // return true;
       },
       startingDayOfWeek: StartingDayOfWeek.monday,
       onDaySelected: _onDaySelected,
@@ -559,27 +593,26 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     });
     Future.delayed(Duration.zero).then((_) async {
       Future.wait([
-        // Provider.of<FacilityProvider>(context, listen: false)
-        //     .getAddresses()
-        //     .then((value) {
-        //   setState(() {
-        //     _regions = value;
-        //   });
-        // }),
-        // Provider.of<FacilityProvider>(context, listen: false)
-        //     .fetchAndSetFacilities(),
-        // Provider.of<EstateTypesProvider>(context, listen: false)
-        //     .fetchAndSetTypes(),
-        // Provider.of<CurrencyProvider>(context, listen: false)
-        //     .fetchAndSetCurrencies(),
-        // Provider.of<AuthProvider>(context, listen: false)
-        //     .getUserData()
-        //     .then((user) {
-        //   if (user.runtimeType.toString() == "UserModel") {
-        //     _announcerController.text = "${user!.firstName} ${user.lastName}";
-        //     _phoneController.text = "+${user.phone}";
-        //   }
-        // }),
+        Provider.of<FacilityProvider>(context, listen: false)
+            .getAddresses()
+            .then((value) {
+          setState(() {
+            _regions = value;
+          });
+        }),
+        Provider.of<FacilityProvider>(context, listen: false).getFacilities(),
+        Provider.of<CurrencyProvider>(context, listen: false).getCurrencies(),
+        Provider.of<EstateTypesProvider>(context, listen: false)
+            .getCategories()
+            .then((value) => _categories = value),
+        Provider.of<AuthProvider>(context, listen: false)
+            .getUserData()
+            .then((user) {
+          if (user.runtimeType.toString() == "UserModel") {
+            _announcerController.text = "${user!.firstName} ${user.lastName}";
+            _phoneController.text = "+${user.phone}";
+          }
+        }),
       ]).then((_) async {
         Map data = ModalRoute.of(context)?.settings.arguments as Map;
         String locale = await getCurrentLocale();
@@ -588,33 +621,33 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
           setState(() {
             _isEditing = true;
           });
-          // Provider.of<EstateProvider>(context, listen: false)
-          //     .fetchEstateById(data["estate"])
-          //     .then((value) {
-          //   _estate = value;
-          //   _mainImage = value.photo;
-          //   print(_mainImage);
-          //   _extraImages = List.generate(8, (_) => null);
-          //   value.photos.forEach((photo) {
-          //     int index = value.photos.indexOf(photo);
-          //     _extraImages[index] = photo.photo;
-          //   });
-          //   _currentSectionId = value.typeId;
-          //   _titleController.text = value.title;
-          //   _descriptionController.text = value.description;
-          //   _announcerController.text = value.announcer;
-          //   _phoneController.text = value.phone;
-          //   _addressController.text = value.address;
-          //   _weekdayPriceController.text = value.weekdayPrice.toString();
-          //   _weekendPriceController.text = value.weekendPrice.toString();
-          //   _currentCurrencyId = int.parse(value.priceType);
-          //   // _currentRegionId = _regions.firstWhere((region) => region.translations[]);
-          //   // _currentDistrictId = 0;
-          //   _facilities =
-          //       value.facilities.map((facility) => facility.id).toList();
-          //   _longtitude = value.longtitute;
-          //   _latitute = value.latitute;
-          // });
+          Provider.of<EstateProvider>(context, listen: false)
+              .getEstateById(data["estate"])
+              .then((value) {
+            _estate = value;
+            _mainImage = value.photo;
+            print(_mainImage);
+            _extraImages = List.generate(8, (_) => null);
+            value.photos.forEach((photo) {
+              int index = value.photos.indexOf(photo);
+              _extraImages[index] = photo.photo;
+            });
+            _currentSection = value.typeId.toString();
+            _titleController.text = value.title;
+            _descriptionController.text = value.description;
+            _announcerController.text = value.announcer;
+            _phoneController.text = value.phone;
+            _addressController.text = value.address;
+            _weekdayPriceController.text = value.weekdayPrice.toString();
+            _weekendPriceController.text = value.weekendPrice.toString();
+            _currentCurrencyId = int.parse(value.priceType);
+            // _currentRegion = _regions.firstWhere((region) => region.translations[]);
+            // _currentDistrict = 0;
+            _facilities =
+                value.facilities.map((facility) => facility.id).toList();
+            _longtitude = value.longtitute;
+            _latitute = value.latitute;
+          });
         }
       });
     });
@@ -667,7 +700,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                         Locales.string(context, "saving"),
                         style: TextStyle(
                           color: normalOrange,
-                          fontSize: 20,
+                          fontSize: 14,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -695,23 +728,41 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                   child: Form(
                     key: _form,
                     child: SingleChildScrollView(
-                      reverse: true,
                       controller: _scrollController,
                       physics: BouncingScrollPhysics(),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          VerticalHorizontalSizedBox(),
-                          Text(Locales.string(context, "main_photo")),
-                          VerticalHorizontalHalfSizedBox(),
-                          Text(
-                            Locales.string(context, "this_photo_is_main"),
-                          ),
-                          VerticalHorizontalSizedBox(),
-                          _buildMainImagePicker(
-                            image: _mainImage,
-                            callback: _selectMainImage,
-                            disabled: false,
+                          SizedBox(height: defaultPadding),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                width: 40.w,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      Locales.string(context, "main_photo"),
+                                      style: TextStyles.display9(),
+                                    ),
+                                    SizedBox(height: 12),
+                                    Text(
+                                      Locales.string(
+                                          context, "this_photo_is_main"),
+                                      style: TextStyles.display10(),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              _buildMainImagePicker(
+                                photo: _mainImage,
+                                callback: _selectMainImage,
+                                disabled: false,
+                                height: 45.w,
+                              ),
+                            ],
                           ),
                           ErrorText(
                             errorText: Locales.string(context, "pick_a_photo"),
@@ -720,53 +771,80 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                           VerticalHorizontalSizedBox(),
                           Text(
                             Locales.string(context, "gallary"),
+                            style: TextStyles.display9(),
                           ),
                           VerticalHorizontalSizedBox(),
                           _buildExtraImagesGrid(),
                           VerticalHorizontalHalfSizedBox(),
-                          Text(Locales.string(context, "max_photo_count_8")),
+                          Text(
+                            Locales.string(context, "max_photo_count_8"),
+                            style: TextStyles.display10(),
+                          ),
                           VerticalHorizontalSizedBox(),
-                          Text(Locales.string(context, "choose_section")),
-                          _buildSelectionRow(categories, _currentSectionId,
+                          Text(
+                            Locales.string(context, "choose_section"),
+                            style: TextStyles.display9(),
+                          ),
+                          _buildSelectionRow(
+                              categories
+                                  .map((category) => category.title)
+                                  .toList(),
+                              _currentSection,
                               Locales.string(context, "choose_section"),
                               onChanged: (value) {
                             setState(() {
-                              _currentSectionId = value as int;
+                              _currentSection = value as String;
                             });
                           }),
                           VerticalHorizontalSizedBox(),
                           Text(
                             Locales.string(context, "region"),
+                            style: TextStyles.display9(),
                           ),
-                          _buildSelectionRow(_regions, _currentRegionId,
+                          _buildSelectionRow(
+                              _regions.map((region) => region.title).toList(),
+                              _currentRegion,
                               Locales.string(context, "choose_region"),
                               onChanged: (value) {
                             setState(() {
-                              _currentRegionId = value as int;
-                              if (_currentRegionId == 0) {
-                                _currentDistrictId = 0;
-                                _districts = [];
+                              _currentRegion = value as String;
+                              if (_currentRegion == "0") {
+                                setState(() {
+                                  _currentDistrict = "0";
+                                  _districts = [];
+                                });
                               } else {
-                                _districts = _regions
-                                    .firstWhere((region) =>
-                                        region.id == _currentRegionId)
-                                    .districts;
+                                setState(() {
+                                  _districts = _regions
+                                      .firstWhere((region) =>
+                                          region.title.toString() ==
+                                          _currentRegion)
+                                      .districts;
+                                });
                               }
                             });
                           }),
                           VerticalHorizontalSizedBox(),
                           Text(
                             Locales.string(context, "district"),
+                            style: TextStyles.display9(),
                           ),
-                          _buildSelectionRow(_districts, _currentDistrictId,
+                          _buildSelectionRow(
+                              _districts
+                                  .map((district) => district.title)
+                                  .toList(),
+                              _currentDistrict,
                               Locales.string(context, "choose_district"),
                               onChanged: (value) {
                             setState(() {
-                              _currentDistrictId = value as int;
+                              _currentDistrict = value as String;
                             });
                           }),
                           VerticalHorizontalSizedBox(),
-                          Text(Locales.string(context, "choose_title")),
+                          Text(
+                            Locales.string(context, "choose_title"),
+                            style: TextStyles.display9(),
+                          ),
                           VerticalHorizontalHalfSizedBox(),
                           NormalTextInput(
                             hintText: Locales.string(context, "example_title"),
@@ -784,7 +862,15 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                           ),
                           VerticalHorizontalSizedBox(),
                           Text(
+                            Locales.string(context, "choose_location"),
+                            style: TextStyles.display9(),
+                          ),
+                          VerticalHorizontalHalfSizedBox(),
+                          _buildLocationPicker(),
+                          VerticalHorizontalSizedBox(),
+                          Text(
                             Locales.string(context, "enter_address"),
+                            style: TextStyles.display9(),
                           ),
                           VerticalHorizontalHalfSizedBox(),
                           NormalTextInput(
@@ -803,11 +889,10 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                             },
                           ),
                           VerticalHorizontalSizedBox(),
-                          Text(Locales.string(context, "choose_location")),
-                          VerticalHorizontalHalfSizedBox(),
-                          _buildLocationPicker(),
-                          VerticalHorizontalSizedBox(),
-                          Text(Locales.string(context, "description")),
+                          Text(
+                            Locales.string(context, "about_estate"),
+                            style: TextStyles.display9(),
+                          ),
                           VerticalHorizontalHalfSizedBox(),
                           NormalTextInput(
                             hintText: Locales.string(context, "about_estate"),
@@ -836,16 +921,25 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                             ],
                           ),
                           VerticalHorizontalSizedBox(),
-                          Text(Locales.string(context, "booked_days_if_any")),
+                          Text(
+                            Locales.string(context, "booked_days_if_any"),
+                            style: TextStyles.display9(),
+                          ),
                           _buildCalendar(),
                           VerticalHorizontalHalfSizedBox(),
                           BookedDaysHint(),
                           VerticalHorizontalSizedBox(),
-                          Text(Locales.string(context, "adding_filters")),
+                          Text(
+                            Locales.string(context, "adding_filters"),
+                            style: TextStyles.display9(),
+                          ),
                           VerticalHorizontalHalfSizedBox(),
                           _buildFacilitiesGrid(facilities),
                           VerticalHorizontalSizedBox(),
-                          Text(Locales.string(context, "contact")),
+                          Text(
+                            Locales.string(context, "contact"),
+                            style: TextStyles.display9(),
+                          ),
                           VerticalHorizontalHalfSizedBox(),
                           NormalTextInput(
                             hintText: Locales.string(context, "fullname"),
@@ -879,35 +973,50 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                             },
                           ),
                           VerticalHorizontalSizedBox(),
-                          Text(Locales.string(context, "price")),
-                          VerticalHorizontalHalfSizedBox(),
-                          NormalTextInput(
-                            hintText: Locales.string(context, "weekday_price"),
-                            controller: _weekdayPriceController,
-                            focusNode: _weekdayPriceFocusNode,
-                            isPrice: true,
-                            onChanged: () {
-                              setState(() {
-                                _isLoading = false;
-                              });
-                            },
-                            onSubmitted: (value) {
-                              FocusScope.of(context)
-                                  .requestFocus(_weekendPriceFocusNode);
-                            },
+                          Text(
+                            Locales.string(context, "price"),
+                            style: TextStyles.display9(),
                           ),
                           VerticalHorizontalHalfSizedBox(),
-                          NormalTextInput(
-                            hintText: Locales.string(context, "weekend_price"),
-                            controller: _weekendPriceController,
-                            focusNode: _weekendPriceFocusNode,
-                            isPrice: true,
-                            onChanged: () {
-                              setState(() {
-                                _isLoading = false;
-                              });
-                            },
-                            onSubmitted: (value) {},
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                width: 43.w,
+                                child: NormalTextInput(
+                                  hintText:
+                                      Locales.string(context, "weekday_price"),
+                                  controller: _weekdayPriceController,
+                                  focusNode: _weekdayPriceFocusNode,
+                                  isPrice: true,
+                                  onChanged: () {
+                                    setState(() {
+                                      _isLoading = false;
+                                    });
+                                  },
+                                  onSubmitted: (value) {
+                                    FocusScope.of(context)
+                                        .requestFocus(_weekendPriceFocusNode);
+                                  },
+                                ),
+                              ),
+                              Container(
+                                width: 43.w,
+                                child: NormalTextInput(
+                                  hintText:
+                                      Locales.string(context, "weekend_price"),
+                                  controller: _weekendPriceController,
+                                  focusNode: _weekendPriceFocusNode,
+                                  isPrice: true,
+                                  onChanged: () {
+                                    setState(() {
+                                      _isLoading = false;
+                                    });
+                                  },
+                                  onSubmitted: (value) {},
+                                ),
+                              ),
+                            ],
                           ),
                           _buildPriceTypeRow(currencies),
                           ErrorText(
@@ -916,45 +1025,17 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                             display: (_isSubmitted && _currentCurrencyId == 0),
                           ),
                           VerticalHorizontalSizedBox(),
-                          ElevatedButton(
-                            onPressed: () async {
+                          FluidBigButton(
+                            onPress: () async {
                               if (_isEditing) {
                                 await updateData();
                               } else {
                                 await sendData();
                               }
                             },
-                            style: ElevatedButton.styleFrom(
-                              minimumSize: Size(100.w - 2 * defaultPadding, 50),
-                              primary: normalOrange,
-                              // onPrimary: normalOrange.withOpacity(0.05),
-                              elevation: 0,
-                              shadowColor: Colors.transparent,
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                _isEditing
-                                    ? Text(
-                                        Locales.string(context, "edit_estate"),
-                                        style: TextStyle(
-                                          color: _isLoading
-                                              ? normalOrange
-                                              : Colors.white,
-                                          fontSize: 20,
-                                        ),
-                                      )
-                                    : Text(
-                                        Locales.string(context, "save_estate"),
-                                        style: TextStyle(
-                                          color: _isLoading
-                                              ? normalOrange
-                                              : Colors.white,
-                                          fontSize: 20,
-                                        ),
-                                      ),
-                              ],
-                            ),
+                            text: _isEditing
+                                ? Locales.string(context, "edit_estate")
+                                : Locales.string(context, "save_estate"),
                           ),
                           VerticalHorizontalSizedBox(),
                         ],

@@ -1,4 +1,5 @@
 import 'package:dachaturizm/constants.dart';
+import 'package:dachaturizm/styles/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 
@@ -20,7 +21,10 @@ class BookedDaysHint extends StatelessWidget {
           ),
         ),
         SizedBox(width: 10),
-        Text(Locales.string(context, "booked_days")),
+        Text(
+          Locales.string(context, "booked_days"),
+          style: TextStyles.display10(),
+        ),
       ],
     );
   }

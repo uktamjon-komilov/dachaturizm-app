@@ -1,4 +1,6 @@
 import 'package:dachaturizm/constants.dart';
+import 'package:dachaturizm/styles/input.dart';
+import 'package:dachaturizm/styles/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_locales/flutter_locales.dart';
@@ -69,13 +71,10 @@ class NormalTextInput extends StatelessWidget {
       },
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: TextStyle(color: normalGrey.withAlpha(150)),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(color: normalOrange)),
+        hintStyle: TextStyles.display5(),
+        border: InputStyles.inputBorder(),
+        focusedBorder: InputStyles.focusBorder(),
+        enabledBorder: InputStyles.enabledBorder(),
         contentPadding: EdgeInsets.all(defaultPadding / 2),
       ),
       style: TextStyle(fontSize: 18),

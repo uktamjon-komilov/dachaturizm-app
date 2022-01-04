@@ -60,3 +60,50 @@ class ProfileListItem extends StatelessWidget {
     );
   }
 }
+
+class SettingsItem extends StatelessWidget {
+  const SettingsItem({
+    Key? key,
+    required this.title,
+    required this.callback,
+  }) : super(key: key);
+
+  final String title;
+  final Function callback;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.symmetric(
+        vertical: defaultPadding / 3,
+        horizontal: defaultPadding / 1.5,
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () {
+          callback();
+        },
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.fromLTRB(
+            10,
+            3,
+            10,
+            6,
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                title,
+                style: TextStyles.display1(),
+              ),
+              Spacer(),
+              Icon(Icons.keyboard_arrow_right_rounded)
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

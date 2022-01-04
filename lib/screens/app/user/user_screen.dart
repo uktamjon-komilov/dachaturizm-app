@@ -1,13 +1,16 @@
 import 'package:dachaturizm/components/profile_item.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/helpers/call_with_auth.dart';
+import 'package:dachaturizm/models/static_page_model.dart';
 import 'package:dachaturizm/models/user_model.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
+import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/screens/app/user/change_language.dart';
 import 'package:dachaturizm/screens/app/user/edit_profile_screen.dart';
 import 'package:dachaturizm/screens/app/user/my_announcements_screen.dart';
 import 'package:dachaturizm/screens/app/user/my_balance_screen.dart';
+import 'package:dachaturizm/screens/app/user/static_page_screen.dart';
 import 'package:dachaturizm/screens/app/user/wishlist_screen.dart';
 import 'package:dachaturizm/screens/app/user_extra_details.dart';
 import 'package:dachaturizm/screens/auth/login_screen.dart';
@@ -27,17 +30,26 @@ class _UserPageScreenState extends State<UserPageScreen> {
   bool _userLoading = false;
   bool _someChange = false;
   UserModel? _user;
+  List<StaticPageModel> _staticPages = [];
 
   Future _refreshUser() async {
     setState(() {
       _userLoading = true;
     });
+
     Provider.of<AuthProvider>(context, listen: false)
         .getUserData()
         .then((user) {
       setState(() {
         _user = user;
-        _userLoading = false;
+      });
+      Provider.of<EstateProvider>(context, listen: false)
+          .getStaticPages()
+          .then((value) {
+        setState(() {
+          _staticPages = value;
+          _userLoading = false;
+        });
       });
     });
   }
@@ -91,6 +103,18 @@ class _UserPageScreenState extends State<UserPageScreen> {
               SizedBox(height: 1.5 * defaultPadding),
               ColumnTitle("Sozlamalar"),
               _buildSettingsList(),
+              SizedBox(height: 1.5 * defaultPadding),
+              ColumnTitle("Boshqa sozlamalar"),
+              ..._staticPages
+                  .map((page) => SettingsItem(
+                      title: page.title,
+                      callback: () {
+                        Navigator.of(context).pushNamed(
+                            StaticPageScreen.routeName,
+                            arguments: page);
+                      }))
+                  .toList(),
+
               // Divider(),
             ],
           ),

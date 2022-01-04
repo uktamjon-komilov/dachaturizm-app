@@ -5,6 +5,7 @@ import 'package:dachaturizm/helpers/locale_helper.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/models/category_model.dart';
 import 'package:dachaturizm/models/estate_rating_model.dart';
+import 'package:dachaturizm/models/static_page_model.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
@@ -112,6 +113,18 @@ class EstateProvider with ChangeNotifier {
     } catch (e) {}
     data["estates"] = estates;
     return data;
+  }
+
+  // Get static pages
+  Future<List<StaticPageModel>> getStaticPages() async {
+    List<StaticPageModel> pages = [];
+    const url = "${baseUrl}api/staticpages/";
+    final response = await dio.get(url);
+    await response.data.forEach((item) async {
+      StaticPageModel page = await StaticPageModel.fromJson(item);
+      pages.add(page);
+    });
+    return pages;
   }
 
   // Begin
@@ -276,11 +289,13 @@ class EstateProvider with ChangeNotifier {
   Future<List<EstateModel>> getSimilarEstates(int estateId) async {
     List<EstateModel> estates = [];
     final url = "${baseUrl}api/estate/${estateId}/similar/";
-    final response = await dio.get(url);
-    await response.data.forEach((item) async {
-      EstateModel estate = await EstateModel.fromJson(item);
-      estates.add(estate);
-    });
+    try {
+      final response = await dio.get(url);
+      await response.data.forEach((item) async {
+        EstateModel estate = await EstateModel.fromJson(item);
+        estates.add(estate);
+      });
+    } catch (e) {}
     return estates.sublist(0, 2);
   }
 
@@ -355,6 +370,8 @@ class EstateProvider with ChangeNotifier {
       }
     };
 
+    print(translations);
+
     if (data.containsKey("title")) {
       translations[locale.toString()]["title"] = data["title"];
     } else {
@@ -378,15 +395,15 @@ class EstateProvider with ChangeNotifier {
     }
 
     if (data.containsKey("beds")) {
-      tempData["beds"] = data["beds"];
+      tempData["beds"] = 5;
     }
 
     if (data.containsKey("pool")) {
-      tempData["pool"] = data["pool"];
+      tempData["pool"] = 1;
     }
 
     if (data.containsKey("people")) {
-      tempData["people"] = data["people"];
+      tempData["people"] = 5;
     }
 
     if (data.containsKey("weekday_price")) {
@@ -429,6 +446,8 @@ class EstateProvider with ChangeNotifier {
       tempData["booked_days"] = "[${data['booked_days'].join(',')}]";
     }
 
+    print(tempData);
+
     return tempData;
   }
 
@@ -440,16 +459,21 @@ class EstateProvider with ChangeNotifier {
       return {"statusCode": 400};
     }
     String access = await auth.getAccessToken();
-    Options options = Options(headers: {
-      "Content-type": "multipart/form-data",
-      "Authorization": "Bearer ${access}",
-    });
+    Options options = Options(
+      headers: {
+        "Content-type": "multipart/form-data",
+        "Authorization": "Bearer ${access}",
+      },
+    );
+
+    print(5);
 
     Map<String, dynamic> tempData = await prepareData(data);
 
     try {
       FormData formData = FormData.fromMap(tempData);
-      var response = await dio.post(url, data: formData, options: options);
+      final response = await dio.post(url, data: formData, options: options);
+      print(6);
       return {"statusCode": response.statusCode};
     } catch (e) {
       print(e);

@@ -158,8 +158,8 @@ class _HomePageScreenState extends State<HomePageScreen> {
           if (value != "") {
             String term = _searchController.text;
             _searchController.text = "";
-            Provider.of<NavigationScreenProvider>(context, listen: false)
-                .visitSearchPage(term);
+            // Provider.of<NavigationScreenProvider>(context, listen: false)
+            //     .visitSearchPage(term);
           }
         },
       ),
