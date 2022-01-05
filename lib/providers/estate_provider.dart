@@ -455,10 +455,12 @@ class EstateProvider with ChangeNotifier {
   Future<Map<String, dynamic>> createEstate(Map<String, dynamic> data) async {
     const url = "${baseUrl}api/estate/";
     String refresh = await auth.getRefreshToken();
+    print("refresh");
     if (refresh == null || refresh == "") {
       return {"statusCode": 400};
     }
     String access = await auth.getAccessToken();
+    print("access");
     Options options = Options(
       headers: {
         "Content-type": "multipart/form-data",
@@ -466,14 +468,12 @@ class EstateProvider with ChangeNotifier {
       },
     );
 
-    print(5);
-
     Map<String, dynamic> tempData = await prepareData(data);
 
     try {
       FormData formData = FormData.fromMap(tempData);
       final response = await dio.post(url, data: formData, options: options);
-      print(6);
+      print("uploaded");
       return {"statusCode": response.statusCode};
     } catch (e) {
       print(e);
@@ -540,16 +540,47 @@ class EstateProvider with ChangeNotifier {
     return [];
   }
 
+  // Getting my last estate
+  Future<EstateModel?> getMyLastEstate() async {
+    const url = "${baseUrl}api/estate/last/";
+    final access = await auth.getAccessToken();
+    print(url);
+    try {
+      print(url);
+      final response = await dio.get(
+        url,
+        options: Options(headers: {
+          "Content-type": "application/json",
+          "Authorization": "Bearer ${access}",
+        }),
+      );
+      print(response);
+      if (response.statusCode as int >= 200 ||
+          response.statusCode as int < 300) {
+        EstateModel estate = await EstateModel.fromJson(response.data);
+        return estate;
+      }
+    } catch (e) {
+      print(e);
+    }
+    print("no");
+    return null;
+  }
+
   // Advertise estate
-  Future<bool> advertise(String plan, String id) async {
-    final url = "${baseUrl}api/advertise/${plan}/${id}/";
+  Future<bool> advertise(String slug, int estateId) async {
+    final url = "${baseUrl}api/advertise/${slug}/${estateId}/";
+    print(url);
     final access = await auth.getAccessToken();
     try {
+      print("try");
       final response = await dio.post(url,
           options: Options(headers: {
             "Content-type": "application/json",
             "Authorization": "Bearer ${access}"
           }));
+      print(response);
+      print(response.data);
       if (response.statusCode as int >= 200 ||
           response.statusCode as int < 300) {
         return true;
@@ -558,6 +589,7 @@ class EstateProvider with ChangeNotifier {
     } catch (e) {
       print(e);
     }
+    print(false);
     return false;
   }
 

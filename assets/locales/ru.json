@@ -154,5 +154,10 @@
     "payment_amount_must_be_uzs": "Количество должно быть UZS",
     "enter_payment_amount": "Введите сумму платежа",
     "payment_method": "Тип платежа",
-    "ready": "Готовый"
+    "ready": "Готовый",
+    "plans": "Рекламные планы",
+    "you_can_change_plans_later_on": "Вы можете изменить рекламный план своего поместья позже",
+    "activate": "Активировать",
+    "you_dont_have_enough_money": "У вас недостаточно денег",
+    "you_can_activate_this_plan": "Вы можете активировать этот план"
 }

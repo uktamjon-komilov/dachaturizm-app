@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:dachaturizm/components/app_bar.dart';
+import 'package:dachaturizm/components/bottom_navbar.dart';
 import 'package:dachaturizm/components/fluid_big_button.dart';
 import 'package:dachaturizm/components/no_result_univesal.dart';
 import 'package:dachaturizm/components/search_bar_with_filter.dart';
@@ -184,6 +185,9 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
             "my_announcements",
           ),
         ),
+        bottomNavigationBar: buildBottomNavigation(context, () {
+          Navigator.of(context).pop();
+        }),
         body: _isLoading
             ? Center(
                 child: CircularProgressIndicator(),
@@ -228,7 +232,13 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
                             ),
                           ),
                           SizedBox(height: defaultPadding / 4),
-                          ..._estateBlockList()
+                          Expanded(
+                            child: SingleChildScrollView(
+                              child: Column(
+                                children: [..._estateBlockList()],
+                              ),
+                            ),
+                          ),
                         ],
                       );
                     } else {

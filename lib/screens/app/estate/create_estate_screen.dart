@@ -21,6 +21,7 @@ import 'package:dachaturizm/providers/facility_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/providers/category_provider.dart';
 import 'package:dachaturizm/screens/app/estate/location_picker_screen.dart';
+import 'package:dachaturizm/screens/app/estate/plans_screen.dart';
 import 'package:dachaturizm/screens/app/search/filters_screen.dart';
 import 'package:dachaturizm/screens/app/user/my_announcements_screen.dart';
 import 'package:dachaturizm/styles/text_styles.dart';
@@ -165,31 +166,11 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     return data;
   }
 
-  Future<dynamic> sendData() async {
+  sendData() {
     Map<String, dynamic> data = beforeSending();
-    print(4);
+    _resetInputs();
     if (data.containsKey("status")) return;
-    print(4);
-    setState(() {
-      _isUploading = true;
-      _isSubmitted = false;
-    });
-    Provider.of<EstateProvider>(context, listen: false)
-        .createEstate(data)
-        .then((value) async {
-      print(7);
-      print(value);
-      _resetInputs();
-      setState(() {
-        _isUploading = false;
-      });
-      Provider.of<NavigationScreenProvider>(context, listen: false)
-          .changePageIndex(4);
-      await callWithAuth(context, () async {
-        Navigator.of(context).pushNamed(MyAnnouncements.routeName);
-      });
-      return value;
-    });
+    return data;
   }
 
   Future<dynamic> updateData() async {
@@ -1030,7 +1011,10 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                               if (_isEditing) {
                                 await updateData();
                               } else {
-                                await sendData();
+                                dynamic data = await sendData();
+                                Navigator.of(context).pushNamed(
+                                    PlansScreen.routeName,
+                                    arguments: {"data": data});
                               }
                             },
                             text: _isEditing

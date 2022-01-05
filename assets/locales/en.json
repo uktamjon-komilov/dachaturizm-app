@@ -154,5 +154,10 @@
     "payment_amount_must_be_uzs": "Payment amount must be in UZS",
     "enter_payment_amount": "Enter payment amount",
     "payment_method": "Payment method",
-    "ready": "Ready"
+    "ready": "Ready",
+    "plans": "Advertising plans",
+    "you_can_change_plans_later_on": "You can change you estate's advertising plan later on",
+    "activate": "Activate",
+    "you_dont_have_enough_money": "You don't have enough funds",
+    "you_can_activate_this_plan": "You can activate this plan"
 }

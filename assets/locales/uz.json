@@ -154,5 +154,10 @@
     "payment_amount_must_be_uzs": "Miqdor UZS bo‘lishi shart",
     "enter_payment_amount": "To‘lov miqdorini kiriting",
     "payment_method": "To‘lov turi",
-    "ready": "Tayyor"
+    "ready": "Tayyor",
+    "plans": "Tariflar",
+    "you_can_change_plans_later_on": "Tarif rejani keyinchalik istagan vaqtda o‘zgartirish mumkin",
+    "activate": "Faollashtirish",
+    "you_dont_have_enough_money": "Hisobingizda yetarli mablag’ mavjud emas",
+    "you_can_activate_this_plan": "Bu tarifni faollashtira olasiz"
 }

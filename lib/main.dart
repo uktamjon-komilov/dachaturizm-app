@@ -13,6 +13,7 @@ import 'package:dachaturizm/screens/app/chat/chat_screen.dart';
 import 'package:dachaturizm/screens/app/estate/create_estate_screen.dart';
 import 'package:dachaturizm/screens/app/estate/estate_detail_screen.dart';
 import 'package:dachaturizm/screens/app/estate/location_picker_screen.dart';
+import 'package:dachaturizm/screens/app/estate/plans_screen.dart';
 import 'package:dachaturizm/screens/app/estate/user_estates_screen.dart';
 import 'package:dachaturizm/screens/app/home/home_screen.dart';
 import 'package:dachaturizm/screens/app/home/listing_screen.dart';
@@ -165,6 +166,7 @@ class _MyAppState extends State<MyApp> {
               EstateListingScreen.routeName: (context) => EstateListingScreen(),
               EstateCreationPageScreen.routeName: (context) =>
                   EstateCreationPageScreen(),
+              PlansScreen.routeName: (context) => PlansScreen(),
               ServicesListScreen.routeName: (context) => ServicesListScreen(),
               ServiceScreen.routeName: (context) => ServiceScreen(),
               SearchFilersScreen.routeName: (context) => SearchFilersScreen(),
