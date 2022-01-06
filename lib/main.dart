@@ -1,5 +1,4 @@
 import 'package:dachaturizm/constants.dart';
-import 'package:dachaturizm/helpers/get_my_location.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/providers/banner_provider.dart';
 import 'package:dachaturizm/providers/currency_provider.dart';
@@ -21,6 +20,7 @@ import 'package:dachaturizm/screens/app/home/service_screen.dart';
 import 'package:dachaturizm/screens/app/home/services_list_screen.dart';
 import 'package:dachaturizm/screens/app/navigational_app_screen.dart';
 import 'package:dachaturizm/screens/app/search/filters_screen.dart';
+import 'package:dachaturizm/screens/app/user/feedback_screen.dart';
 import 'package:dachaturizm/screens/app/user/fill_balance_screen.dart';
 import 'package:dachaturizm/screens/app/user/change_language.dart';
 import 'package:dachaturizm/screens/app/user/edit_profile_screen.dart';
@@ -181,6 +181,7 @@ class _MyAppState extends State<MyApp> {
               BalanceScreen.routeName: (context) => BalanceScreen(),
               ChangeLanguage.routeName: (context) => ChangeLanguage(),
               StaticPageScreen.routeName: (context) => StaticPageScreen(),
+              FeedbackScreen.routeName: (context) => FeedbackScreen(),
             },
           );
         }),

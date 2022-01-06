@@ -83,15 +83,21 @@ class EstateModel {
     String locale = await getCurrentLocale();
 
     return EstateModel(
-      id: data["id"],
+      id: data.containsKey("id") ? data["id"] : 0,
       title: data["translations"][locale]["title"],
       description: data["translations"][locale]["description"],
       priceType: data["price_type"]["translations"][locale]["title"],
       rating: data["rating"],
       views: data["views"],
-      beds: data["beds"],
-      pool: data["pool"],
-      people: data["people"],
+      beds: data["beds"].runtimeType.toString() == "String"
+          ? int.parse(data["beds"])
+          : data["beds"],
+      pool: data["pool"].runtimeType.toString() == "String"
+          ? int.parse(data["pool"])
+          : data["pool"],
+      people: data["people"].runtimeType.toString() == "String"
+          ? int.parse(data["people"])
+          : data["people"],
       weekdayPrice: data["weekday_price"],
       weekendPrice: data["weekend_price"],
       longtitute: data["longtitute"],

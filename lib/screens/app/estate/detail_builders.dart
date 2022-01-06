@@ -406,7 +406,7 @@ class DetailBuilder {
 
   Widget buildContactBox(context, fromChat, userId) {
     return Visibility(
-      visible: userId != detail.userId,
+      visible: userId != null && userId != detail.userId,
       child: Container(
         height: 70,
         padding: EdgeInsets.symmetric(

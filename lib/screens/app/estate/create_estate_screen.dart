@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dachaturizm/components/booked_days_hint.dart';
 import 'package:dachaturizm/components/fluid_big_button.dart';
+import 'package:dachaturizm/components/fluid_outlined_button.dart';
 import 'package:dachaturizm/components/normal_input.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/helpers/call_with_auth.dart';
@@ -20,6 +21,7 @@ import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/facility_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/providers/category_provider.dart';
+import 'package:dachaturizm/screens/app/estate/estate_detail_screen.dart';
 import 'package:dachaturizm/screens/app/estate/location_picker_screen.dart';
 import 'package:dachaturizm/screens/app/estate/plans_screen.dart';
 import 'package:dachaturizm/screens/app/search/filters_screen.dart';
@@ -1012,6 +1014,8 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                                 await updateData();
                               } else {
                                 dynamic data = await sendData();
+                                FocusScope.of(context)
+                                    .requestFocus(FocusNode());
                                 Navigator.of(context).pushNamed(
                                     PlansScreen.routeName,
                                     arguments: {"data": data});

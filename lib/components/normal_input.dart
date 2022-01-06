@@ -77,7 +77,7 @@ class NormalTextInput extends StatelessWidget {
         enabledBorder: InputStyles.enabledBorder(),
         contentPadding: EdgeInsets.all(defaultPadding / 2),
       ),
-      style: TextStyle(fontSize: 18),
+      style: TextStyles.display5(),
     );
   }
 }

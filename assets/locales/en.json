@@ -159,5 +159,9 @@
     "you_can_change_plans_later_on": "You can change you estate's advertising plan later on",
     "activate": "Activate",
     "you_dont_have_enough_money": "You don't have enough funds",
-    "you_can_activate_this_plan": "You can activate this plan"
+    "you_can_activate_this_plan": "You can activate this plan",
+    "feedback": "Feedback",
+    "fill_in_all_fields": "Please, fill all the fields",
+    "feedback_has_been_sent": "Your feedback has been sent!",
+    "something_went_wrong": "Something went wrong"
 }

@@ -159,5 +159,9 @@
     "you_can_change_plans_later_on": "Tarif rejani keyinchalik istagan vaqtda o‘zgartirish mumkin",
     "activate": "Faollashtirish",
     "you_dont_have_enough_money": "Hisobingizda yetarli mablag’ mavjud emas",
-    "you_can_activate_this_plan": "Bu tarifni faollashtira olasiz"
+    "you_can_activate_this_plan": "Bu tarifni faollashtira olasiz",
+    "feedback": "Qayta aloqa",
+    "fill_in_all_fields": "Iltimos, barcha maydonlarni to'ldiring",
+    "feedback_has_been_sent": "Fikr-mulohazalaringiz yuborildi!",
+    "something_went_wrong": "Xatolik yuz berdi"
 }

@@ -12,6 +12,7 @@ import 'package:dachaturizm/helpers/call_with_auth.dart';
 import 'package:dachaturizm/helpers/parse_datetime.dart';
 import 'package:dachaturizm/models/ads_plan.dart';
 import 'package:dachaturizm/models/estate_model.dart';
+import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/providers/currency_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
@@ -514,7 +515,7 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
                   _isLoading = true;
                 });
                 Provider.of<EstateProvider>(context, listen: false)
-                    .advertise(_adPlan, estateId)
+                    .advertise(_adPlan, int.parse(estateId))
                     .then((value) {
                   _refresh();
                   _showStatusSnackBar(value);

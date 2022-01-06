@@ -8,6 +8,7 @@ import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/screens/app/user/change_language.dart';
 import 'package:dachaturizm/screens/app/user/edit_profile_screen.dart';
+import 'package:dachaturizm/screens/app/user/feedback_screen.dart';
 import 'package:dachaturizm/screens/app/user/my_announcements_screen.dart';
 import 'package:dachaturizm/screens/app/user/my_balance_screen.dart';
 import 'package:dachaturizm/screens/app/user/static_page_screen.dart';
@@ -16,6 +17,7 @@ import 'package:dachaturizm/screens/app/user_extra_details.dart';
 import 'package:dachaturizm/screens/auth/login_screen.dart';
 import 'package:dachaturizm/styles/text_styles.dart';
 import "package:flutter/material.dart";
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:provider/provider.dart';
 
@@ -96,7 +98,8 @@ class _UserPageScreenState extends State<UserPageScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildUserDetails(context, _user),
+              _buildUserDetails(
+                  context, Provider.of<AuthProvider>(context).user),
               SizedBox(height: 1.5 * defaultPadding),
               ColumnTitle("Mening profilim"),
               _buildProfileList(),
@@ -114,7 +117,11 @@ class _UserPageScreenState extends State<UserPageScreen> {
                             arguments: page);
                       }))
                   .toList(),
-
+              SettingsItem(
+                  title: "Feedback",
+                  callback: () {
+                    Navigator.of(context).pushNamed(FeedbackScreen.routeName);
+                  }),
               // Divider(),
             ],
           ),

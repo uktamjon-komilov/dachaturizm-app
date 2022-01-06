@@ -253,7 +253,7 @@ class AuthProvider with ChangeNotifier {
           response.statusCode as int < 300) {
         Map<String, dynamic> data = response.data;
         _user = UserModel.fromJson(data);
-        // notifyListeners();
+        notifyListeners();
         return _user;
       }
     }
@@ -396,5 +396,17 @@ class AuthProvider with ChangeNotifier {
       });
     } catch (e) {}
     return transactions;
+  }
+
+  Future sendFeedback(String phone, String name, String text) async {
+    const url = "${baseUrl}api/feedback/";
+    print(url);
+    final response =
+        await dio.post(url, data: {"phone": phone, "name": name, "text": text});
+    print(response);
+    if (response.statusCode as int >= 200 || response.statusCode as int < 300) {
+      return true;
+    }
+    return false;
   }
 }
