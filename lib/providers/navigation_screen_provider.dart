@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 class NavigationScreenProvider with ChangeNotifier {
   final AuthProvider auth;
-  int _currentIndex = 2;
+  int _currentIndex = 0;
   List<int> _authRequiredScreens = [2, 3];
   Map<String, dynamic> _data = {};
   bool _refreshHomePage = false;

@@ -253,7 +253,7 @@ class AuthProvider with ChangeNotifier {
           response.statusCode as int < 300) {
         Map<String, dynamic> data = response.data;
         _user = UserModel.fromJson(data);
-        notifyListeners();
+        // notifyListeners();
         return _user;
       }
     }
@@ -382,6 +382,30 @@ class AuthProvider with ChangeNotifier {
       "new_password": newPassword
     };
     return await resetPasswordBase(url, data);
+  }
+
+  Future<Map<String, dynamic>> renewPassword(
+    String oldPassword,
+    String newPassword,
+  ) async {
+    String access = await getAccessToken();
+    const url = "${baseUrl}api/users/renew-password/";
+    Map<String, dynamic> data = {
+      "old_password": oldPassword,
+      "new_password": newPassword
+    };
+    Map<String, String> headers = {"Authorization": "Bearer ${access}"};
+    try {
+      final response = await dio.post(
+        url,
+        data: data,
+        options: Options(headers: headers),
+      );
+      return response.data;
+    } catch (e) {
+      print(e);
+    }
+    return {"status": false, "detail": "BASE_ERROR"};
   }
 
   Future<List<TransactionModel>> getTransactions(String type) async {

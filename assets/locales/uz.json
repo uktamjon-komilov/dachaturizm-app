@@ -6,7 +6,7 @@
     "searchpagescreen_appbar_text": "Dacha Turizm Bo'ylab Qidirish",
     "estatecreationscreen_appbar_text": "E'lon Yaratish",
     "chatpagescreen_appbar_text": "Foydalanuvchi Yozishmalari",
-    "userpagescreen_appbar_text": "Sozlamalar",
+    "userpagescreen_appbar_text": "Profil",
     "profile": "Profil",
     "your_balance": "Sizning hisobingiz",
     "edit_profile": "Profilni tahrirlash",
@@ -163,5 +163,12 @@
     "feedback": "Qayta aloqa",
     "fill_in_all_fields": "Iltimos, barcha maydonlarni to'ldiring",
     "feedback_has_been_sent": "Fikr-mulohazalaringiz yuborildi!",
-    "something_went_wrong": "Xatolik yuz berdi"
+    "something_went_wrong": "Xatolik yuz berdi",
+    "current_password": "Joriy parol",
+    "enter_new_password": "Yangi parol",
+    "repeat_new_password": "Yangi parol takroran",
+    "fill_in_the_fields": "Maydonni to'ldiring",
+    "old_password_wrong": "Joriy parol xato",
+    "your_password_renewed": "Parolingiz yangilandi",
+    "settings": "Sozlamalar"
 }

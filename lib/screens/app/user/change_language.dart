@@ -1,8 +1,5 @@
-import 'dart:async';
+import 'package:dachaturizm/components/app_bar.dart';
 import 'package:dachaturizm/helpers/locale_helper.dart';
-import 'package:dachaturizm/providers/auth_provider.dart';
-import 'package:dachaturizm/providers/banner_provider.dart';
-import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/restartable_app.dart';
 import "package:flutter/material.dart";
@@ -23,7 +20,7 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
 
   final List<Map<String, String>> languages = [
     {"code": "uz", "language": "O'zbekcha"},
-    {"code": "ru", "language": "Russkiy"},
+    {"code": "ru", "language": "Русский"},
     {"code": "en", "language": "English"},
   ];
 
@@ -33,17 +30,11 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(
-          title: LocaleText("change_language"),
-          leading: chosenLang == ""
-              ? IconButton(
-                  icon: Icon(Icons.arrow_back),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                )
-              : Container(),
-          actions: [
+        appBar: buildNavigationalAppBar(
+          context,
+          Locales.string(context, "change_language"),
+          () {},
+          [
             chosenLang != ""
                 ? IconButton(
                     icon: Icon(Icons.check),

@@ -66,13 +66,13 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
   @override
   void didChangeDependencies() async {
-    bool shouldRefresh =
-        Provider.of<NavigationScreenProvider>(context).refreshHomePage;
-    if (shouldRefresh) {
-      Provider.of<NavigationScreenProvider>(context, listen: false)
-          .refreshHomePage = false;
-      await _refreshHomePage();
-    }
+    // bool shouldRefresh =
+    //     Provider.of<NavigationScreenProvider>(context).refreshHomePage;
+    // if (shouldRefresh) {
+    //   Provider.of<NavigationScreenProvider>(context, listen: false)
+    //       .refreshHomePage = false;
+    //   await _refreshHomePage();
+    // }
     super.didChangeDependencies();
   }
 
@@ -242,10 +242,9 @@ class _HomePageScreenState extends State<HomePageScreen> {
   }
 
   Widget _buildEstateTypeBlock(CategoryModel category) {
-    List topEstates = Provider.of<EstateProvider>(context, listen: false)
-        .topEstates[category.id];
-    List banners = Provider.of<BannerProvider>(context, listen: false)
-        .banners[category.id];
+    List topEstates =
+        Provider.of<EstateProvider>(context).topEstates[category.id];
+    List banners = Provider.of<BannerProvider>(context).banners[category.id];
 
     return Visibility(
       visible: (topEstates.length > 0 || banners.length > 0),

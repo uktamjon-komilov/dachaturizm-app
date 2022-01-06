@@ -4,13 +4,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 
 class PasswordInputField extends StatefulWidget {
-  const PasswordInputField(
-      {Key? key, this.onChanged, this.controller, this.focusNode})
-      : super(key: key);
+  const PasswordInputField({
+    Key? key,
+    this.onChanged,
+    this.controller,
+    this.focusNode,
+    this.hintText,
+    this.validator,
+  }) : super(key: key);
 
   final void Function(String)? onChanged;
   final TextEditingController? controller;
   final FocusNode? focusNode;
+  final String? hintText;
+  final String? Function(String?)? validator;
 
   @override
   State<PasswordInputField> createState() => _PasswordInputFieldState();
@@ -21,11 +28,12 @@ class _PasswordInputFieldState extends State<PasswordInputField> {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
+    return TextFormField(
       onChanged: widget.onChanged,
       controller: widget.controller,
       focusNode: widget.focusNode,
       obscureText: _showPassword,
+      validator: widget.validator,
       decoration: InputDecoration(
         border: InputStyles.inputBorder(),
         enabledBorder: InputStyles.enabledBorder(),
@@ -34,7 +42,7 @@ class _PasswordInputFieldState extends State<PasswordInputField> {
           Icons.lock_outline_rounded,
           color: greyishLight,
         ),
-        hintText: Locales.string(context, "password_hint"),
+        hintText: widget.hintText ?? Locales.string(context, "password_hint"),
         hintStyle: TextStyle(color: greyishLight),
         suffixIcon: Container(
           margin: EdgeInsets.only(right: defaultPadding / 3),

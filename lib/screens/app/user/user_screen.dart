@@ -11,13 +11,13 @@ import 'package:dachaturizm/screens/app/user/edit_profile_screen.dart';
 import 'package:dachaturizm/screens/app/user/feedback_screen.dart';
 import 'package:dachaturizm/screens/app/user/my_announcements_screen.dart';
 import 'package:dachaturizm/screens/app/user/my_balance_screen.dart';
+import 'package:dachaturizm/screens/app/user/renew_password_screen.dart';
 import 'package:dachaturizm/screens/app/user/static_page_screen.dart';
 import 'package:dachaturizm/screens/app/user/wishlist_screen.dart';
 import 'package:dachaturizm/screens/app/user_extra_details.dart';
 import 'package:dachaturizm/screens/auth/login_screen.dart';
 import 'package:dachaturizm/styles/text_styles.dart';
 import "package:flutter/material.dart";
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:provider/provider.dart';
 
@@ -63,11 +63,11 @@ class _UserPageScreenState extends State<UserPageScreen> {
         builder: (context) => page,
       ),
     ) as Map;
-    // if (result != null && result.containsKey("change")) {
-    //   setState(() {
-    //     _someChange = true;
-    //   });
-    // }
+    if (result != null && result.containsKey("change")) {
+      setState(() {
+        _someChange = true;
+      });
+    }
   }
 
   @override
@@ -101,10 +101,10 @@ class _UserPageScreenState extends State<UserPageScreen> {
               _buildUserDetails(
                   context, Provider.of<AuthProvider>(context).user),
               SizedBox(height: 1.5 * defaultPadding),
-              ColumnTitle("Mening profilim"),
+              ColumnTitle(Locales.string(context, "my_profile")),
               _buildProfileList(),
               SizedBox(height: 1.5 * defaultPadding),
-              ColumnTitle("Sozlamalar"),
+              ColumnTitle(Locales.string(context, "settings")),
               _buildSettingsList(),
               SizedBox(height: 1.5 * defaultPadding),
               ColumnTitle("Boshqa sozlamalar"),
@@ -118,7 +118,7 @@ class _UserPageScreenState extends State<UserPageScreen> {
                       }))
                   .toList(),
               SettingsItem(
-                  title: "Feedback",
+                  title: Locales.string(context, "feedback"),
                   callback: () {
                     Navigator.of(context).pushNamed(FeedbackScreen.routeName);
                   }),
@@ -157,8 +157,9 @@ class _UserPageScreenState extends State<UserPageScreen> {
           child: ProfileListItem(
             title: Locales.string(context, "login_profile"),
             iconData: Icons.person,
-            callback: () {
-              Navigator.of(context).pushNamed(LoginScreen.routeName);
+            callback: () async {
+              final loginScreen = LoginScreen();
+              await _navigateTo(loginScreen);
             },
           ),
         ),
@@ -193,8 +194,9 @@ class _UserPageScreenState extends State<UserPageScreen> {
             title: Locales.string(context, "my_balance"),
             iconData: Icons.account_balance_wallet_rounded,
             callback: () {
-              callWithAuth(context, () {
-                Navigator.of(context).pushNamed(MyBalanceScreen.routeName);
+              callWithAuth(context, () async {
+                final myBalanceScreen = MyBalanceScreen();
+                await _navigateTo(myBalanceScreen);
               });
             },
           ),
@@ -243,8 +245,9 @@ class _UserPageScreenState extends State<UserPageScreen> {
             title: Locales.string(context, "edit_profile"),
             iconData: Icons.person_rounded,
             callback: () {
-              callWithAuth(context, () {
-                Navigator.of(context).pushNamed(EditProfileScreen.routeName);
+              callWithAuth(context, () async {
+                final editProfileScreen = EditProfileScreen();
+                await _navigateTo(editProfileScreen);
               });
             },
           ),
@@ -255,8 +258,9 @@ class _UserPageScreenState extends State<UserPageScreen> {
             title: Locales.string(context, "change_password"),
             iconData: Icons.lock,
             callback: () {
-              callWithAuth(context, () {
-                Navigator.of(context).pushNamed(MyAnnouncements.routeName);
+              callWithAuth(context, () async {
+                final renewPasswordScreen = RenewPasswordScreen();
+                await _navigateTo(renewPasswordScreen);
               });
             },
           ),
@@ -265,8 +269,8 @@ class _UserPageScreenState extends State<UserPageScreen> {
           title: Locales.string(context, "change_language"),
           iconData: Icons.language_rounded,
           callback: () async {
-            final changeLang = ChangeLanguage();
-            await _navigateTo(changeLang);
+            final changeLangScreen = ChangeLanguage();
+            await _navigateTo(changeLangScreen);
           },
         ),
       ],

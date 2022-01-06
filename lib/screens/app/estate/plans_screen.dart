@@ -6,6 +6,8 @@ import 'package:dachaturizm/models/ads_plan.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/models/user_model.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
+import 'package:dachaturizm/providers/banner_provider.dart';
+import 'package:dachaturizm/providers/category_provider.dart';
 import 'package:dachaturizm/providers/currency_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
@@ -116,6 +118,18 @@ class _PlansScreenState extends State<PlansScreen> {
                       Provider.of<NavigationScreenProvider>(context,
                               listen: false)
                           .changePageIndex(4);
+                      Provider.of<EstateTypesProvider>(context, listen: false)
+                          .getCategories()
+                          .then(
+                        (types) {
+                          Future.wait([
+                            Provider.of<BannerProvider>(context, listen: false)
+                                .getBanners(types),
+                            Provider.of<EstateProvider>(context, listen: false)
+                                .getTopEstates(types),
+                          ]);
+                        },
+                      );
                       callWithAuth(context, () {
                         Navigator.of(context)
                           ..pop()

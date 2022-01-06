@@ -26,6 +26,7 @@ import 'package:dachaturizm/screens/app/user/change_language.dart';
 import 'package:dachaturizm/screens/app/user/edit_profile_screen.dart';
 import 'package:dachaturizm/screens/app/user/my_announcements_screen.dart';
 import 'package:dachaturizm/screens/app/user/my_balance_screen.dart';
+import 'package:dachaturizm/screens/app/user/renew_password_screen.dart';
 import 'package:dachaturizm/screens/app/user/static_page_screen.dart';
 import 'package:dachaturizm/screens/app/user/wishlist_screen.dart';
 import 'package:dachaturizm/screens/auth/auth_type_screen.dart';
@@ -51,41 +52,16 @@ import 'providers/category_provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Locales.init(["en", "uz", "ru"]);
-  runApp(RestartWidget(child: const MyApp()));
-}
-
-class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
   Dio dio = Dio();
 
-  @override
-  void initState() {
-    super.initState();
-    dio.interceptors.add(
-      RetryInterceptor(
-        dio: dio,
-        retries: 100,
-        retryDelays: List.generate(
-          100,
-          (index) => Duration(seconds: 2),
-        ),
-      ),
-    );
-  }
+  final auth = AuthProvider(dio: dio);
 
-  @override
-  Widget build(BuildContext context) {
-    return LocaleBuilder(
-      builder: (locale) => MultiProvider(
+  runApp(
+    RestartWidget(
+      child: MultiProvider(
         providers: [
           ChangeNotifierProvider.value(
-            value: AuthProvider(dio: dio),
+            value: auth,
           ),
           ChangeNotifierProvider.value(
             value: BannerProvider(dio: dio),
@@ -94,9 +70,8 @@ class _MyAppState extends State<MyApp> {
             value: EstateTypesProvider(dio: dio),
           ),
           ChangeNotifierProxyProvider<AuthProvider, EstateProvider>(
-            create: (context) =>
-                EstateProvider(dio: dio, auth: AuthProvider(dio: dio)),
-            update: (context, auth, _) => EstateProvider(dio: dio, auth: auth),
+            create: (context) => EstateProvider(dio: dio, auth: auth),
+            update: (context, _a, _) => EstateProvider(dio: dio, auth: auth),
           ),
           ChangeNotifierProxyProvider<AuthProvider, NavigationScreenProvider>(
             create: (context) =>
@@ -113,79 +88,112 @@ class _MyAppState extends State<MyApp> {
             value: RegionProvider(),
           ),
         ],
-        child: Sizer(builder: (context, orientation, deviceType) {
-          Provider.of<AuthProvider>(context, listen: false).refresh_token();
-          return MaterialApp(
-            title: LocaleText("appbar_text").toString(),
-            localizationsDelegates: Locales.delegates,
-            supportedLocales: Locales.supportedLocales,
-            locale: locale,
-            theme: ThemeData(
-              fontFamily: GoogleFonts.inter().fontFamily,
-              primarySwatch: Colors.grey,
-              textTheme: Theme.of(context).textTheme.apply(
-                    bodyColor: darkPurple,
-                    displayColor: darkPurple,
-                    fontFamily: GoogleFonts.inter().fontFamily,
-                  ),
-              primaryTextTheme: TextTheme(
-                headline6: TextStyle(color: Colors.white),
-              ),
-              appBarTheme: AppBarTheme(
-                titleTextStyle: TextStyle(
-                  color: darkPurple,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600,
-                ),
-                centerTitle: true,
-                backgroundColor: Colors.white,
-                elevation: 0.2,
-              ),
-              backgroundColor: Colors.white,
-              scaffoldBackgroundColor: Colors.white,
-            ),
-            debugShowCheckedModeBanner: false,
-            home: SplashScreen(),
-            routes: {
-              AuthTypeScreen.routeName: (context) => AuthTypeScreen(),
-              RegisterScreen.routeName: (context) => RegisterScreen(),
-              OTPConfirmationScreen.routeName: (context) =>
-                  OTPConfirmationScreen(),
-              CreateProfileScreen.routeName: (context) => CreateProfileScreen(),
-              LocationPickerScreen.routeName: (context) =>
-                  LocationPickerScreen(),
-              LoginScreen.routeName: (context) => LoginScreen(),
-              ResetPasswordStep1.routeName: (context) => ResetPasswordStep1(),
-              ResetPasswordStep2.routeName: (context) => ResetPasswordStep2(),
-              ResetPasswordStep3.routeName: (context) => ResetPasswordStep3(),
-              HomePageScreen.routeName: (context) => HomePageScreen(),
-              NavigationalAppScreen.routeName: (context) =>
-                  NavigationalAppScreen(),
-              ChooseLangugageScreen.routeName: (context) =>
-                  ChooseLangugageScreen(),
-              EstateListingScreen.routeName: (context) => EstateListingScreen(),
-              EstateCreationPageScreen.routeName: (context) =>
-                  EstateCreationPageScreen(),
-              PlansScreen.routeName: (context) => PlansScreen(),
-              ServicesListScreen.routeName: (context) => ServicesListScreen(),
-              ServiceScreen.routeName: (context) => ServiceScreen(),
-              SearchFilersScreen.routeName: (context) => SearchFilersScreen(),
-              EstateDetailScreen.routeName: (context) => EstateDetailScreen(),
-              UserEstatesScreen.routeName: (context) => UserEstatesScreen(),
-              EditProfileScreen.routeName: (context) => EditProfileScreen(),
-              ChatListScreen.routeName: (context) => ChatListScreen(),
-              ChatScreen.routeName: (context) => ChatScreen(),
-              MyAnnouncements.routeName: (context) => MyAnnouncements(),
-              WishlistScreen.routeName: (context) => WishlistScreen(),
-              MyBalanceScreen.routeName: (context) => MyBalanceScreen(),
-              BalanceScreen.routeName: (context) => BalanceScreen(),
-              ChangeLanguage.routeName: (context) => ChangeLanguage(),
-              StaticPageScreen.routeName: (context) => StaticPageScreen(),
-              FeedbackScreen.routeName: (context) => FeedbackScreen(),
-            },
-          );
-        }),
+        child: MyApp(dio: dio),
       ),
+    ),
+  );
+}
+
+class MyApp extends StatefulWidget {
+  const MyApp({Key? key, required this.dio}) : super(key: key);
+
+  final Dio dio;
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    widget.dio.interceptors.add(
+      RetryInterceptor(
+        dio: widget.dio,
+        retries: 100,
+        retryDelays: List.generate(
+          100,
+          (index) => Duration(seconds: 2),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return LocaleBuilder(
+      builder: (locale) => Sizer(builder: (context, orientation, deviceType) {
+        Provider.of<AuthProvider>(context, listen: false).refresh_token();
+        return MaterialApp(
+          title: LocaleText("appbar_text").toString(),
+          localizationsDelegates: Locales.delegates,
+          supportedLocales: Locales.supportedLocales,
+          locale: locale,
+          theme: ThemeData(
+            fontFamily: GoogleFonts.inter().fontFamily,
+            primarySwatch: Colors.grey,
+            textTheme: Theme.of(context).textTheme.apply(
+                  bodyColor: darkPurple,
+                  displayColor: darkPurple,
+                  fontFamily: GoogleFonts.inter().fontFamily,
+                ),
+            primaryTextTheme: TextTheme(
+              headline6: TextStyle(color: Colors.white),
+            ),
+            appBarTheme: AppBarTheme(
+              titleTextStyle: TextStyle(
+                color: darkPurple,
+                fontSize: 24,
+                fontWeight: FontWeight.w600,
+              ),
+              centerTitle: true,
+              backgroundColor: Colors.white,
+              elevation: 0.2,
+            ),
+            backgroundColor: Colors.white,
+            scaffoldBackgroundColor: Colors.white,
+          ),
+          debugShowCheckedModeBanner: false,
+          home: SplashScreen(),
+          routes: {
+            AuthTypeScreen.routeName: (context) => AuthTypeScreen(),
+            RegisterScreen.routeName: (context) => RegisterScreen(),
+            OTPConfirmationScreen.routeName: (context) =>
+                OTPConfirmationScreen(),
+            CreateProfileScreen.routeName: (context) => CreateProfileScreen(),
+            LocationPickerScreen.routeName: (context) => LocationPickerScreen(),
+            LoginScreen.routeName: (context) => LoginScreen(),
+            ResetPasswordStep1.routeName: (context) => ResetPasswordStep1(),
+            ResetPasswordStep2.routeName: (context) => ResetPasswordStep2(),
+            ResetPasswordStep3.routeName: (context) => ResetPasswordStep3(),
+            HomePageScreen.routeName: (context) => HomePageScreen(),
+            NavigationalAppScreen.routeName: (context) =>
+                NavigationalAppScreen(),
+            ChooseLangugageScreen.routeName: (context) =>
+                ChooseLangugageScreen(),
+            EstateListingScreen.routeName: (context) => EstateListingScreen(),
+            EstateCreationPageScreen.routeName: (context) =>
+                EstateCreationPageScreen(),
+            PlansScreen.routeName: (context) => PlansScreen(),
+            ServicesListScreen.routeName: (context) => ServicesListScreen(),
+            ServiceScreen.routeName: (context) => ServiceScreen(),
+            SearchFilersScreen.routeName: (context) => SearchFilersScreen(),
+            EstateDetailScreen.routeName: (context) => EstateDetailScreen(),
+            UserEstatesScreen.routeName: (context) => UserEstatesScreen(),
+            EditProfileScreen.routeName: (context) => EditProfileScreen(),
+            ChatListScreen.routeName: (context) => ChatListScreen(),
+            ChatScreen.routeName: (context) => ChatScreen(),
+            MyAnnouncements.routeName: (context) => MyAnnouncements(),
+            WishlistScreen.routeName: (context) => WishlistScreen(),
+            MyBalanceScreen.routeName: (context) => MyBalanceScreen(),
+            BalanceScreen.routeName: (context) => BalanceScreen(),
+            RenewPasswordScreen.routeName: (context) => RenewPasswordScreen(),
+            ChangeLanguage.routeName: (context) => ChangeLanguage(),
+            StaticPageScreen.routeName: (context) => StaticPageScreen(),
+            FeedbackScreen.routeName: (context) => FeedbackScreen(),
+          },
+        );
+      }),
     );
   }
 }

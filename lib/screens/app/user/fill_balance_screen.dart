@@ -56,8 +56,6 @@ class _BalanceScreenState extends State<BalanceScreen>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state == AppLifecycleState.resumed) {
-      print("working");
-      print(context);
       Navigator.of(context).pop();
     }
   }
