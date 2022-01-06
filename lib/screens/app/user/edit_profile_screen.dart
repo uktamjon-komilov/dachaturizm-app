@@ -1,14 +1,18 @@
 import 'dart:io';
 
+import 'package:dachaturizm/components/app_bar.dart';
+import 'package:dachaturizm/components/fluid_big_button.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/helpers/call_with_auth.dart';
 import 'package:dachaturizm/helpers/url_helper.dart';
 import 'package:dachaturizm/models/user_model.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
-import 'package:dachaturizm/screens/auth/login_screen.dart';
+import 'package:dachaturizm/styles/input.dart';
+import 'package:dachaturizm/styles/text_styles.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
@@ -149,31 +153,22 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
               )
             : Scaffold(
-                appBar: AppBar(
-                  title: Text(Locales.string(context, "editing")),
-                  leading: IconButton(
-                    onPressed: () {
-                      Provider.of<NavigationScreenProvider>(context,
-                              listen: false)
-                          .changePageIndex(4);
-                      Navigator.of(context).pop();
-                    },
-                    icon: Icon(Icons.arrow_back),
+                appBar: buildNavigationalAppBar(
+                  context,
+                  Locales.string(context, "editing"),
+                  () {
+                    Provider.of<NavigationScreenProvider>(context,
+                            listen: false)
+                        .changePageIndex(4);
+                    Navigator.of(context).pop();
+                  },
+                ),
+                floatingActionButton: Container(
+                  width: 100.w - 1.8 * defaultPadding,
+                  child: FluidBigButton(
+                    text: Locales.string(context, "save"),
+                    onPress: _saveDetails,
                   ),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        _saveDetails();
-                      },
-                      child: Text(
-                        Locales.string(context, "save"),
-                        style: TextStyle(
-                          color: normalOrange,
-                          fontSize: 18,
-                        ),
-                      ),
-                    ),
-                  ],
                 ),
                 body: Container(
                   width: 100.w,
@@ -186,13 +181,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         onTap: () {
                           _selectProfileImage();
                         },
-                        child: Padding(
+                        child: Container(
                           padding: EdgeInsets.only(bottom: defaultPadding),
+                          decoration: BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.05),
+                                blurRadius: 15,
+                              ),
+                            ],
+                          ),
                           child: ClipRRect(
-                            borderRadius: BorderRadius.circular(25.w),
+                            borderRadius: BorderRadius.circular(10),
                             child: Container(
-                              width: 50.w,
-                              height: 50.w,
+                              width: 150,
+                              height: 150,
                               child: Stack(
                                 children: [
                                   _profileImage != null
@@ -216,8 +219,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                               height: 100.w,
                                             ),
                                   Center(
-                                    child:
-                                        Image.asset("assets/images/camera.png"),
+                                    child: Icon(
+                                      Icons.camera_alt_rounded,
+                                      color: Colors.white,
+                                      size: 40,
+                                    ),
+                                    // Image.asset("assets/images/camera.png"),
                                   ),
                                 ],
                               ),
@@ -229,23 +236,38 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       TextFormField(
                         controller: _firstNameController,
                         decoration: InputDecoration(
+                          border: InputStyles.inputBorder(),
+                          focusedBorder: InputStyles.focusBorder(),
+                          enabledBorder: InputStyles.enabledBorder(),
                           hintText: Locales.string(context, "first_name"),
-                          label: Text(Locales.string(context, "first_name")),
+                          label: Text(
+                            Locales.string(context, "first_name"),
+                          ),
                         ),
                       ),
                       SizedBox(height: defaultPadding * 1.5),
                       TextFormField(
                         controller: _lastNameController,
                         decoration: InputDecoration(
-                            hintText: Locales.string(context, "last_name"),
-                            label: Text(Locales.string(context, "last_name"))),
+                          border: InputStyles.inputBorder(),
+                          focusedBorder: InputStyles.focusBorder(),
+                          enabledBorder: InputStyles.enabledBorder(),
+                          hintText: Locales.string(context, "last_name"),
+                          label: Text(
+                            Locales.string(context, "last_name"),
+                          ),
+                        ),
                       ),
                       SizedBox(height: defaultPadding * 1.5),
                       TextFormField(
                         controller: _phoneController,
                         decoration: InputDecoration(
-                            hintText: Locales.string(context, "phone"),
-                            label: Text(Locales.string(context, "phone"))),
+                          border: InputStyles.inputBorder(),
+                          focusedBorder: InputStyles.focusBorder(),
+                          enabledBorder: InputStyles.enabledBorder(),
+                          hintText: Locales.string(context, "phone"),
+                          label: Text(Locales.string(context, "phone")),
+                        ),
                         inputFormatters: [
                           MaskTextInputFormatter(mask: "+998 ## ### ## ##")
                         ],
