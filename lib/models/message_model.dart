@@ -10,6 +10,7 @@ class MessageModel {
   final int estateId;
   final EstateModel estateDetail;
   final int count;
+  final String time;
 
   MessageModel({
     required this.id,
@@ -19,6 +20,7 @@ class MessageModel {
     required this.estateId,
     required this.estateDetail,
     required this.count,
+    required this.time,
   });
 
   static Future<MessageModel> fromJson(data) async {
@@ -31,6 +33,7 @@ class MessageModel {
       estateId: data["estate"],
       estateDetail: estate,
       count: data["unread_messages_count"],
+      time: data["time"],
     );
   }
 }

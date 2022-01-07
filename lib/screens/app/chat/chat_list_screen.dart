@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:dachaturizm/components/no_result_univesal.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/helpers/url_helper.dart';
 import 'package:dachaturizm/models/estate_model.dart';
@@ -80,78 +81,83 @@ class _ChatListScreenState extends State<ChatListScreen> {
               ? Center(
                   child: CircularProgressIndicator(),
                 )
-              : ListView.builder(
-                  itemCount: _chats.length,
-                  itemBuilder: (context, index) {
-                    UserModel user = _chats[index].sender.id == _userId
-                        ? _chats[index].receiver
-                        : _chats[index].sender;
-                    EstateModel estate = _chats[index].estateDetail;
-                    return ListTile(
-                      onTap: () {
-                        Navigator.of(context).pushNamed(ChatScreen.routeName,
-                            arguments: {"estate": estate, "sender": user});
-                      },
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: defaultPadding / 1.5,
-                        vertical: defaultPadding / 6,
-                      ),
-                      title: Text(
-                        user.fullname,
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      subtitle: Text(
-                        estate.title,
-                        maxLines: 1,
-                        style: TextStyle(
-                          color: normalGrey,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      trailing: (_chats[index].count < 1 ||
-                              _chats[index].sender.id == _userId)
-                          ? null
-                          : Container(
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 5, horizontal: 8),
-                              decoration: BoxDecoration(
-                                color: normalOrange,
-                                borderRadius: BorderRadius.circular(15),
-                              ),
-                              child: Text(
-                                _chats[index].count.toString(),
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 13),
-                              ),
+              : (_chats.length == 0
+                  ? NoResult(
+                      photoPath: "assets/images/empty-chat.png",
+                      text: "Sizda mavjud xabarlar yo’q",
+                    )
+                  : ListView.builder(
+                      itemCount: _chats.length,
+                      padding: EdgeInsets.zero,
+                      itemBuilder: (context, index) {
+                        UserModel user = _chats[index].sender.id == _userId
+                            ? _chats[index].receiver
+                            : _chats[index].sender;
+                        EstateModel estate = _chats[index].estateDetail;
+                        return ListTile(
+                          onTap: () {
+                            Navigator.of(context).pushNamed(
+                                ChatScreen.routeName,
+                                arguments: {"estate": estate, "sender": user});
+                          },
+                          contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                          title: Text(
+                            user.fullname,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
                             ),
-                      leading: user.photo == null
-                          ? Container(
-                              width: 60,
-                              height: 60,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(30),
-                                child: Image.asset(
-                                  "assets/images/user.png",
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            )
-                          : Container(
-                              width: 60,
-                              height: 60,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(30),
-                                child: Image.network(
-                                  fixMediaUrl(user.photo),
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
+                          ),
+                          subtitle: Text(
+                            estate.title,
+                            maxLines: 1,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: normalGrey,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                    );
-                  }),
+                          ),
+                          trailing: (_chats[index].count < 1 ||
+                                  _chats[index].sender.id == _userId)
+                              ? null
+                              : Container(
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: 5, horizontal: 8),
+                                  decoration: BoxDecoration(
+                                    color: normalOrange,
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                  child: Text(
+                                    _chats[index].count.toString(),
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 13),
+                                  ),
+                                ),
+                          leading: user.photo == null
+                              ? Container(
+                                  width: 50,
+                                  height: 50,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(30),
+                                    child: Image.asset(
+                                      "assets/images/user.png",
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                )
+                              : Container(
+                                  width: 50,
+                                  height: 50,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(30),
+                                    child: Image.network(
+                                      fixMediaUrl(user.photo),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                        );
+                      })),
         ),
       ),
     );
