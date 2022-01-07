@@ -170,5 +170,7 @@
     "fill_in_the_fields": "Maydonni to'ldiring",
     "old_password_wrong": "Joriy parol xato",
     "your_password_renewed": "Parolingiz yangilandi",
-    "settings": "Sozlamalar"
+    "settings": "Sozlamalar",
+    "estate_editing_title": "E'lonni tahrirlash",
+    "edit_estate": "O'zgarishlarni saqlash"
 }

@@ -9,13 +9,13 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 class NormalTextInput extends StatelessWidget {
   const NormalTextInput({
     GlobalKey? key,
+    required this.controller,
+    required this.onSubmitted,
     this.hintText = "",
     this.maxLines = 1,
     this.maxLength = 255,
-    required this.onChanged,
-    required this.controller,
+    this.onChanged,
     this.focusNode,
-    required this.onSubmitted,
     ScrollController? scrollController,
     this.isPhone = false,
     this.isPrice = false,
@@ -27,7 +27,7 @@ class NormalTextInput extends StatelessWidget {
   final int maxLength;
   final TextEditingController controller;
   final focusNode;
-  final Function onChanged;
+  final void Function(String)? onChanged;
   final Function onSubmitted;
   final bool isPhone;
   final bool isPrice;
@@ -46,9 +46,7 @@ class NormalTextInput extends StatelessWidget {
             ? MaskTextInputFormatter(mask: "+998 ## ### ## ##")
             : LengthLimitingTextInputFormatter(255),
       ],
-      onChanged: (value) {
-        // onChanged(value);
-      },
+      onChanged: onChanged,
       onFieldSubmitted: (value) {
         onSubmitted(value);
       },

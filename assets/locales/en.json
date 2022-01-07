@@ -170,5 +170,7 @@
     "fill_in_the_fields": "Fill in the field",
     "old_password_wrong": "Old password is wrong",
     "your_password_renewed": "Your password is renewed",
-    "settings": "Settings"
+    "settings": "Settings",
+    "estate_editing_title": "Editing Announcement",
+    "edit_estate": "Save Changes"
 }

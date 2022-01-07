@@ -164,7 +164,7 @@ class DetailBuilder {
     DateTime _focusedDay = DateTime.now();
 
     return Visibility(
-      visible: show,
+      visible: (show && _selectedDays.length != 0),
       child: Column(
         children: [
           drawDivider(),

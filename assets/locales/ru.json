@@ -170,5 +170,7 @@
     "fill_in_the_fields": "Заполните поле",
     "old_password_wrong": "Старый пароль неверный",
     "your_password_renewed": "Ваш пароль обновлен",
-    "settings": "Настройки"
+    "settings": "Настройки",
+    "estate_editing_title": "Редактирование объявления",
+    "edit_estate": "Сохранить изменения"
 }

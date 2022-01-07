@@ -337,16 +337,25 @@ class EstateProvider with ChangeNotifier {
 
       while (data["photos"].length > 0) {
         if (data["photos"].length == i) break;
-        var photo = await MultipartFile.fromFile(data["photos"][i].path,
-            filename: "testimage.png");
+        var photo;
+        if (data["photos"][i].runtimeType.toString() == "String") {
+          photo = data["photos"][i];
+        } else {
+          photo = await MultipartFile.fromFile(data["photos"][i].path,
+              filename: "testimage.png");
+        }
         tempData["photo${i + 1}"] = photo;
         i += 1;
       }
     }
 
     if (data.containsKey("photo")) {
-      tempData["photo"] = await MultipartFile.fromFile(data["photo"].path,
-          filename: "testimage.png");
+      if (data["photo"].runtimeType.toString() == "String") {
+        tempData["photo"] = data["photo"];
+      } else {
+        tempData["photo"] = await MultipartFile.fromFile(data["photo"].path,
+            filename: "testimage.png");
+      }
     }
 
     Map<String, dynamic> translations = {
@@ -482,8 +491,8 @@ class EstateProvider with ChangeNotifier {
   }
 
   // Estate updating future
-  Future updateEstate(userId, data, estate) async {
-    final url = "${baseUrl}api/estate/${userId}/";
+  Future updateEstate(estateId, data, estate) async {
+    final url = "${baseUrl}api/estate/${estateId}/";
     String refresh = await auth.getRefreshToken();
     if (refresh == null || refresh == "") {
       return {"statusCode": 400};
@@ -499,6 +508,7 @@ class EstateProvider with ChangeNotifier {
     try {
       FormData formData = FormData.fromMap(tempData);
       var response = await dio.patch(url, data: formData, options: options);
+      print(response);
       return {"statusCode": response.statusCode};
     } catch (e) {
       print(e);

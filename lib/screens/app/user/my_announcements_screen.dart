@@ -427,7 +427,7 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
 
   void _navigateToEditScreen([String? id]) {
     Navigator.of(context).pushNamed(EstateCreationPageScreen.routeName,
-        arguments: {"estate": id});
+        arguments: {"estateId": id});
   }
 
   void _openAdsPriceList([String? id]) {

@@ -1,8 +1,10 @@
 import 'package:dachaturizm/helpers/locale_helper.dart';
 import 'package:dachaturizm/helpers/url_helper.dart';
 import 'package:dachaturizm/models/booking_day.dart';
+import 'package:dachaturizm/models/district_model.dart';
 import 'package:dachaturizm/models/facility_model.dart';
 import 'package:dachaturizm/models/photo_model.dart';
+import 'package:dachaturizm/models/region_model.dart';
 
 class EstateModel {
   final int id;
@@ -23,6 +25,8 @@ class EstateModel {
   final double weekdayPrice;
   final double weekendPrice;
   final String address;
+  final String region;
+  final String district;
   final double longtitute;
   final double latitute;
   final String announcer;
@@ -52,6 +56,8 @@ class EstateModel {
     this.weekdayPrice = 0.0,
     this.weekendPrice = 0.0,
     this.address = "",
+    this.region = "",
+    this.district = "",
     this.announcer = "",
     this.phone = "",
     this.userAdsCount = 0,
@@ -86,6 +92,8 @@ class EstateModel {
       id: data.containsKey("id") ? data["id"] : 0,
       title: data["translations"][locale]["title"],
       description: data["translations"][locale]["description"],
+      region: data["translations"][locale]["region"],
+      district: data["translations"][locale]["district"],
       priceType: data["price_type"]["translations"][locale]["title"],
       rating: data["rating"],
       views: data["views"],
