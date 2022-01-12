@@ -2,9 +2,7 @@ import 'dart:async';
 import 'package:dachaturizm/components/app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart' as geocoding;
-import 'package:location/location.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class LocationPickerScreen extends StatefulWidget {

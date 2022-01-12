@@ -38,7 +38,6 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
   var _showCalendar = false;
   var detail;
   var _detailBuilder;
-  var _location;
   int _userId = 0;
   bool _isLiked = false;
   EstateModel? _banner;
@@ -174,10 +173,7 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
                                 _detailBuilder.drawDivider(),
                                 SizedBox(height: defaultPadding),
                                 _detailBuilder.buildDescription(context),
-                                _detailBuilder.buildAddressBox(
-                                  context,
-                                  _location,
-                                ),
+                                _detailBuilder.buildAddressBox(context),
                                 _detailBuilder.buildChips(),
                                 _detailBuilder.buildAnnouncerBox(context),
                                 buildRatingResults(context, _estateRating),

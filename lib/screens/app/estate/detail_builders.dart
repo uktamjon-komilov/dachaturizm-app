@@ -41,13 +41,7 @@ class DetailBuilder {
     );
   }
 
-  Widget buildAddressBox(context, location) {
-    var distance = 0.0;
-    if (location != null) {
-      distance = calculateDistance(detail.latitute, detail.longtitute,
-          location.latitude, location.longitude);
-    }
-
+  Widget buildAddressBox(context) {
     return Visibility(
       visible: (detail.longtitute != 0.0 && detail.latitute != 0.0),
       child: Container(
@@ -85,17 +79,6 @@ class DetailBuilder {
                         color: darkPurple,
                       ),
                     ),
-                    Visibility(
-                      visible: (location != null || distance != 0.0),
-                      child: Text(
-                        "${Locales.string(context, 'km_from_you_1')} ${distance} ${Locales.string(context, 'km_from_you_2')}",
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w400,
-                          color: darkPurple,
-                        ),
-                      ),
-                    )
                   ],
                 ),
               ),
