@@ -94,7 +94,7 @@
     "saving": "Saqlanmoqda...",
     "main_photo": "Asosiy rasm",
     "this_photo_is_main": "Ushbu surat e'loningiz asosiy rasmi bo'ladi.",
-    "pick_a_photo": "Please, pick an image",
+    "pick_a_photo": "Iltimos, asosiy rasmni tanlang",
     "gallary": "Galereya",
     "max_photo_count_8": "*Umumiy maksimum 8ta rasm joylashingiz mumkin",
     "choose_section": "Bo'limni tanlang",
@@ -116,7 +116,7 @@
     "price": "Narx",
     "weekday_price": "Hafta kunlari",
     "weekend_price": "Dam olish kunlari",
-    "choose_currency": "Please, choose a currency",
+    "choose_currency": "Iltimos, pul birligini tanlang",
     "save_estate": "Joylashtirish",
     "booked_days": "Band qilingan kunlar",
     "login_profile": "Mening profilim",
@@ -173,5 +173,8 @@
     "your_password_renewed": "Parolingiz yangilandi",
     "settings": "Sozlamalar",
     "estate_editing_title": "E'lonni tahrirlash",
-    "edit_estate": "O'zgarishlarni saqlash"
+    "edit_estate": "O'zgarishlarni saqlash",
+    "choose_one": "Tanlang",
+    "required_field": "To'ldirilishi shart",
+    "invalid_item": "Tanlashda xatolik"
 }

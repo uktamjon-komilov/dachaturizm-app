@@ -20,6 +20,7 @@ class NormalTextInput extends StatelessWidget {
     this.isPhone = false,
     this.isPrice = false,
     this.validation = false,
+    this.validator,
   }) : super(key: key);
 
   final String hintText;
@@ -32,6 +33,7 @@ class NormalTextInput extends StatelessWidget {
   final bool isPhone;
   final bool isPrice;
   final bool validation;
+  final String? Function(String?)? validator;
 
   @override
   Widget build(BuildContext context) {
@@ -50,23 +52,25 @@ class NormalTextInput extends StatelessWidget {
       onFieldSubmitted: (value) {
         onSubmitted(value);
       },
-      validator: (value) {
-        if (!validation) return null;
-        if (value != null && value.length < 13 && isPhone) {
-          return Locales.string(context, "Please, enter a valid phone number");
-        } else if (isPhone) {
-          return null;
-        }
-        if (value != null && value.length == 0 && isPrice) {
-          return Locales.string(context, "Please, enter a valid price");
-        } else if (isPrice) {
-          return null;
-        }
-        if (value != null && value.length < (maxLines > 1 ? 50 : 20)) {
-          return Locales.string(context, "must_be_at_least_20_chars");
-        }
-        return null;
-      },
+      validator: validator ??
+          (value) {
+            if (!validation) return null;
+            if (value != null && value.length < 13 && isPhone) {
+              return Locales.string(
+                  context, "Please, enter a valid phone number");
+            } else if (isPhone) {
+              return null;
+            }
+            if (value != null && value.length == 0 && isPrice) {
+              return Locales.string(context, "Please, enter a valid price");
+            } else if (isPrice) {
+              return null;
+            }
+            if (value != null && value.length < (maxLines > 1 ? 50 : 20)) {
+              return Locales.string(context, "must_be_at_least_20_chars");
+            }
+            return null;
+          },
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: TextStyles.display5(),

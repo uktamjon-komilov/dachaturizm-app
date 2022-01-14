@@ -286,7 +286,7 @@ class DetailBuilder {
               imageUrl: detail.photo,
               fit: BoxFit.cover,
               placeholder: (context, _) => Image.asset(
-                "assets/images/placeholder.png",
+                "assets/images/square-placeholder.jpg",
                 fit: BoxFit.cover,
               ),
             ),
@@ -295,7 +295,7 @@ class DetailBuilder {
                       imageUrl: item.photo,
                       fit: BoxFit.cover,
                       placeholder: (context, _) => Image.asset(
-                        "assets/images/placeholder.png",
+                        "assets/images/square-placeholder.jpg",
                         fit: BoxFit.cover,
                       ),
                     ))

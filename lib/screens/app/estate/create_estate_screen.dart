@@ -5,6 +5,7 @@ import 'package:dachaturizm/components/booked_days_hint.dart';
 import 'package:dachaturizm/components/fluid_big_button.dart';
 import 'package:dachaturizm/components/fluid_outlined_button.dart';
 import 'package:dachaturizm/components/normal_input.dart';
+import 'package:dachaturizm/components/small_button.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/helpers/call_with_auth.dart';
 import 'package:dachaturizm/helpers/locale_helper.dart';
@@ -29,6 +30,7 @@ import 'package:dachaturizm/screens/app/navigational_app_screen.dart';
 import 'package:dachaturizm/screens/app/search/filters_screen.dart';
 import 'package:dachaturizm/screens/app/user/my_announcements_screen.dart';
 import 'package:dachaturizm/styles/text_styles.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_locales/flutter_locales.dart';
@@ -75,8 +77,10 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
   FocusNode _weekendPriceFocusNode = FocusNode();
 
   dynamic? _mainImage;
+  int _mainImageId = 0;
   List _extraImages = List.generate(8, (_) => null);
-  String _currentSection = "0";
+  List _extraImagesId = List.generate(8, (_) => 0);
+  String _currentSection = "";
   TextEditingController _titleController = TextEditingController();
   TextEditingController _descriptionController = TextEditingController();
   TextEditingController _announcerController = TextEditingController();
@@ -85,8 +89,8 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
   TextEditingController _weekdayPriceController = TextEditingController();
   TextEditingController _weekendPriceController = TextEditingController();
   int _currentCurrencyId = 0;
-  String _currentRegion = "0";
-  String _currentDistrict = "0";
+  String _currentRegion = "";
+  String _currentDistrict = "";
   List<int> _facilities = [];
   double _longtitude = 0.0;
   double _latitute = 0.0;
@@ -139,10 +143,9 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
       );
       return {"status": false};
     }
-    print(1);
     Map<String, dynamic> data = {};
-    data["photo"] = _mainImage;
-    data["photos"] = _extraImages.where((image) => image != null).toList();
+    data["photo"] = _mainImageId;
+    data["photos"] = _extraImagesId;
     data["estate_type"] = _categories
         .firstWhere((element) => element.title == _currentSection.toString())
         .id;
@@ -155,7 +158,6 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     data["longtitute"] = _longtitude;
     data["latitute"] = _latitute;
     data["description"] = _descriptionController.text;
-    print(2);
     data["booked_days"] = _bookedDays;
     data["facilities"] = _facilities;
     data["announcer"] = _announcerController.text;
@@ -168,14 +170,13 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     data["pool"] = "0";
     data["people"] = "0";
     data["is_published"] = "true";
-    print(3);
     return data;
   }
 
   sendData() {
     Map<String, dynamic> data = beforeSending();
-    _resetInputs();
     if (data.containsKey("status")) return;
+    _resetInputs();
     return data;
   }
 
@@ -243,6 +244,15 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     setState(() {
       _mainImage = File(image as String);
     });
+
+    var photo = await MultipartFile.fromFile(_mainImage.path,
+        filename: "testimage.png");
+
+    Provider.of<EstateProvider>(context, listen: false)
+        .uploadTempPhoto(photo)
+        .then((value) {
+      _mainImageId = value;
+    });
   }
 
   Future<void> _selectExtraImage(index) async {
@@ -254,6 +264,15 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
           _currentExtraImageIndex = index - 1;
       });
     } else {
+      var photo = await MultipartFile.fromFile(File(image as String).path,
+          filename: "testimage.png");
+
+      Provider.of<EstateProvider>(context, listen: false)
+          .uploadExtraPhoto(photo)
+          .then((value) {
+        _extraImagesId[index] = value;
+      });
+
       setState(() {
         _extraImages[index] = File(image as String);
         _currentExtraImageIndex = index + 1;
@@ -304,13 +323,13 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
               .getEstateById(int.parse(data["estateId"]))
               .then((value) {
             _estate = value;
-            print("nima bolyapti");
             _mainImage = value.photo;
-            print("nima bolyapti");
+            _mainImageId = 0;
             _extraImages = List.generate(8, (_) => null);
             value.photos.forEach((photo) {
               int index = value.photos.indexOf(photo);
               _extraImages[index] = photo.photo;
+              _extraImagesId[index] = photo.id;
             });
             _currentExtraImageIndex = value.photos.length - 1;
             _currentSection = value.typeId.toString();
@@ -348,13 +367,11 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                 })
                 .id
                 .toString();
-            print(_currentRegion);
             _districts = _regions.firstWhere(
                 (region) => region.id.toString() == _currentRegion, orElse: () {
               return RegionModel(
                   id: 0, title: "", districts: [], translations: {});
             }).districts;
-            print(_districts);
             _currentDistrict = _districts
                 .firstWhere((district) => district.title == value.district,
                     orElse: () {
@@ -366,10 +383,8 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                 })
                 .id
                 .toString();
-            print(_currentDistrict);
             _facilities =
                 value.facilities.map((facility) => facility.id).toList();
-            print(_facilities);
             _longtitude = value.longtitute;
             _latitute = value.latitute;
             _selectedDays = value.bookedDays.toSet();
@@ -520,17 +535,19 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                               Locales.string(context, "choose_section"),
                               style: TextStyles.display9(),
                             ),
-                            _buildSelectionRow(
-                                categories
-                                    .map((category) => category.title)
-                                    .toList(),
-                                _currentSection,
-                                Locales.string(context, "choose_section"),
-                                onChanged: (value) {
-                              setState(() {
-                                _currentSection = value as String;
-                              });
-                            }),
+                            Row(
+                              children: [
+                                ...categories.map((category) {
+                                  return SmallButton(category.title,
+                                      enabled: _currentSection ==
+                                          category.title, onPressed: () {
+                                    setState(() {
+                                      _currentSection = category.title;
+                                    });
+                                  });
+                                }).toList()
+                              ],
+                            ),
                             VerticalHorizontalSizedBox(),
                             Text(
                               Locales.string(context, "region"),
@@ -590,6 +607,13 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                                 FocusScope.of(context)
                                     .requestFocus(_addressFocusNode);
                               },
+                              validator: (value) {
+                                if (value!.length == 0) {
+                                  return Locales.string(
+                                      context, "required_field");
+                                }
+                                return null;
+                              },
                             ),
                             VerticalHorizontalSizedBox(),
                             Text(
@@ -613,6 +637,13 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                                 FocusScope.of(context)
                                     .requestFocus(_descriptionFocusNode);
                               },
+                              validator: (value) {
+                                if (value!.length == 0) {
+                                  return Locales.string(
+                                      context, "required_field");
+                                }
+                                return null;
+                              },
                             ),
                             VerticalHorizontalSizedBox(),
                             Text(
@@ -629,6 +660,13 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                               onSubmitted: (value) {
                                 FocusScope.of(context)
                                     .requestFocus(_announcerFocusNode);
+                              },
+                              validator: (value) {
+                                if (value!.length == 0) {
+                                  return Locales.string(
+                                      context, "required_field");
+                                }
+                                return null;
                               },
                             ),
                             VerticalHorizontalHalfSizedBox(),
@@ -704,6 +742,13 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                                       FocusScope.of(context)
                                           .requestFocus(_weekendPriceFocusNode);
                                     },
+                                    validator: (value) {
+                                      if (value!.length == 0) {
+                                        return Locales.string(
+                                            context, "required_field");
+                                      }
+                                      return null;
+                                    },
                                   ),
                                 ),
                                 Container(
@@ -715,6 +760,13 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                                     focusNode: _weekendPriceFocusNode,
                                     isPrice: true,
                                     onSubmitted: (value) {},
+                                    validator: (value) {
+                                      if (value!.length == 0) {
+                                        return Locales.string(
+                                            context, "required_field");
+                                      }
+                                      return null;
+                                    },
                                   ),
                                 ),
                               ],
@@ -733,11 +785,13 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                                   await updateData();
                                 } else {
                                   dynamic data = await sendData();
-                                  FocusScope.of(context)
-                                      .requestFocus(FocusNode());
-                                  Navigator.of(context).pushNamed(
-                                      PlansScreen.routeName,
-                                      arguments: {"data": data});
+                                  if (data != null) {
+                                    FocusScope.of(context)
+                                        .requestFocus(FocusNode());
+                                    Navigator.of(context).pushNamed(
+                                        PlansScreen.routeName,
+                                        arguments: {"data": data});
+                                  }
                                 }
                               },
                               text: _isEditing
@@ -827,7 +881,6 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
 
   Widget _buildSelectionRow(List<String> values, value, String placeHolder,
       {void Function(String?)? onChanged}) {
-    print(value);
     return Container(
       height: 45,
       margin: EdgeInsets.only(top: 10),
@@ -835,7 +888,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
         physics: NeverScrollableScrollPhysics(),
         child: FindDropdown<String>(
           items: values,
-          label: "Choose one",
+          label: Locales.string(context, "choose_one"),
           labelVisible: false,
           selectedItem: value,
           onChanged: onChanged ??
@@ -844,9 +897,9 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
               },
           validate: (String? item) {
             if (item == null)
-              return "Required field";
+              return Locales.string(context, "required_field");
             else if (!value.contains(item))
-              return "Invalid item";
+              return Locales.string(context, "invalid_item");
             else
               return null;
           },
@@ -889,6 +942,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
   Widget _buildLocationPicker() {
     return GestureDetector(
       onTap: () async {
+        FocusScope.of(context).requestFocus(FocusNode());
         _showGoogleMap(context);
       },
       child: ClipRRect(
@@ -970,7 +1024,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
   }
 
   Widget _buildCalendar() {
-    return (_isLoading || _selectedDays.length == 0)
+    return (_isLoading && _selectedDays.length == 0)
         ? Container()
         : TableCalendar(
             firstDay: now,

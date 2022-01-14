@@ -39,7 +39,6 @@ class _UserPageScreenState extends State<UserPageScreen> {
     setState(() {
       _userLoading = true;
     });
-
     Provider.of<AuthProvider>(context, listen: false)
         .getUserData()
         .then((user) {

@@ -1,4 +1,3 @@
-import 'package:dachaturizm/components/app_bar.dart';
 import 'package:dachaturizm/components/fluid_big_button.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/helpers/call_with_auth.dart';

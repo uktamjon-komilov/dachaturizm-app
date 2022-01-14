@@ -263,7 +263,9 @@ class _HomePageScreenState extends State<HomePageScreen> {
     List banners = Provider.of<BannerProvider>(context).banners[category.id];
 
     return Visibility(
-      visible: (topEstates.length > 0 || banners.length > 0),
+      visible: (topEstates != null &&
+          banners != null &&
+          (topEstates.length > 0 || banners.length > 0)),
       child: Container(
         child: Column(
           children: [

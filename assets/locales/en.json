@@ -173,5 +173,8 @@
     "your_password_renewed": "Your password is renewed",
     "settings": "Settings",
     "estate_editing_title": "Editing Announcement",
-    "edit_estate": "Save Changes"
+    "edit_estate": "Save Changes",
+    "choose_one": "Choose one",
+    "required_field": "Required field",
+    "invalid_item": "Invalid item"
 }

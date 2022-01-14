@@ -332,31 +332,33 @@ class EstateProvider with ChangeNotifier {
     final locale = await getCurrentLocale();
     Map<String, dynamic> tempData = {};
 
-    if (data.containsKey("photos")) {
-      int i = 0;
+    // if (data.containsKey("photos")) {
+    //   int i = 0;
 
-      while (data["photos"].length > 0) {
-        if (data["photos"].length == i) break;
-        var photo;
-        if (data["photos"][i].runtimeType.toString() == "String") {
-          photo = data["photos"][i];
-        } else {
-          photo = await MultipartFile.fromFile(data["photos"][i].path,
-              filename: "testimage.png");
-        }
-        tempData["photo${i + 1}"] = photo;
-        i += 1;
-      }
-    }
+    //   while (data["photos"].length > 0) {
+    //     if (data["photos"].length == i) break;
+    //     var photo;
+    //     if (data["photos"][i].runtimeType.toString() == "String") {
+    //       photo = data["photos"][i];
+    //     } else {
+    //       photo = await MultipartFile.fromFile(data["photos"][i].path,
+    //           filename: "testimage.png");
+    //     }
+    //     tempData["photo${i + 1}"] = photo;
+    //     i += 1;
+    //   }
+    // }
+    tempData["photos"] = "[${data['photos'].join(',')}]";
 
-    if (data.containsKey("photo")) {
-      if (data["photo"].runtimeType.toString() == "String") {
-        tempData["photo"] = data["photo"];
-      } else {
-        tempData["photo"] = await MultipartFile.fromFile(data["photo"].path,
-            filename: "testimage.png");
-      }
-    }
+    // if (data.containsKey("photo")) {
+    //   if (data["photo"].runtimeType.toString() == "String") {
+    //     tempData["photo"] = data["photo"];
+    //   } else {
+    //     tempData["photo"] = await MultipartFile.fromFile(data["photo"].path,
+    //         filename: "testimage.png");
+    //   }
+    // }
+    tempData["photo"] = data["photo"];
 
     Map<String, dynamic> translations = {
       "en": {
@@ -514,6 +516,46 @@ class EstateProvider with ChangeNotifier {
       print(e);
     }
     return {"statusCode": 400};
+  }
+
+  Future<int> uploadTempPhoto(photo) async {
+    try {
+      const url = "${baseUrl}api/tempphoto/";
+      String access = await auth.getAccessToken();
+      Options options = Options(headers: {
+        "Content-type": "multipart/form-data",
+        "Authorization": "Bearer ${access}",
+      });
+      FormData formData = FormData.fromMap({"photo": photo});
+      final response = await dio.post(url, options: options, data: formData);
+      if (response.statusCode as int >= 200 &&
+          response.statusCode as int < 300) {
+        return response.data["id"];
+      }
+    } catch (e) {
+      print(e);
+    }
+    return 0;
+  }
+
+  Future<int> uploadExtraPhoto(photo) async {
+    try {
+      const url = "${baseUrl}api/estatephotos/";
+      String access = await auth.getAccessToken();
+      Options options = Options(headers: {
+        "Content-type": "multipart/form-data",
+        "Authorization": "Bearer ${access}",
+      });
+      FormData formData = FormData.fromMap({"photo": photo});
+      final response = await dio.post(url, options: options, data: formData);
+      if (response.statusCode as int >= 200 &&
+          response.statusCode as int < 300) {
+        return response.data["id"];
+      }
+    } catch (e) {
+      print(e);
+    }
+    return 0;
   }
 
   // Getting my estates

@@ -173,5 +173,8 @@
     "your_password_renewed": "Ваш пароль обновлен",
     "settings": "Настройки",
     "estate_editing_title": "Редактирование объявления",
-    "edit_estate": "Сохранить изменения"
+    "edit_estate": "Сохранить изменения",
+    "choose_one": "Выбери один",
+    "required_field": "Обязательное поле",
+    "invalid_item": "Недопустимый элемент"
 }

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/helpers/call_with_auth.dart';
@@ -66,11 +67,20 @@ class _EstateCardState extends State<EstateCard> {
             children: [
               Stack(
                 children: [
-                  Ink.image(
-                    height: 145,
+                  // Ink.image(
+                  //   height: 145,
+                  //   fit: BoxFit.cover,
+                  //   image: NetworkImage(
+                  //     widget.estate.photo,
+                  //   ),
+                  // ),
+                  CachedNetworkImage(
+                    imageUrl: widget.estate.photo,
                     fit: BoxFit.cover,
-                    image: NetworkImage(
-                      widget.estate.photo,
+                    height: 145,
+                    placeholder: (context, _) => Image.asset(
+                      "assets/images/square-placeholder.jpg",
+                      fit: BoxFit.contain,
                     ),
                   ),
                   widget.estate.isTop ? _showTopIndicator() : SizedBox.shrink()
