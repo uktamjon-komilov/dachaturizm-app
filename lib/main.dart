@@ -74,8 +74,9 @@ void main() async {
             update: (context, _a, _) => EstateProvider(dio: dio, auth: auth),
           ),
           ChangeNotifierProxyProvider<AuthProvider, NavigationScreenProvider>(
-            create: (context) =>
-                NavigationScreenProvider(auth: AuthProvider(dio: dio)),
+            create: (context) => NavigationScreenProvider(
+              auth: AuthProvider(dio: dio),
+            ),
             update: (context, auth, _) => NavigationScreenProvider(auth: auth),
           ),
           ChangeNotifierProvider.value(
@@ -125,7 +126,7 @@ class _MyAppState extends State<MyApp> {
       builder: (locale) => Sizer(builder: (context, orientation, deviceType) {
         Provider.of<AuthProvider>(context, listen: false).refresh_token();
         return MaterialApp(
-          title: LocaleText("appbar_text").toString(),
+          title: "DachaTurizm",
           localizationsDelegates: Locales.delegates,
           supportedLocales: Locales.supportedLocales,
           locale: locale,

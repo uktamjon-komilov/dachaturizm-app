@@ -33,7 +33,7 @@ class _MyBalanceScreenState extends State<MyBalanceScreen> {
   Future _refresh() async {
     await Future.wait([
       Provider.of<AuthProvider>(context, listen: false)
-          .getUserData()
+          .getUserDataWithoutNotifying()
           .then((user) => _user = user),
       Provider.of<AuthProvider>(context, listen: false)
           .getTransactions("in")

@@ -27,6 +27,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  bool _isLoading = false;
   bool _hidePassword = true;
   bool _wrongCredentials = false;
 
@@ -63,7 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Image.asset(
-                      "assets/images/logo.png",
+                      "assets/images/logo-turizm.png",
                       width: 120,
                       fit: BoxFit.cover,
                     ),
@@ -126,8 +127,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     SizedBox(height: defaultPadding),
                     FluidBigButton(
-                        text: Locales.string(context, "log_in"),
-                        onPress: login),
+                      text: Locales.string(context, "log_in"),
+                      onPress: login,
+                      loading: _isLoading,
+                    ),
                     SizedBox(height: 1.5 * defaultPadding),
                     TextLinkButton(Locales.string(context, "forgot_password?"),
                         () {
@@ -161,22 +164,24 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   login() {
+    setState(() {
+      _isLoading = true;
+    });
     String phone = clearPhoneNumber(_phoneController.text);
     String password = _passwordController.text;
-    print(phone);
-    print(password);
     Provider.of<AuthProvider>(context, listen: false)
         .login(phone, password)
         .then((value) async {
       if (value.containsKey("status")) {
         setState(() {
           _wrongCredentials = true;
+          _isLoading = false;
         });
       } else {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setBool("noAuth", true);
         Navigator.of(context)
-          ..pop()
+          ..popUntil(ModalRoute.withName(NavigationalAppScreen.routeName))
           ..pushReplacementNamed(NavigationalAppScreen.routeName);
       }
     });

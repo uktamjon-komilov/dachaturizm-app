@@ -93,6 +93,7 @@ class AuthProvider with ChangeNotifier {
       ),
       data: json.encode({"phone": phone}),
     );
+    print(response);
     if (response.statusCode as int >= 200 || response.statusCode as int < 300) {
       return response.data;
     }
@@ -168,7 +169,6 @@ class AuthProvider with ChangeNotifier {
         }
       }
     } catch (e) {
-      // await logout();
       print("debugging");
       print(e);
     }
@@ -210,6 +210,7 @@ class AuthProvider with ChangeNotifier {
   Future logout() async {
     _accessToken = "";
     _refreshToken = "";
+    _userId = 0;
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString("access", "");
     prefs.setString("refresh", "");
@@ -253,7 +254,23 @@ class AuthProvider with ChangeNotifier {
           response.statusCode as int < 300) {
         Map<String, dynamic> data = response.data;
         _user = UserModel.fromJson(data);
-        // notifyListeners();
+        notifyListeners();
+        return _user;
+      }
+    }
+
+    return null;
+  }
+
+  Future<UserModel?> getUserDataWithoutNotifying() async {
+    int userId = await getUserId();
+    if (userId != null) {
+      final url = "${baseUrl}api/users/${userId}/";
+      final response = await dio.get(url);
+      if (response.statusCode as int >= 200 ||
+          response.statusCode as int < 300) {
+        Map<String, dynamic> data = response.data;
+        _user = UserModel.fromJson(data);
         return _user;
       }
     }

@@ -11,6 +11,8 @@ Widget buildBottomNavigation(BuildContext context, [Function? popCallback]) {
       Provider.of<NavigationScreenProvider>(context).currentIndex;
 
   return BottomNavigationBar(
+    showSelectedLabels: false,
+    showUnselectedLabels: false,
     selectedLabelStyle: TextStyles.display4(),
     unselectedLabelStyle:
         TextStyles.display4().copyWith(color: Color(0xFFBDBDBD)),
@@ -40,14 +42,14 @@ Widget buildBottomNavigation(BuildContext context, [Function? popCallback]) {
               : Icons.dashboard_outlined,
           color: currentIndex == 0 ? darkPurple : Color(0xFFBDBDBD),
         ),
-        label: "Home",
+        label: "",
       ),
       BottomNavigationBarItem(
         icon: Icon(
           currentIndex == 1 ? Icons.search_rounded : Icons.search_outlined,
           color: currentIndex == 1 ? darkPurple : Color(0xFFBDBDBD),
         ),
-        label: "Search",
+        label: "",
       ),
       BottomNavigationBarItem(
         icon: Icon(
@@ -56,7 +58,7 @@ Widget buildBottomNavigation(BuildContext context, [Function? popCallback]) {
               : Icons.add_circle_outline_rounded,
           color: currentIndex == 2 ? darkPurple : Color(0xFFBDBDBD),
         ),
-        label: "Add",
+        label: "",
       ),
       BottomNavigationBarItem(
         icon: Container(
@@ -88,7 +90,7 @@ Widget buildBottomNavigation(BuildContext context, [Function? popCallback]) {
             ]),
           ),
         ),
-        label: "Chat",
+        label: "",
       ),
       BottomNavigationBarItem(
         icon: Icon(
@@ -97,7 +99,7 @@ Widget buildBottomNavigation(BuildContext context, [Function? popCallback]) {
               : Icons.person_outline_rounded,
           color: currentIndex == 4 ? darkPurple : Color(0xFFBDBDBD),
         ),
-        label: "User",
+        label: "",
       ),
     ],
   );

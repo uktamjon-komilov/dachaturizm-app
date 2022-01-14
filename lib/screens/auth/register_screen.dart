@@ -40,7 +40,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Image.asset(
-                          "assets/images/logo.png",
+                          "assets/images/logo-icon.png",
                           width: 120,
                           fit: BoxFit.cover,
                         ),
@@ -74,9 +74,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         FluidBigButton(
                           text: Locales.string(context, "next"),
                           onPress: () {
-                            String phone =
-                                _phoneController.text.replaceAll(" ", "");
-                            if (phone.length == 13) {
+                            String phone = _phoneController.text
+                                .replaceAll(" ", "")
+                                .replaceAll("(", "")
+                                .replaceAll(")", "");
+                            if (phone.length > 11) {
                               setState(() {
                                 _isLoading = true;
                               });

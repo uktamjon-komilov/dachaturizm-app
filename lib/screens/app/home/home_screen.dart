@@ -8,8 +8,8 @@ import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/models/category_model.dart';
 import 'package:dachaturizm/providers/banner_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
-import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/providers/category_provider.dart';
+import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/screens/app/home/listing_screen.dart';
 import 'package:dachaturizm/screens/app/home/services_list_screen.dart';
 import 'package:dachaturizm/styles/text_styles.dart';
@@ -33,11 +33,11 @@ class _HomePageScreenState extends State<HomePageScreen> {
   final FocusNode _searchFocusNode = FocusNode();
 
   Future<void> _refreshHomePage() async {
-    Future.delayed(Duration.zero).then((_) {
+    Future.delayed(Duration.zero).then((_) async {
       setState(() {
         _isLoading = true;
       });
-      Provider.of<BannerProvider>(context, listen: false).getTopBanners();
+      await Provider.of<BannerProvider>(context, listen: false).getTopBanners();
       Provider.of<EstateTypesProvider>(context, listen: false)
           .getCategories()
           .then(
@@ -64,15 +64,24 @@ class _HomePageScreenState extends State<HomePageScreen> {
     );
   }
 
+  _search(context) {
+    String term = _searchController.text;
+    _searchController.text = "";
+    Provider.of<NavigationScreenProvider>(context, listen: false)
+        .visitSearchPage(term);
+  }
+
   @override
   void didChangeDependencies() async {
-    // bool shouldRefresh =
-    //     Provider.of<NavigationScreenProvider>(context).refreshHomePage;
-    // if (shouldRefresh) {
-    //   Provider.of<NavigationScreenProvider>(context, listen: false)
-    //       .refreshHomePage = false;
-    //   await _refreshHomePage();
-    // }
+    bool shouldRefresh =
+        Provider.of<NavigationScreenProvider>(context).refreshHomePage;
+    if (shouldRefresh) {
+      Provider.of<NavigationScreenProvider>(context, listen: false)
+          .setHomeData = {"refresh_callback": _refreshHomePage};
+      Provider.of<NavigationScreenProvider>(context, listen: false)
+          .refreshHomePage = false;
+      await _refreshHomePage();
+    }
     super.didChangeDependencies();
   }
 
@@ -103,37 +112,46 @@ class _HomePageScreenState extends State<HomePageScreen> {
               child: Column(
                 children: [
                   Expanded(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          _buidlCategoryRow(context, categories),
-                          SizedBox(height: defaultPadding * 1.5),
-                          _buildSearchBar(context),
-                          _buildTopBannerBlock(context, topBanners),
-                          SizedBox(height: defaultPadding * 1.5),
-                          Container(
-                            padding: EdgeInsets.fromLTRB(
-                              defaultPadding,
-                              24,
-                              defaultPadding,
-                              0,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[100],
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(30),
-                                topRight: Radius.circular(30),
+                    child:
+                        NotificationListener<OverscrollIndicatorNotification>(
+                      onNotification:
+                          (OverscrollIndicatorNotification overScroll) {
+                        overScroll.disallowGlow();
+                        return false;
+                      },
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            _buidlCategoryRow(context, categories),
+                            SizedBox(height: defaultPadding * 1.5),
+                            _buildSearchBar(context),
+                            _buildTopBannerBlock(context, topBanners),
+                            SizedBox(height: defaultPadding * 1.5),
+                            Container(
+                              padding: EdgeInsets.fromLTRB(
+                                defaultPadding,
+                                24,
+                                defaultPadding,
+                                defaultPadding,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[100],
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(30),
+                                  topRight: Radius.circular(30),
+                                ),
+                              ),
+                              child: Column(
+                                children: [
+                                  ...categories
+                                      .map(
+                                          (item) => _buildEstateTypeBlock(item))
+                                      .toList(),
+                                ],
                               ),
                             ),
-                            child: Column(
-                              children: [
-                                ...categories
-                                    .map((item) => _buildEstateTypeBlock(item))
-                                    .toList(),
-                              ],
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -156,12 +174,10 @@ class _HomePageScreenState extends State<HomePageScreen> {
         autofocus: false,
         onSubmit: (value) {
           if (value != "") {
-            String term = _searchController.text;
-            _searchController.text = "";
-            // Provider.of<NavigationScreenProvider>(context, listen: false)
-            //     .visitSearchPage(term);
+            _search(context);
           }
         },
+        onFilterCallback: () => _search(context),
       ),
     );
   }

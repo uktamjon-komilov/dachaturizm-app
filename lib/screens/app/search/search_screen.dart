@@ -79,6 +79,8 @@ class _SearchPageScreenState extends State<SearchPageScreen> {
     await Provider.of<EstateProvider>(context, listen: false)
         .getSearchedResults(term: value)
         .then((value) {
+      print("new");
+      print(value);
       setState(() {
         _results = value["estates"];
         _nextPage = value["next"];
@@ -112,14 +114,26 @@ class _SearchPageScreenState extends State<SearchPageScreen> {
 
   Future<void> _refreshAction() async {
     _searchController.text = "";
+    setState(() {
+      _results = [];
+    });
   }
 
   @override
-  void didChangeDependencies() {
+  void didChangeDependencies() async {
     super.didChangeDependencies();
     Future.delayed(Duration.zero).then((_) {
       _listenScroller(context);
     });
+    String term =
+        Provider.of<NavigationScreenProvider>(context).data["search_term"];
+    if (term.length > 0) {
+      _searchController.text = term;
+      await _search(context, term);
+      Provider.of<NavigationScreenProvider>(context, listen: false)
+          .clearSearch();
+      setState(() {});
+    }
   }
 
   @override
@@ -182,7 +196,8 @@ class _SearchPageScreenState extends State<SearchPageScreen> {
                           children: [
                             Padding(
                               padding: const EdgeInsets.symmetric(
-                                  vertical: defaultPadding / 2),
+                                vertical: defaultPadding / 2,
+                              ),
                               child: Text(
                                 Locales.string(
                                   context,
@@ -192,16 +207,23 @@ class _SearchPageScreenState extends State<SearchPageScreen> {
                               ),
                             ),
                             Expanded(
-                              child: SingleChildScrollView(
-                                controller: _scrollController,
-                                child: Wrap(
-                                  children: [
-                                    ..._results
-                                        .map((estate) =>
-                                            EstateCard(estate: estate))
-                                        .toList(),
-                                    SizedBox(height: defaultPadding),
-                                  ],
+                              child: NotificationListener<
+                                  OverscrollIndicatorNotification>(
+                                onNotification: (OverscrollIndicatorNotification
+                                    overScroll) {
+                                  overScroll.disallowGlow();
+                                  return false;
+                                },
+                                child: SingleChildScrollView(
+                                  controller: _scrollController,
+                                  child: Wrap(
+                                    children: [
+                                      ..._results
+                                          .map((estate) =>
+                                              EstateCard(estate: estate))
+                                          .toList(),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),

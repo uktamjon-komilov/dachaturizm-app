@@ -30,7 +30,7 @@ class _AuthTypeScreenState extends State<AuthTypeScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.asset(
-                "assets/images/logo.png",
+                "assets/images/logo-turizm.png",
                 width: 120,
                 fit: BoxFit.cover,
               ),

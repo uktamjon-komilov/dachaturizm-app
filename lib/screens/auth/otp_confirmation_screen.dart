@@ -1,4 +1,3 @@
-import 'package:dachaturizm/components/fluid_big_button.dart';
 import 'package:dachaturizm/components/text_link.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
@@ -38,7 +37,7 @@ class _OTPConfirmationScreenState extends State<OTPConfirmationScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Image.asset(
-                          "assets/images/logo.png",
+                          "assets/images/logo-icon.png",
                           width: 120,
                           fit: BoxFit.cover,
                         ),

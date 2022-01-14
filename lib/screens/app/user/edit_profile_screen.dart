@@ -143,6 +143,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       onWillPop: () async {
         Provider.of<NavigationScreenProvider>(context, listen: false)
             .changePageIndex(4);
+        Provider.of<AuthProvider>(context, listen: false)
+            .getUserData()
+            .then((value) {
+          return true;
+        });
         return true;
       },
       child: SafeArea(
@@ -154,15 +159,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               )
             : Scaffold(
                 appBar: buildNavigationalAppBar(
-                  context,
-                  Locales.string(context, "editing"),
-                  () {
-                    Provider.of<NavigationScreenProvider>(context,
-                            listen: false)
-                        .changePageIndex(4);
-                    Navigator.of(context).pop();
-                  },
-                ),
+                    context, Locales.string(context, "editing"), () {
+                  Provider.of<AuthProvider>(context, listen: false)
+                      .getUserData();
+                }),
                 floatingActionButton: Container(
                   width: 100.w - 1.8 * defaultPadding,
                   child: FluidBigButton(

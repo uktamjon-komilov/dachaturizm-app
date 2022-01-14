@@ -77,7 +77,7 @@ class _NavigationalAppScreenState extends State<NavigationalAppScreen>
                   icon: Icon(
                     Icons.favorite_border_rounded,
                     size: 24,
-                    color: favouriteRed,
+                    color: darkPurple,
                   ),
                 ),
               )

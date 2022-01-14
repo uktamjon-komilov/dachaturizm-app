@@ -6,6 +6,7 @@ import 'package:dachaturizm/models/user_model.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
+import 'package:dachaturizm/restartable_app.dart';
 import 'package:dachaturizm/screens/app/user/change_language.dart';
 import 'package:dachaturizm/screens/app/user/edit_profile_screen.dart';
 import 'package:dachaturizm/screens/app/user/feedback_screen.dart';
@@ -147,7 +148,8 @@ class _UserPageScreenState extends State<UserPageScreen> {
   }
 
   Widget _buildProfileList() {
-    bool userExists = _user != null;
+    bool userExists =
+        Provider.of<AuthProvider>(context, listen: false).userId != 0;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -223,7 +225,9 @@ class _UserPageScreenState extends State<UserPageScreen> {
               callWithAuth(context, () async {
                 await Provider.of<AuthProvider>(context, listen: false)
                     .logout();
-                Navigator.of(context).pushNamed(LoginScreen.routeName);
+                // Provider.of<AuthProvider>(context, listen: false).getUserData();
+                // Navigator.of(context).pushNamed(LoginScreen.routeName);
+                RestartWidget.restartApp(context);
               });
             },
           ),

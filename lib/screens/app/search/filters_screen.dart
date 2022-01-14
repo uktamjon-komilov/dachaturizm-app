@@ -62,20 +62,6 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
       }),
     ]);
 
-    // double minPrice =
-    //     Provider.of<EstateProvider>(context, listen: false).filters["minPrice"];
-    // double maxPrice =
-    //     Provider.of<EstateProvider>(context, listen: false).filters["maxPrice"];
-
-    // _minPriceController.text = minPrice.toString();
-    // if (maxPrice == 0.0) {
-    //   _maxPriceController.text = "10000";
-    //   _selectedRange = RangeValues(minPrice, 10000);
-    // } else {
-    //   _maxPriceController.text = maxPrice.toString();
-    //   _selectedRange = RangeValues(minPrice, maxPrice);
-    // }
-
     _sortingTypes = Provider.of<EstateProvider>(context, listen: false).sorting;
     _currentSort =
         Provider.of<EstateProvider>(context, listen: false).filters["sorting"];
@@ -95,11 +81,17 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
         .getExtrimalPrices(currencyId as int, categoryId: _categoryId)
         .then((value) {
       setState(() {
-        _priceConstraints = RangeValues(value["min"], value["max"]);
-        _selectedRange = RangeValues(value["min"], value["max"]);
+        if (currencyId as int < 2) {
+          _priceConstraints = RangeValues(0.0, 1200.0);
+          _selectedRange = RangeValues(0.0, 1200.0);
+          _divisions = 240;
+        } else {
+          _priceConstraints = RangeValues(0.0, 5000000.0);
+          _selectedRange = RangeValues(0.0, 5000000.0);
+          _divisions = 250;
+        }
         _minPriceController.text = _selectedRange.start.toString();
         _maxPriceController.text = _selectedRange.end.toString();
-        _divisions = value["divisions"];
       });
     });
   }

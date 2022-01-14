@@ -256,7 +256,11 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
         ),
         SizedBox(height: 10),
         FluidBigButton(
-          onPress: _saveRating,
+          onPress: () {
+            callWithAuth(context, () {
+              _saveRating();
+            });
+          },
           text: Locales.string(context, "send"),
           size: Size(180, 36),
           shape: RoundedRectangleBorder(

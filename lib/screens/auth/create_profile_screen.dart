@@ -66,7 +66,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Image.asset(
-                      "assets/images/logo.png",
+                      "assets/images/logo-icon.png",
                       width: 120,
                       fit: BoxFit.cover,
                     ),

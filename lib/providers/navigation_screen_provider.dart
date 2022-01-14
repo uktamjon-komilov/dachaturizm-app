@@ -4,12 +4,15 @@ import 'package:flutter/material.dart';
 
 class NavigationScreenProvider with ChangeNotifier {
   final AuthProvider auth;
-  int _currentIndex = 3;
+  int _currentIndex = 0;
   List<int> _authRequiredScreens = [2, 3];
-  Map<String, dynamic> _data = {};
+  Map<String, dynamic> _data = {
+    "search_term": "",
+  };
   bool _refreshHomePage = false;
   bool _refreshChatsScreen = false;
   int _unreadMessagesCount = 0;
+  Map<String, dynamic> extraPageData = {"home": {}};
 
   NavigationScreenProvider({required this.auth});
 
@@ -24,6 +27,10 @@ class NavigationScreenProvider with ChangeNotifier {
 
   bool get refreshChatsScreen {
     return _refreshChatsScreen;
+  }
+
+  set setHomeData(Map<String, dynamic> data) {
+    extraPageData["home"] = data;
   }
 
   set refreshHomePage(bool value) {
@@ -71,5 +78,14 @@ class NavigationScreenProvider with ChangeNotifier {
       }
       notifyListeners();
     }
+  }
+
+  visitSearchPage(String term) async {
+    _data["search_term"] = term;
+    await changePageIndex(1);
+  }
+
+  clearSearch() {
+    _data["search_term"] = "";
   }
 }

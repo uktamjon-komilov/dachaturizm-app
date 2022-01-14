@@ -74,7 +74,7 @@ class _SplashScreenState extends State<SplashScreen> {
           child: Container(
             width: 150,
             child: Image.asset(
-              "assets/images/logo.png",
+              "assets/images/logo-turizm.png",
               scale: 1.8,
             ),
           ),
