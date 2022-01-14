@@ -558,6 +558,26 @@ class EstateProvider with ChangeNotifier {
     return 0;
   }
 
+  Future<int> updateExtraPhoto(id, photo) async {
+    try {
+      final url = "${baseUrl}api/estatephotos/${id}/";
+      String access = await auth.getAccessToken();
+      Options options = Options(headers: {
+        "Content-type": "multipart/form-data",
+        "Authorization": "Bearer ${access}",
+      });
+      FormData formData = FormData.fromMap({"photo": photo});
+      final response = await dio.patch(url, options: options, data: formData);
+      if (response.statusCode as int >= 200 &&
+          response.statusCode as int < 300) {
+        return response.data["id"];
+      }
+    } catch (e) {
+      print(e);
+    }
+    return 0;
+  }
+
   // Getting my estates
   Future<List<EstateModel>> getMyEstates([String? term]) async {
     String url = "";

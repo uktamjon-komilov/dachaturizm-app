@@ -99,7 +99,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
   void _resetInputs() {
     _mainImage = null;
     _extraImages = List.generate(8, (_) => null);
-    _currentSection = "0";
+    _currentSection = "";
     _titleController.text = "";
     _descriptionController.text = "";
     _announcerController.text = "";
@@ -108,8 +108,8 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     _weekdayPriceController.text = "";
     _weekendPriceController.text = "";
     _currentCurrencyId = 0;
-    _currentRegion = "0";
-    _currentDistrict = "0";
+    _currentRegion = "";
+    _currentDistrict = "";
     _facilities = [];
     _longtitude = 0.0;
     _latitute = 0.0;
@@ -120,7 +120,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     return _selectedDays.map((day) => day.date).toList();
   }
 
-  beforeSending() {
+  beforeSending(context) {
     if (!_form.currentState!.validate() ||
         _mainImage == null ||
         _currentSection == "0" ||
@@ -173,15 +173,15 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     return data;
   }
 
-  sendData() {
-    Map<String, dynamic> data = beforeSending();
+  sendData(context) {
+    Map<String, dynamic> data = beforeSending(context);
     if (data.containsKey("status")) return;
     _resetInputs();
     return data;
   }
 
-  Future<dynamic> updateData() async {
-    Map<String, dynamic> data = beforeSending();
+  Future<dynamic> updateData(context) async {
+    Map<String, dynamic> data = beforeSending(context);
     if (data.containsKey("status")) return;
     setState(() {
       _isUploading = true;
@@ -260,18 +260,29 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     if (image == null) {
       setState(() {
         _extraImages[index] = null;
-        if (index > 0 && _extraImages[index + 1] != null)
+        if (_isEditing) {
+          _currentExtraImageIndex = 8;
+        } else if (index > 0 && _extraImages[index + 1] != null) {
           _currentExtraImageIndex = index - 1;
+        }
       });
     } else {
       var photo = await MultipartFile.fromFile(File(image as String).path,
           filename: "testimage.png");
 
-      Provider.of<EstateProvider>(context, listen: false)
-          .uploadExtraPhoto(photo)
-          .then((value) {
-        _extraImagesId[index] = value;
-      });
+      if (_extraImages[index] == null) {
+        Provider.of<EstateProvider>(context, listen: false)
+            .uploadExtraPhoto(photo)
+            .then((value) {
+          _extraImagesId[index] = value;
+        });
+      } else {
+        Provider.of<EstateProvider>(context, listen: false)
+            .updateExtraPhoto(_extraImagesId[index], photo)
+            .then((value) {
+          _extraImagesId[index] = value;
+        });
+      }
 
       setState(() {
         _extraImages[index] = File(image as String);
@@ -331,8 +342,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
               _extraImages[index] = photo.photo;
               _extraImagesId[index] = photo.id;
             });
-            _currentExtraImageIndex = value.photos.length - 1;
-            _currentSection = value.typeId.toString();
+            _currentExtraImageIndex = 8;
             _titleController.text = value.title;
             _descriptionController.text = value.description;
             _announcerController.text = value.announcer;
@@ -357,7 +367,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                     backgroundColor: "",
                   );
                 })
-                .id
+                .title
                 .toString();
             _currentRegion = _regions
                 .firstWhere((region) => region.title == value.region,
@@ -365,13 +375,14 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                   return RegionModel(
                       id: 0, title: "", translations: {}, districts: []);
                 })
-                .id
+                .title
                 .toString();
             _districts = _regions.firstWhere(
                 (region) => region.id.toString() == _currentRegion, orElse: () {
               return RegionModel(
                   id: 0, title: "", districts: [], translations: {});
             }).districts;
+            print(_currentRegion);
             _currentDistrict = _districts
                 .firstWhere((district) => district.title == value.district,
                     orElse: () {
@@ -381,7 +392,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                     translations: {},
                   );
                 })
-                .id
+                .title
                 .toString();
             _facilities =
                 value.facilities.map((facility) => facility.id).toList();
@@ -782,9 +793,9 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                             FluidBigButton(
                               onPress: () async {
                                 if (_isEditing) {
-                                  await updateData();
+                                  await updateData(context);
                                 } else {
-                                  dynamic data = await sendData();
+                                  dynamic data = await sendData(context);
                                   if (data != null) {
                                     FocusScope.of(context)
                                         .requestFocus(FocusNode());

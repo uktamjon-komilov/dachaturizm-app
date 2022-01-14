@@ -15,7 +15,11 @@ class BookingDay extends Equatable {
   }
 
   static BookingDay toObj(DateTime date) {
-    return BookingDay(id: 0, date: "${date.year}-${date.month}-${date.day}");
+    String year = date.year.toString();
+    String month = date.month < 10 ? "0${date.month}" : date.month.toString();
+    String day = date.day < 10 ? "0${date.day}" : date.day.toString();
+
+    return BookingDay(id: 0, date: "${year}-${month}-${day}");
   }
 
   @override

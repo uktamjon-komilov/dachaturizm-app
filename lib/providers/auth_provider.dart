@@ -165,6 +165,7 @@ class AuthProvider with ChangeNotifier {
               "refresh_expires", refreshExpiryDate.toString());
           Map<String, dynamic> payload = Jwt.parseJwt(data["access"]);
           _userId = payload["user_id"];
+          await getUserData();
           return data;
         }
       }

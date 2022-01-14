@@ -32,10 +32,11 @@ class UserPageScreen extends StatefulWidget {
 class _UserPageScreenState extends State<UserPageScreen> {
   bool _userLoading = false;
   bool _someChange = false;
+  bool _isInit = true;
   UserModel? _user;
   List<StaticPageModel> _staticPages = [];
 
-  Future _refreshUser() async {
+  Future _refreshUser(BuildContext context) async {
     setState(() {
       _userLoading = true;
     });
@@ -71,23 +72,19 @@ class _UserPageScreenState extends State<UserPageScreen> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    Future.delayed(Duration.zero).then((_) async {
-      await _refreshUser();
-    });
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  void didChangeDependencies() async {
     if (_someChange) {
-      _refreshUser().then((_) {
+      _refreshUser(context).then((_) {
         Provider.of<NavigationScreenProvider>(context, listen: false)
             .changePageIndex(4);
       });
       _someChange = false;
     }
+    if (_isInit) {
+      _isInit = false;
+      await _refreshUser(context);
+    }
+    super.didChangeDependencies();
   }
 
   @override

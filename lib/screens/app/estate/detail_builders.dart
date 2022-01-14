@@ -182,6 +182,9 @@ class DetailBuilder {
               ),
             ),
             selectedDayPredicate: (day) {
+              print(_selectedDays);
+              print(BookingDay.toObj(day));
+              print(_selectedDays.contains(BookingDay.toObj(day)));
               return _selectedDays.contains(BookingDay.toObj(day));
               // return true;
             },
