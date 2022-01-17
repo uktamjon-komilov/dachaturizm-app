@@ -281,9 +281,7 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
     return buildNavigationalAppBar(
       context,
       Locales.string(context, "detail"),
-      () {
-        Navigator.of(context).pop();
-      },
+      null,
       [
         IconButton(
           onPressed: () {

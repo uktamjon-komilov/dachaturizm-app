@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_locales/flutter_locales.dart';
 import 'package:sizer/sizer.dart';
 
 class NoResult extends StatelessWidget {
@@ -20,7 +21,7 @@ class NoResult extends StatelessWidget {
           ),
           SizedBox(height: 30),
           Text(
-            "Natija topilmadi",
+            Locales.string(context, "result_not_found"),
             style: TextStyle(
               color: Colors.black,
               height: 1.25,
@@ -31,7 +32,7 @@ class NoResult extends StatelessWidget {
           ),
           SizedBox(height: 20),
           Text(
-            "Mahsulot nomini topish uchun boshqa kalit so'zlarni ishlatishga harakat qiling",
+            Locales.string(context, "no_estates_found_with_these_query"),
             style: TextStyle(
                 fontSize: 14,
                 height: 1.42,

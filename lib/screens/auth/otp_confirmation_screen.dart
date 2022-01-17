@@ -6,6 +6,7 @@ import "package:flutter/material.dart";
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 import 'package:provider/provider.dart';
+import 'package:sms_autofill/sms_autofill.dart';
 
 class OTPConfirmationScreen extends StatefulWidget {
   const OTPConfirmationScreen({Key? key}) : super(key: key);
@@ -18,6 +19,16 @@ class OTPConfirmationScreen extends StatefulWidget {
 
 class _OTPConfirmationScreenState extends State<OTPConfirmationScreen> {
   bool _isLoading = false;
+  bool _isInit = true;
+
+  @override
+  void didChangeDependencies() async {
+    super.didChangeDependencies();
+    if (_isInit) {
+      _isInit = false;
+      await SmsAutoFill().listenForCode();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

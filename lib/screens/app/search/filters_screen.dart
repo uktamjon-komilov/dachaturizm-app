@@ -5,10 +5,12 @@ import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/models/category_model.dart';
 import 'package:dachaturizm/models/currency_model.dart';
 import 'package:dachaturizm/models/facility_model.dart';
+import 'package:dachaturizm/models/popular_place_model.dart';
 import 'package:dachaturizm/providers/currency_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/facility_provider.dart';
 import 'package:dachaturizm/styles/text_styles.dart';
+import 'package:find_dropdown/find_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:provider/provider.dart';
@@ -32,6 +34,8 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
   List? _sortingTypes;
   String? _currentSort;
   int? _currentCurrencyId;
+  String _currentPlace = "";
+  List<PopularPlaceModel> _places = [];
   void Function()? onFilterCallback;
   int? _categoryId;
 
@@ -55,6 +59,11 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
 
     await Future.wait([
       Provider.of<FacilityProvider>(context, listen: false).getFacilities(),
+      Provider.of<FacilityProvider>(context, listen: false)
+          .getPopularPlaces()
+          .then((value) {
+        _places = value;
+      }),
       Provider.of<CurrencyProvider>(context, listen: false)
           .getCurrencies()
           .then((value) async {
@@ -106,6 +115,13 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
   _setAllFilters() {
     Provider.of<EstateProvider>(context, listen: false)
         .filtersAddress(_addressController.text);
+
+    if (_currentPlace != "") {
+      int _currentPlaceId =
+          _places.firstWhere((element) => element.title == _currentPlace).id;
+      Provider.of<EstateProvider>(context, listen: false)
+          .filtersPlace(_currentPlaceId);
+    }
 
     double maxPrice = double.parse(_maxPriceController.text);
     double minPrice = double.parse(_minPriceController.text);
@@ -242,6 +258,29 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
                         TextInput(
                           hintText: Locales.string(context, "address"),
                           controller: _addressController,
+                        ),
+                        SizedBox(height: defaultPadding),
+                        Text(
+                          Locales.string(context, "choose_popular_place"),
+                          style: TextStyles.display5(),
+                        ),
+                        SizedBox(height: 12),
+                        Container(
+                          height: 45,
+                          margin: EdgeInsets.only(top: 10),
+                          child: SingleChildScrollView(
+                            physics: NeverScrollableScrollPhysics(),
+                            child: FindDropdown<String>(
+                              items:
+                                  _places.map((place) => place.title).toList(),
+                              label: Locales.string(context, "choose_one"),
+                              labelVisible: false,
+                              selectedItem: _currentPlace,
+                              onChanged: (value) {
+                                _currentPlace = value as String;
+                              },
+                            ),
+                          ),
                         ),
                         SizedBox(height: defaultPadding),
                         Text(

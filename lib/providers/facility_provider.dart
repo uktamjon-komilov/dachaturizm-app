@@ -1,5 +1,6 @@
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/models/facility_model.dart';
+import 'package:dachaturizm/models/popular_place_model.dart';
 import 'package:dachaturizm/models/region_model.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -42,5 +43,18 @@ class FacilityProvider with ChangeNotifier {
       }
     }
     return regions;
+  }
+
+  Future getPopularPlaces() async {
+    const url = "${baseUrl}api/popular-places/";
+    final response = await dio.get(url);
+    List<PopularPlaceModel> places = [];
+    if (response.statusCode as int >= 200 || response.statusCode as int < 300) {
+      for (int i = 0; i < response.data.length; i++) {
+        PopularPlaceModel place = PopularPlaceModel.fromJson(response.data[i]);
+        places.add(place);
+      }
+    }
+    return places;
   }
 }

@@ -19,7 +19,6 @@ import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:intl/intl.dart';
-import 'package:sizer/sizer.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 
@@ -84,6 +83,7 @@ class DetailBuilder {
               ),
             ),
             Expanded(
+              flex: 9,
               child: GestureDetector(
                 onTap: () {
                   UrlLauncher.launch(
@@ -182,9 +182,6 @@ class DetailBuilder {
               ),
             ),
             selectedDayPredicate: (day) {
-              print(_selectedDays);
-              print(BookingDay.toObj(day));
-              print(_selectedDays.contains(BookingDay.toObj(day)));
               return _selectedDays.contains(BookingDay.toObj(day));
               // return true;
             },

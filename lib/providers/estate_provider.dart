@@ -133,6 +133,7 @@ class EstateProvider with ChangeNotifier {
   Map<String, dynamic> _filters = {
     "sorting": "latest",
     "address": "",
+    "place": 0,
     "minPrice": 0.0,
     "maxPrice": 0.0,
     "priceType": null,
@@ -156,6 +157,7 @@ class EstateProvider with ChangeNotifier {
             category == null ? null.toString() : category.id.toString(),
         "sorting": _filters["sorting"],
         "address": _filters["address"],
+        "place": _filters["place"].toString(),
         "term": term ?? "",
         "min_price": _filters["minPrice"].toString(),
         "max_price": _filters["maxPrice"].toString(),
@@ -185,6 +187,10 @@ class EstateProvider with ChangeNotifier {
     _filters["address"] = address;
   }
 
+  filtersPlace(int id) {
+    _filters["place"] = id;
+  }
+
   filtersMinPrice(double price) {
     _filters["minPrice"] = price;
   }
@@ -208,6 +214,7 @@ class EstateProvider with ChangeNotifier {
     _filters = {
       "sorting": "latest",
       "address": "",
+      "place": 0,
       "minPrice": 0.0,
       "maxPrice": 0.0,
       "priceType": null,
@@ -403,6 +410,10 @@ class EstateProvider with ChangeNotifier {
 
     if (data.containsKey("price_type")) {
       tempData["price_type"] = data["price_type"];
+    }
+
+    if (data.containsKey("popular_place_id")) {
+      tempData["popular_place_id"] = data["popular_place_id"];
     }
 
     if (data.containsKey("beds")) {

@@ -53,6 +53,7 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
 
   List<AdPlan> _plans = [];
   bool _isLoading = false;
+  bool _adPlanNotAvailable = false;
   List<Map<String, dynamic>> _actions = [];
   String _adPlan = "";
   TextEditingController _searchController = TextEditingController();
@@ -69,8 +70,10 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
     setState(() {
       _isLoading = true;
     });
+
     Future.wait([
       _fetchEstates(),
+      Provider.of<AuthProvider>(context, listen: false).getUserData(),
       Provider.of<CurrencyProvider>(context, listen: false)
           .fetchAdPlans()
           .then((value) {
@@ -83,6 +86,8 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
         _isLoading = false;
         _currentEstates = _allEstates;
       });
+      Provider.of<NavigationScreenProvider>(context, listen: false)
+          .changePageIndex(4);
     });
   }
 
@@ -186,9 +191,11 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
             "my_announcements",
           ),
         ),
-        bottomNavigationBar: buildBottomNavigation(context, () {
-          Navigator.of(context).pop();
-        }),
+        bottomNavigationBar: _isLoading
+            ? null
+            : buildBottomNavigation(context, () {
+                Navigator.of(context).pop();
+              }),
         body: _isLoading
             ? Center(
                 child: CircularProgressIndicator(),
@@ -202,17 +209,6 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
                     if (_allEstates.length > 0) {
                       return Column(
                         children: [
-                          SearchBarWithFilter(
-                            controller: _searchController,
-                            showFilters: false,
-                            onSubmit: (value) async {
-                              if (_searchController.text == "") return;
-                              await _fetchEstates(_searchController.text);
-                              setState(() {
-                                _currentEstates = _allEstates;
-                              });
-                            },
-                          ),
                           SizedBox(height: defaultPadding / 4),
                           SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
@@ -444,13 +440,21 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
                       title: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(plan.title),
+                          Text(
+                            plan.title,
+                            style: plan.available
+                                ? null
+                                : TextStyle(color: Colors.grey[500]),
+                          ),
                           Text(
                             "${plan.price.toString()} " +
                                 Locales.string(
                                   context,
                                   "sum",
                                 ),
+                            style: plan.available
+                                ? null
+                                : TextStyle(color: Colors.grey[500]),
                           ),
                         ],
                       ),
@@ -458,9 +462,21 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
                       groupValue: _adPlan,
                       activeColor: normalOrange,
                       onChanged: (value) {
-                        setState(() {
-                          _adPlan = value as String;
-                        });
+                        if (plan.available) {
+                          setState(() {
+                            _adPlan = value as String;
+                          });
+                        } else {
+                          Navigator.of(context).pop();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                Locales.string(context,
+                                    "this_plan_is_not_available_currently_try_soon"),
+                              ),
+                            ),
+                          );
+                        }
                       },
                     ),
                   )

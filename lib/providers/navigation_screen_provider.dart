@@ -11,6 +11,7 @@ class NavigationScreenProvider with ChangeNotifier {
   };
   bool _refreshHomePage = false;
   bool _refreshChatsScreen = false;
+  bool _refreshUserScreen = false;
   int _unreadMessagesCount = 0;
   Map<String, dynamic> extraPageData = {"home": {}};
 
@@ -65,6 +66,8 @@ class NavigationScreenProvider with ChangeNotifier {
       _refreshHomePage = true;
     } else if (index == 3) {
       _refreshChatsScreen = true;
+    } else if (index == 4) {
+      _refreshUserScreen = true;
     }
     if (!_authRequiredScreens.contains(index)) {
       _currentIndex = index;

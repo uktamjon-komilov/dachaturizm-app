@@ -7,6 +7,7 @@ class AdPlan {
   final String description;
   final int days;
   final double price;
+  final bool available;
 
   AdPlan({
     required this.id,
@@ -15,6 +16,7 @@ class AdPlan {
     required this.slug,
     required this.days,
     required this.price,
+    required this.available,
   });
 
   static Future<AdPlan> fromJson(data) async {
@@ -30,6 +32,7 @@ class AdPlan {
       slug: data["slug"],
       days: data["days"],
       price: data["price"],
+      available: data["available"],
     );
   }
 }

@@ -19,10 +19,6 @@ Widget buildBottomNavigation(BuildContext context, [Function? popCallback]) {
     type: BottomNavigationBarType.fixed,
     currentIndex: currentIndex,
     onTap: (index) {
-      if (index != 1) {
-        // Provider.of<NavigationScreenProvider>(context, listen: false)
-        //     .clearData();
-      }
       Provider.of<NavigationScreenProvider>(context, listen: false)
           .changePageIndex(index, () {
         Navigator.push(

@@ -15,6 +15,7 @@ import 'package:dachaturizm/models/currency_model.dart';
 import 'package:dachaturizm/models/district_model.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/models/facility_model.dart';
+import 'package:dachaturizm/models/popular_place_model.dart';
 import 'package:dachaturizm/models/region_model.dart';
 import 'package:dachaturizm/models/category_model.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
@@ -64,6 +65,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
   List<DistrictModel> _districts = [];
   List<CategoryModel> _categories = [];
   List<CurrencyModel> _currencies = [];
+  List<PopularPlaceModel> _popular_places = [];
   String errors = "";
   GlobalKey<FormState> _form = GlobalKey<FormState>();
   ScrollController _scrollController = ScrollController();
@@ -91,6 +93,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
   int _currentCurrencyId = 0;
   String _currentRegion = "";
   String _currentDistrict = "";
+  String _currentPopularPlace = "";
   List<int> _facilities = [];
   double _longtitude = 0.0;
   double _latitute = 0.0;
@@ -154,6 +157,9 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
         .firstWhere((region) => region.title.toString() == _currentRegion);
     data["district"] = _districts.firstWhere(
         (district) => district.title.toString() == _currentDistrict);
+    data["popular_place_id"] = _popular_places
+        .firstWhere((place) => place.title.toString() == _currentPopularPlace)
+        .id;
     data["address"] = _addressController.text;
     data["longtitute"] = _longtitude;
     data["latitute"] = _latitute;
@@ -306,6 +312,13 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
             .then((value) {
           setState(() {
             _regions = value;
+          });
+        }),
+        Provider.of<FacilityProvider>(context, listen: false)
+            .getPopularPlaces()
+            .then((value) {
+          setState(() {
+            _popular_places = value;
           });
         }),
         Provider.of<FacilityProvider>(context, listen: false).getFacilities(),
@@ -601,6 +614,22 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                                 onChanged: (value) {
                               setState(() {
                                 _currentDistrict = value as String;
+                              });
+                            }),
+                            VerticalHorizontalSizedBox(),
+                            Text(
+                              Locales.string(context, "popular_place"),
+                              style: TextStyles.display9(),
+                            ),
+                            _buildSelectionRow(
+                                _popular_places
+                                    .map((place) => place.title)
+                                    .toList(),
+                                _currentPopularPlace,
+                                Locales.string(context, "choose_popular_place"),
+                                onChanged: (value) {
+                              setState(() {
+                                _currentPopularPlace = value as String;
                               });
                             }),
                             VerticalHorizontalSizedBox(),
@@ -953,7 +982,6 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
   Widget _buildLocationPicker() {
     return GestureDetector(
       onTap: () async {
-        FocusScope.of(context).requestFocus(FocusNode());
         _showGoogleMap(context);
       },
       child: ClipRRect(

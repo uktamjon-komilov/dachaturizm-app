@@ -30,28 +30,19 @@ class UserPageScreen extends StatefulWidget {
 }
 
 class _UserPageScreenState extends State<UserPageScreen> {
-  bool _userLoading = false;
   bool _someChange = false;
   bool _isInit = true;
-  UserModel? _user;
   List<StaticPageModel> _staticPages = [];
 
   Future _refreshUser(BuildContext context) async {
-    setState(() {
-      _userLoading = true;
-    });
     Provider.of<AuthProvider>(context, listen: false)
         .getUserData()
         .then((user) {
-      setState(() {
-        _user = user;
-      });
       Provider.of<EstateProvider>(context, listen: false)
           .getStaticPages()
           .then((value) {
         setState(() {
           _staticPages = value;
-          _userLoading = false;
         });
       });
     });
@@ -82,7 +73,9 @@ class _UserPageScreenState extends State<UserPageScreen> {
     }
     if (_isInit) {
       _isInit = false;
+      print("before refresh");
       await _refreshUser(context);
+      print("after refresh");
     }
     super.didChangeDependencies();
   }
@@ -95,8 +88,7 @@ class _UserPageScreenState extends State<UserPageScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildUserDetails(
-                  context, Provider.of<AuthProvider>(context).user),
+              _buildUserDetails(),
               SizedBox(height: 1.5 * defaultPadding),
               ColumnTitle(Locales.string(context, "my_profile")),
               _buildProfileList(),
@@ -127,154 +119,159 @@ class _UserPageScreenState extends State<UserPageScreen> {
     );
   }
 
-  Widget _buildUserDetails(BuildContext context, UserModel? user) {
-    return Visibility(
-      visible: user != null,
-      child: Container(
-        decoration: BoxDecoration(
-          color: disabledOrange,
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(20),
-            bottomRight: Radius.circular(20),
+  Widget _buildUserDetails() {
+    return Consumer<AuthProvider>(builder: (_, auth, __) {
+      print(auth.user);
+      print(auth.userId);
+      bool userExists = auth.user != null;
+      return Visibility(
+        visible: userExists,
+        child: Container(
+          decoration: BoxDecoration(
+            color: disabledOrange,
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(20),
+              bottomRight: Radius.circular(20),
+            ),
           ),
+          child: buildUserDetails(context, auth.user, true),
         ),
-        child: buildUserDetails(context, user, true),
-      ),
-    );
+      );
+    });
   }
 
   Widget _buildProfileList() {
-    bool userExists =
-        Provider.of<AuthProvider>(context, listen: false).userId != 0;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Visibility(
-          visible: !userExists,
-          child: ProfileListItem(
-            title: Locales.string(context, "login_profile"),
-            iconData: Icons.person,
-            callback: () async {
-              final loginScreen = LoginScreen();
-              await _navigateTo(loginScreen);
-            },
-          ),
-        ),
-        Visibility(
-          visible: userExists,
-          child: ProfileListItem(
-            title: Locales.string(context, "my_estates"),
-            iconData: Icons.description_rounded,
-            callback: () async {
-              callWithAuth(context, () async {
-                final myAnnouncements = MyAnnouncements();
-                await _navigateTo(myAnnouncements);
-              });
-            },
-          ),
-        ),
-        Visibility(
-          visible: userExists,
-          child: ProfileListItem(
-              title: Locales.string(context, "my_favourites"),
-              iconData: Icons.favorite_outline_rounded,
+    return Consumer<AuthProvider>(builder: (_, auth, __) {
+      bool userExists = auth.user != null;
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Visibility(
+            visible: !userExists,
+            child: ProfileListItem(
+              title: Locales.string(context, "login_profile"),
+              iconData: Icons.person,
               callback: () async {
-                await callWithAuth(context, () async {
-                  final wishlist = WishlistScreen();
-                  await _navigateTo(wishlist);
+                final loginScreen = LoginScreen();
+                await _navigateTo(loginScreen);
+              },
+            ),
+          ),
+          Visibility(
+            visible: userExists,
+            child: ProfileListItem(
+              title: Locales.string(context, "my_estates"),
+              iconData: Icons.description_rounded,
+              callback: () async {
+                callWithAuth(context, () async {
+                  final myAnnouncements = MyAnnouncements();
+                  await _navigateTo(myAnnouncements);
                 });
-              }),
-        ),
-        Visibility(
-          visible: userExists,
-          child: ProfileListItem(
-            title: Locales.string(context, "my_balance"),
-            iconData: Icons.account_balance_wallet_rounded,
-            callback: () {
-              callWithAuth(context, () async {
-                final myBalanceScreen = MyBalanceScreen();
-                await _navigateTo(myBalanceScreen);
-              });
-            },
+              },
+            ),
           ),
-        ),
-        Visibility(
-          visible: userExists,
-          child: ProfileListItem(
-            title: Locales.string(context, "messages"),
-            iconData: Icons.question_answer_rounded,
-            callback: () {
-              callWithAuth(context, () {
-                Provider.of<NavigationScreenProvider>(context, listen: false)
-                    .changePageIndex(3);
-              });
-            },
+          Visibility(
+            visible: userExists,
+            child: ProfileListItem(
+                title: Locales.string(context, "my_favourites"),
+                iconData: Icons.favorite_outline_rounded,
+                callback: () async {
+                  await callWithAuth(context, () async {
+                    final wishlist = WishlistScreen();
+                    await _navigateTo(wishlist);
+                  });
+                }),
           ),
-        ),
-        Visibility(
-          visible: userExists,
-          child: ProfileListItem(
-            title: Locales.string(context, "profile_logout"),
-            iconData: Icons.logout_rounded,
-            callback: () {
-              callWithAuth(context, () async {
-                await Provider.of<AuthProvider>(context, listen: false)
-                    .logout();
-                // Provider.of<AuthProvider>(context, listen: false).getUserData();
-                // Navigator.of(context).pushNamed(LoginScreen.routeName);
-                RestartWidget.restartApp(context);
-              });
-            },
+          Visibility(
+            visible: userExists,
+            child: ProfileListItem(
+              title: Locales.string(context, "my_balance"),
+              iconData: Icons.account_balance_wallet_rounded,
+              callback: () {
+                callWithAuth(context, () async {
+                  final myBalanceScreen = MyBalanceScreen();
+                  await _navigateTo(myBalanceScreen);
+                });
+              },
+            ),
           ),
-        ),
-      ],
-    );
+          Visibility(
+            visible: userExists,
+            child: ProfileListItem(
+              title: Locales.string(context, "messages"),
+              iconData: Icons.question_answer_rounded,
+              callback: () {
+                callWithAuth(context, () {
+                  Provider.of<NavigationScreenProvider>(context, listen: false)
+                      .changePageIndex(3);
+                });
+              },
+            ),
+          ),
+          Visibility(
+            visible: userExists,
+            child: ProfileListItem(
+              title: Locales.string(context, "profile_logout"),
+              iconData: Icons.logout_rounded,
+              callback: () {
+                callWithAuth(context, () async {
+                  await Provider.of<AuthProvider>(context, listen: false)
+                      .logout();
+                  // Provider.of<AuthProvider>(context, listen: false).getUserData();
+                  // Navigator.of(context).pushNamed(LoginScreen.routeName);
+                  RestartWidget.restartApp(context);
+                });
+              },
+            ),
+          ),
+        ],
+      );
+    });
   }
 
   Widget _buildSettingsList() {
-    bool userExists =
-        Provider.of<AuthProvider>(context, listen: false).user != null;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Visibility(
-          visible: userExists,
-          child: ProfileListItem(
-            title: Locales.string(context, "edit_profile"),
-            iconData: Icons.person_rounded,
-            callback: () {
-              callWithAuth(context, () async {
-                final editProfileScreen = EditProfileScreen();
-                await _navigateTo(editProfileScreen);
-              });
+    return Consumer<AuthProvider>(builder: (_, auth, __) {
+      bool userExists = auth.user != null;
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Visibility(
+            visible: userExists,
+            child: ProfileListItem(
+              title: Locales.string(context, "edit_profile"),
+              iconData: Icons.person_rounded,
+              callback: () {
+                callWithAuth(context, () async {
+                  final editProfileScreen = EditProfileScreen();
+                  await _navigateTo(editProfileScreen);
+                });
+              },
+            ),
+          ),
+          Visibility(
+            visible: userExists,
+            child: ProfileListItem(
+              title: Locales.string(context, "change_password"),
+              iconData: Icons.lock,
+              callback: () {
+                callWithAuth(context, () async {
+                  final renewPasswordScreen = RenewPasswordScreen();
+                  await _navigateTo(renewPasswordScreen);
+                });
+              },
+            ),
+          ),
+          ProfileListItem(
+            title: Locales.string(context, "change_language"),
+            iconData: Icons.language_rounded,
+            callback: () async {
+              final changeLangScreen = ChangeLanguage();
+              await _navigateTo(changeLangScreen);
             },
           ),
-        ),
-        Visibility(
-          visible: userExists,
-          child: ProfileListItem(
-            title: Locales.string(context, "change_password"),
-            iconData: Icons.lock,
-            callback: () {
-              callWithAuth(context, () async {
-                final renewPasswordScreen = RenewPasswordScreen();
-                await _navigateTo(renewPasswordScreen);
-              });
-            },
-          ),
-        ),
-        ProfileListItem(
-          title: Locales.string(context, "change_language"),
-          iconData: Icons.language_rounded,
-          callback: () async {
-            final changeLangScreen = ChangeLanguage();
-            await _navigateTo(changeLangScreen);
-          },
-        ),
-      ],
-    );
+        ],
+      );
+    });
   }
 }
 

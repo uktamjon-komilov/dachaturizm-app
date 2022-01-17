@@ -255,7 +255,9 @@ class AuthProvider with ChangeNotifier {
           response.statusCode as int < 300) {
         Map<String, dynamic> data = response.data;
         _user = UserModel.fromJson(data);
+        print("will notify");
         notifyListeners();
+        print("notified");
         return _user;
       }
     }

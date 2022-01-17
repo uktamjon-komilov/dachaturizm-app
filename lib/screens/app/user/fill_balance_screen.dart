@@ -78,16 +78,16 @@ class _BalanceScreenState extends State<BalanceScreen>
         floatingActionButton: Container(
           width: 100.w - 1.8 * defaultPadding,
           child: FluidBigButton(
-            text: "Tayyor",
+            text: Locales.string(context, "ready"),
             onPress: () async {
               double? amount = double.tryParse(_amountController.text
                   .toString()
                   .replaceAll(",", "")
                   .replaceAll(".", ""));
-              print(_amountController.text);
               if (amount != null) {
                 String? url = await _getPaymentUrl(amount);
-                if (url != null && await UrlLauncher.canLaunch(url)) {
+                if (url.runtimeType.toString() == "String" &&
+                    await UrlLauncher.canLaunch(url as String)) {
                   UrlLauncher.launch(url);
                 }
               }
