@@ -5,7 +5,6 @@ import 'package:dachaturizm/helpers/parse_datetime.dart';
 import 'package:dachaturizm/models/transaction_model.dart';
 import 'package:dachaturizm/models/user_model.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
-import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/screens/app/user/fill_balance_screen.dart';
 import 'package:dachaturizm/styles/text_styles.dart';
 import 'package:flutter/material.dart';
@@ -97,7 +96,7 @@ class _MyBalanceScreenState extends State<MyBalanceScreen> {
                       ),
                       SizedBox(height: defaultPadding / 2),
                       _buildTransactionsList(
-                        "Oxirgi to‘lov",
+                        Locales.string(context, "last_payments"),
                         _inTransactions,
                       ),
                       SizedBox(height: defaultPadding / 2),
@@ -108,7 +107,7 @@ class _MyBalanceScreenState extends State<MyBalanceScreen> {
                       ),
                       SizedBox(height: defaultPadding / 2),
                       _buildTransactionsList(
-                        "Oxirgi harajat",
+                        Locales.string(context, "last_charges"),
                         _outTransactions,
                       ),
                     ],
@@ -167,7 +166,7 @@ class _MyBalanceScreenState extends State<MyBalanceScreen> {
                 ),
                 SizedBox(height: 3 * defaultPadding),
                 Text(
-                  "Yangilandi: ${formatDateTime(_date)}",
+                  "${Locales.string(context, 'renewed')}: ${formatDateTime(_date)}",
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 10,
@@ -189,7 +188,7 @@ class _MyBalanceScreenState extends State<MyBalanceScreen> {
                     ),
                   ),
                   child: Text(
-                    "Hisobni to‘ldirish",
+                    Locales.string(context, "fill_balance"),
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
@@ -208,7 +207,7 @@ class _MyBalanceScreenState extends State<MyBalanceScreen> {
   Widget _buildTransactionsList(
       String title, List<TransactionModel> transactions) {
     return transactions.length == 0
-        ? Text("Sizda harajat mavjud emas")
+        ? Text(Locales.string(context, "you_dont_have_transactions"))
         : Container(
             height: 25.h,
             child: Column(

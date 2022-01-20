@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 import 'package:provider/provider.dart';
+import 'package:sms_autofill/sms_autofill.dart';
 
 class ResetPasswordStep2 extends StatefulWidget {
   const ResetPasswordStep2({Key? key}) : super(key: key);
@@ -19,6 +20,24 @@ class ResetPasswordStep2 extends StatefulWidget {
 class _ResetPasswordStep2State extends State<ResetPasswordStep2> {
   bool _isLoading = false;
   bool _wrongCredentials = false;
+  bool _isInit = false;
+
+  String _code = "";
+
+  @override
+  void didChangeDependencies() async {
+    super.didChangeDependencies();
+    if (_isInit) {
+      _isInit = false;
+      print(await SmsAutoFill().getAppSignature);
+    }
+  }
+
+  @override
+  void dispose() {
+    SmsAutoFill().unregisterListener();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,24 +82,39 @@ class _ResetPasswordStep2State extends State<ResetPasswordStep2> {
                           ),
                         ),
                         SizedBox(height: 30),
-                        OtpTextField(
-                          numberOfFields: 5,
-                          borderColor: normalOrange,
-                          focusedBorderColor: normalOrange,
-                          borderWidth: 1,
-                          borderRadius: BorderRadius.circular(15),
-                          fieldWidth: 60,
-                          textStyle: TextStyle(
-                            fontSize: 21,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.3,
-                          ),
-                          showFieldAsBox: true,
-                          onCodeChanged: (String code) {},
-                          onSubmit: (String verificationCode) {
-                            resetPasswordStep2(
-                                context, phone, verificationCode);
-                          }, // end onSubmit
+                        // OtpTextField(
+                        //   numberOfFields: 5,
+                        //   borderColor: normalOrange,
+                        //   focusedBorderColor: normalOrange,
+                        //   borderWidth: 1,
+                        //   borderRadius: BorderRadius.circular(15),
+                        //   fieldWidth: 60,
+                        //   textStyle: TextStyle(
+                        //     fontSize: 21,
+                        //     fontWeight: FontWeight.w600,
+                        //     letterSpacing: 0.3,
+                        //   ),
+                        //   showFieldAsBox: true,
+                        //   onCodeChanged: (String code) {},
+                        //   onSubmit: (String verificationCode) {
+                        //     resetPasswordStep2(
+                        //         context, phone, verificationCode);
+                        //   }, // end onSubmit
+                        // ),
+                        PinFieldAutoFill(
+                          currentCode: _code,
+                          onCodeSubmitted: (value) {
+                            print(value);
+                            resetPasswordStep2(context, phone, value);
+                          },
+                          onCodeChanged: (value) {
+                            // _code = value.toString();
+                            if (value!.length == 5) {
+                              resetPasswordStep2(context, phone, value);
+                            }
+                            print(value);
+                          },
+                          codeLength: 5,
                         ),
                         Visibility(
                           visible: _wrongCredentials,

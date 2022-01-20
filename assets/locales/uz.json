@@ -181,5 +181,20 @@
     "choose_popular_place": "Mashxur joylardan tanlang",
     "result_not_found": "Natija topilmadi",
     "no_estates_found_with_these_query": "Ushbu so'rov orqali natija topilmadi",
-    "this_plan_is_not_available_currently_try_soon": "Bu tarif bo'yicha hozircha joylar band, tez orada urinib koʻring"
+    "this_plan_is_not_available_currently_try_soon": "Bu tarif bo'yicha hozircha joylar band, tez orada urinib koʻring",
+    "for_contact": "Aloqa uchun:",
+    "services": "Xizmatlar",
+    "you_dont_have_chats": "Sizda hali chatlar yoʻq",
+    "phone_must_be_provided": "Telefon raqami ko'rsatilishi kerak",
+    "name_must_be_provided": "Ism ko'rsatilishi kerak",
+    "write_feedback": "Fikr-mulohaza yozing",
+    "feedback_must_be_provided": "Fikr-mulohaza to'ldirilishi kerak",
+    "payment_amount_cannot_be_empty": "Toʻlov miqdori boʻsh boʻlishi mumkin emas",
+    "payment_amount_must_be_greater_than_5000": "To'lov miqdori 5000 dan ortiq bo'lishi kerak",
+    "place_announcement": "E'lon yaratish",
+    "last_payments": "Oxirgi to'lovlar",
+    "last_charges": "Oxirgi to'lovlar",
+    "renewed": "Yangilandi",
+    "you_dont_have_transactions": "Sizda tranzaksiyalar mavjuda emas",
+    "other_settings": "Boshqa sozlamalar"
 }

@@ -1,4 +1,3 @@
-import 'package:dachaturizm/components/app_bar.dart';
 import 'package:dachaturizm/components/fluid_big_button.dart';
 import 'package:dachaturizm/components/password_input.dart';
 import 'package:dachaturizm/components/phone_input.dart';
@@ -9,11 +8,8 @@ import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/screens/app/navigational_app_screen.dart';
 import 'package:dachaturizm/screens/auth/register_screen.dart';
 import 'package:dachaturizm/screens/auth/reset_password_step1_screen.dart';
-import 'package:dachaturizm/styles/input.dart';
 import "package:flutter/material.dart";
-import 'package:flutter/services.dart';
 import 'package:flutter_locales/flutter_locales.dart';
-import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -181,7 +177,7 @@ class _LoginScreenState extends State<LoginScreen> {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setBool("noAuth", true);
         Navigator.of(context)
-          ..popUntil(ModalRoute.withName(NavigationalAppScreen.routeName))
+          // ..popUntil(ModalRoute.withName(NavigationalAppScreen.routeName))
           ..pushReplacementNamed(NavigationalAppScreen.routeName);
       }
     });

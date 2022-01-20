@@ -116,21 +116,24 @@ class AuthProvider with ChangeNotifier {
   Future<Map<String, dynamic>> signUp(
       String phone, String password, String firstName, String lastName) async {
     const url = "${baseUrl}api/users/";
-    final response = await dio.post(
-      url,
-      options: Options(
-        headers: {"Content-type": "application/json"},
-      ),
-      data: json.encode({
-        "phone": phone.toString().replaceAll("+", ""),
-        "password": password,
-        "first_name": firstName,
-        "last_name": lastName
-      }),
-    );
-    if (response.statusCode as int >= 200 || response.statusCode as int < 300) {
-      return response.data;
-    }
+    try {
+      final response = await dio.post(
+        url,
+        options: Options(
+          headers: {"Content-type": "application/json"},
+        ),
+        data: json.encode({
+          "phone": phone.toString().replaceAll("+", ""),
+          "password": password,
+          "first_name": firstName,
+          "last_name": lastName
+        }),
+      );
+      if (response.statusCode as int >= 200 ||
+          response.statusCode as int < 300) {
+        return response.data;
+      }
+    } catch (e) {}
     return {"status": false};
   }
 

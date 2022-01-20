@@ -181,5 +181,20 @@
     "choose_popular_place": "Choose a popular place",
     "result_not_found": "No results",
     "no_estates_found_with_these_query": "No estates found with this query",
-    "this_plan_is_not_available_currently_try_soon": "This plan is not availabe now, try soon"
+    "this_plan_is_not_available_currently_try_soon": "This plan is not availabe now, try soon",
+    "for_contact": "Contact:",
+    "services": "Services",
+    "you_dont_have_chats": "You don't have chats yet",
+    "phone_must_be_provided": "Phone number must be provided",
+    "name_must_be_provided": "Name must be provided",
+    "write_feedback": "Write a feedback",
+    "feedback_must_be_provided": "Feedback must be filled",
+    "payment_amount_cannot_be_empty": "Payment amount cannot be empty",
+    "payment_amount_must_be_greater_than_5000": "Payment amount should be greater than 5000",
+    "place_announcement": "Place announcement",
+    "last_payments": "Last payments",
+    "last_charges": "Last charges",
+    "renewed": "Renewed",
+    "you_dont_have_transactions": "You don't have transactions",
+    "other_settings": "Other settings"
 }

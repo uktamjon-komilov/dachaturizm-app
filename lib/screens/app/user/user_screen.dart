@@ -96,7 +96,7 @@ class _UserPageScreenState extends State<UserPageScreen> {
               ColumnTitle(Locales.string(context, "settings")),
               _buildSettingsList(),
               SizedBox(height: 1.5 * defaultPadding),
-              ColumnTitle("Boshqa sozlamalar"),
+              ColumnTitle(Locales.string(context, "other_settings")),
               ..._staticPages
                   .map((page) => SettingsItem(
                       title: page.title,
@@ -120,10 +120,9 @@ class _UserPageScreenState extends State<UserPageScreen> {
   }
 
   Widget _buildUserDetails() {
-    return Consumer<AuthProvider>(builder: (_, auth, __) {
-      print(auth.user);
-      print(auth.userId);
-      bool userExists = auth.user != null;
+    return Consumer<AuthProvider>(builder: (context, auth, __) {
+      bool userExists = false;
+      userExists = auth.user != null;
       return Visibility(
         visible: userExists,
         child: Container(
@@ -134,7 +133,9 @@ class _UserPageScreenState extends State<UserPageScreen> {
               bottomRight: Radius.circular(20),
             ),
           ),
-          child: buildUserDetails(context, auth.user, true),
+          child: auth.user == null
+              ? Container()
+              : buildUserDetails(context, auth.user, true),
         ),
       );
     });

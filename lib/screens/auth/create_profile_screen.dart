@@ -2,6 +2,7 @@ import 'package:dachaturizm/components/fluid_big_button.dart';
 import 'package:dachaturizm/components/text_link.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
+import 'package:dachaturizm/screens/app/navigational_app_screen.dart';
 import 'package:dachaturizm/screens/auth/login_screen.dart';
 import 'package:dachaturizm/styles/input.dart';
 import "package:flutter/material.dart";
@@ -166,7 +167,8 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                         : Container(),
                     _userAlreadyExists
                         ? Text(
-                            "user_already_exists_with_this_phone",
+                            Locales.string(
+                                context, "user_already_exists_with_this_phone"),
                             style: TextStyle(
                               color: Colors.red,
                             ),
@@ -192,18 +194,21 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                                       _firstNameController.text,
                                       _lastNameController.text)
                                   .then((value) {
+                                print(value);
                                 if (value.containsKey("status") &&
                                     value["status"] == false) {
                                   setState(() {
-                                    _somethingWrong = true;
+                                    _userAlreadyExists = true;
                                   });
                                 } else if (value.containsKey("id") &&
                                     value["id"] > 0) {
-                                  Navigator.of(context)
-                                      .popAndPushNamed(LoginScreen.routeName);
-                                } else {
-                                  setState(() {
-                                    _userAlreadyExists = true;
+                                  Provider.of<AuthProvider>(context,
+                                          listen: false)
+                                      .login(phone, _newPasswordController.text)
+                                      .then((_) {
+                                    Navigator.of(context)
+                                      ..pushReplacementNamed(
+                                          NavigationalAppScreen.routeName);
                                   });
                                 }
                               });

@@ -102,8 +102,10 @@ class _PlansScreenState extends State<PlansScreen> {
                       });
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text(Locales.string(context,
-                              "something_went_wrong_try_in_your_profile")),
+                          content: Text(
+                            Locales.string(context,
+                                "something_went_wrong_try_in_your_profile"),
+                          ),
                         ),
                       );
                     } else {

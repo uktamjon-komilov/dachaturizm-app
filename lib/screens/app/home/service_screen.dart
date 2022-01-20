@@ -5,6 +5,7 @@ import 'package:dachaturizm/helpers/url_helper.dart';
 import 'package:dachaturizm/models/service_model.dart';
 import 'package:dachaturizm/styles/text_styles.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_locales/flutter_locales.dart';
 import 'package:sizer/sizer.dart';
 
 class ServiceScreen extends StatefulWidget {
@@ -91,7 +92,7 @@ class _ServiceScreenState extends State<ServiceScreen> {
                           children: [
                             SizedBox(height: defaultPadding),
                             Text(
-                              "Aloqa uchun:",
+                              Locales.string(context, "for_contact"),
                               style: TextStyles.display1(),
                             ),
                             SizedBox(height: defaultPadding),

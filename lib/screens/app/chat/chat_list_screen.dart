@@ -10,6 +10,7 @@ import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/screens/app/chat/chat_screen.dart';
 import "package:flutter/material.dart";
+import 'package:flutter_locales/flutter_locales.dart';
 import 'package:provider/provider.dart';
 
 class ChatListScreen extends StatefulWidget {
@@ -84,7 +85,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
               : (_chats.length == 0
                   ? NoResult(
                       photoPath: "assets/images/empty-chat.png",
-                      text: "Sizda mavjud xabarlar yo’q",
+                      text: Locales.string(context, "you_dont_have_chats"),
                     )
                   : ListView.builder(
                       itemCount: _chats.length,

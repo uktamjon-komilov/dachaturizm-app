@@ -1,6 +1,5 @@
 import 'package:dachaturizm/components/app_bar.dart';
 import 'package:dachaturizm/components/bottom_navbar.dart';
-import 'package:dachaturizm/components/card.dart';
 import 'package:dachaturizm/components/no_result.dart';
 import 'package:dachaturizm/components/search_bar_with_filter.dart';
 import 'package:dachaturizm/components/small_button.dart';
@@ -11,6 +10,7 @@ import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/screens/app/cards_block.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_locales/flutter_locales.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -221,15 +221,15 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
                                 horizontal: defaultPadding),
                             child: Row(
                               children: [
-                                SmallButton("Top", enabled: _showTop,
-                                    onPressed: () {
+                                SmallButton(Locales.string(context, "top"),
+                                    enabled: _showTop, onPressed: () {
                                   setState(() {
                                     _showTop = true;
                                     _currentEstates = _topEstates;
                                   });
                                 }),
-                                SmallButton("Oddiy", enabled: !_showTop,
-                                    onPressed: () {
+                                SmallButton(Locales.string(context, "simple"),
+                                    enabled: !_showTop, onPressed: () {
                                   setState(() {
                                     _showTop = false;
                                     _currentEstates = _simpleEstates;

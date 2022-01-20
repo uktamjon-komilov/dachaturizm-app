@@ -76,6 +76,16 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
             _data["position"] = _markers.firstWhere((element) => true).position;
             Navigator.pop(context, _data);
           },
+          [
+            IconButton(
+              onPressed: () {
+                _data["position"] =
+                    _markers.firstWhere((element) => true).position;
+                Navigator.pop(context, _data);
+              },
+              icon: Icon(Icons.check_rounded),
+            )
+          ],
         ),
         body: _isInit
             ? Center(

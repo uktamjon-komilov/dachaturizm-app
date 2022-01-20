@@ -9,6 +9,7 @@ import 'package:dachaturizm/screens/app/home/service_screen.dart';
 import 'package:dachaturizm/styles/text_styles.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_locales/flutter_locales.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
@@ -49,7 +50,10 @@ class _ServicesListScreenState extends State<ServicesListScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: buildNavigationalAppBar(context, "Services"),
+        appBar: buildNavigationalAppBar(
+          context,
+          Locales.string(context, "services"),
+        ),
         bottomNavigationBar: buildBottomNavigation(context, () {
           Navigator.of(context).pop();
         }),

@@ -247,16 +247,16 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
                             photoPath: "assets/images/no_estates.png",
                           ),
                           FluidBigButton(
-                            onPress: () {
-                              Provider.of<NavigationScreenProvider>(context,
-                                      listen: false)
-                                  .changePageIndex(2);
-                              Navigator.of(context).popUntil(
-                                  ModalRoute.withName(
-                                      NavigationalAppScreen.routeName));
-                            },
-                            text: "E'lon joylashtirish",
-                          )
+                              onPress: () {
+                                Provider.of<NavigationScreenProvider>(context,
+                                        listen: false)
+                                    .changePageIndex(2);
+                                Navigator.of(context).popUntil(
+                                    ModalRoute.withName(
+                                        NavigationalAppScreen.routeName));
+                              },
+                              text:
+                                  Locales.string(context, "place_announcement"))
                         ],
                       );
                     }

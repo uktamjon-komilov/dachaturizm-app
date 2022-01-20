@@ -153,7 +153,7 @@ class _BalanceScreenState extends State<BalanceScreen>
             horizontal: defaultPadding / 2,
             vertical: 0,
           ),
-          hintText: "To'lov miqdori kiriting",
+          hintText: Locales.string(context, "enter_payment_amount"),
           hintStyle: TextStyle(
             fontSize: 13,
             letterSpacing: 1.2,
@@ -163,9 +163,10 @@ class _BalanceScreenState extends State<BalanceScreen>
         ),
         validator: (value) {
           if (value == null) {
-            return "Payment amount cannot be empty";
+            return Locales.string(context, "payment_amount_cannot_be_empty");
           } else if (double.parse(value) < 5000) {
-            return "Payment amount must be greater than 5000 sum.";
+            return Locales.string(
+                context, "payment_amount_must_be_greater_than_5000");
           }
           return null;
         },

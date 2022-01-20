@@ -181,5 +181,20 @@
     "choose_popular_place": "Выберите популярное место",
     "result_not_found": "Нет результатов",
     "no_estates_found_with_these_query": "По данному запросу поместья не найдено",
-    "this_plan_is_not_available_currently_try_soon": "Этот план сейчас недоступен, попробуйте позже"
+    "this_plan_is_not_available_currently_try_soon": "Этот план сейчас недоступен, попробуйте позже",
+    "for_contact": "Контакт:",
+    "services": "Услуги",
+    "you_dont_have_chats": "У вас еще нет чатов",
+    "phone_must_be_provided": "Необходимо указать номер телефона",
+    "name_must_be_provided": "Имя должно быть указано",
+    "write_feedback": "Написать отзыв",
+    "feedback_must_be_provided": "Отзыв должен быть заполнен",
+    "payment_amount_cannot_be_empty": "Сумма платежа не может быть пустой",
+    "payment_amount_must_be_greater_than_5000": "Сумма платежа должна быть больше 5000",
+    "place_announcement": "Разместить объявление",
+    "last_payments": "Последние платежи",
+    "last_charges": "Последние платежи",
+    "renewed": "Обновлено",
+    "you_dont_have_transactions": "У вас нет транзакций",
+    "other_settings": "Другие настройки"
 }

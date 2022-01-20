@@ -46,6 +46,7 @@ class _NavigationalAppScreenState extends State<NavigationalAppScreen>
       child: SafeArea(
         child: Scaffold(
           appBar: AppBar(
+            automaticallyImplyLeading: false,
             toolbarHeight: currentIndex == 0 ? 78 : null,
             centerTitle: currentIndex == 0 ? false : true,
             title: Consumer<NavigationScreenProvider>(

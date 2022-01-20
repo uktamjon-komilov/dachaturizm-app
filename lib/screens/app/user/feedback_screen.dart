@@ -97,7 +97,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Telefon raqam",
+                  Locales.string(context, "phone"),
                   style: TextStyles.display2().copyWith(letterSpacing: 0.3),
                 ),
                 SizedBox(height: defaultPadding * 3 / 4),
@@ -110,7 +110,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                   keyboardType: TextInputType.number,
                   validator: (value) {
                     if (value?.length == 0) {
-                      return "Phone number must be provided";
+                      return Locales.string(context, "phone_must_be_provided");
                     }
                     return null;
                   },
@@ -126,7 +126,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                   hintText: "Ism",
                   validator: (value) {
                     if (value?.length == 0) {
-                      return "Name must be provided";
+                      return Locales.string(context, "name_must_be_provided");
                     }
                     return null;
                   },
@@ -134,11 +134,12 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                 SizedBox(height: defaultPadding * 3 / 4),
                 CustomInput(
                   controller: _textController,
-                  hintText: "Savolingiz yozing...",
+                  hintText: Locales.string(context, "write_feedback"),
                   maxLines: 5,
                   validator: (value) {
                     if (value?.length == 0) {
-                      return "Feedback must be filled";
+                      return Locales.string(
+                          context, "feedback_must_be_provided");
                     }
                     return null;
                   },

@@ -284,7 +284,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
               ],
             ),
             _buildCardsBlock(context, topEstates),
-            // _buildBannerBlock(context, banners)
+            _buildBannerBlock(context, banners)
           ],
         ),
       ),
@@ -324,7 +324,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                 Container(
                   margin: EdgeInsets.only(right: 34),
                   child: CategoryItem(
-                    title: "Xizmatlar",
+                    title: Locales.string(context, "services"),
                     onTap: () {
                       Navigator.of(context)
                           .pushNamed(ServicesListScreen.routeName);

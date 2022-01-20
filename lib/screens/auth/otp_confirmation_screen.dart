@@ -4,7 +4,6 @@ import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/screens/auth/create_profile_screen.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_locales/flutter_locales.dart';
-import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 import 'package:provider/provider.dart';
 import 'package:sms_autofill/sms_autofill.dart';
 
@@ -21,13 +20,27 @@ class _OTPConfirmationScreenState extends State<OTPConfirmationScreen> {
   bool _isLoading = false;
   bool _isInit = true;
 
+  String _code = "";
+
+  @override
+  void initState() {
+    super.initState();
+    SmsAutoFill().listenForCode(smsCodeRegexPattern: "\\d{4,6}");
+  }
+
   @override
   void didChangeDependencies() async {
     super.didChangeDependencies();
     if (_isInit) {
       _isInit = false;
-      await SmsAutoFill().listenForCode();
+      print(await SmsAutoFill().getAppSignature);
     }
+  }
+
+  @override
+  void dispose() {
+    SmsAutoFill().unregisterListener();
+    super.dispose();
   }
 
   @override
@@ -73,23 +86,37 @@ class _OTPConfirmationScreenState extends State<OTPConfirmationScreen> {
                           ),
                         ),
                         SizedBox(height: 30),
-                        OtpTextField(
-                          numberOfFields: 5,
-                          borderColor: normalOrange,
-                          focusedBorderColor: normalOrange,
-                          borderWidth: 1,
-                          borderRadius: BorderRadius.circular(15),
-                          fieldWidth: 60,
-                          textStyle: TextStyle(
-                            fontSize: 21,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.3,
-                          ),
-                          showFieldAsBox: true,
-                          onCodeChanged: (String code) {},
-                          onSubmit: (String verificationCode) {
-                            checkCode(context, phone, verificationCode);
-                          }, // end onSubmit
+                        // OtpTextField(
+                        //   numberOfFields: 5,
+                        //   borderColor: normalOrange,
+                        //   focusedBorderColor: normalOrange,
+                        //   borderWidth: 1,
+                        //   borderRadius: BorderRadius.circular(15),
+                        //   fieldWidth: 60,
+                        //   textStyle: TextStyle(
+                        //     fontSize: 21,
+                        //     fontWeight: FontWeight.w600,
+                        //     letterSpacing: 0.3,
+                        //   ),
+                        //   showFieldAsBox: true,
+                        //   onCodeChanged: (String code) {},
+                        //   onSubmit: (String verificationCode) {
+                        //     checkCode(context, phone, verificationCode);
+                        //   }, // end onSubmit
+                        // ),
+                        PinFieldAutoFill(
+                          currentCode: _code,
+                          onCodeSubmitted: (value) {
+                            print(value);
+                          },
+                          onCodeChanged: (value) {
+                            // _code = value.toString();
+                            if (value!.length == 5) {
+                              checkCode(context, phone, value);
+                            }
+                            print(value);
+                          },
+                          codeLength: 5,
                         ),
                         SizedBox(height: defaultPadding * 1.5),
                         Row(
