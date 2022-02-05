@@ -79,8 +79,6 @@ class _SearchPageScreenState extends State<SearchPageScreen> {
     await Provider.of<EstateProvider>(context, listen: false)
         .getSearchedResults(term: value)
         .then((value) {
-      print("new");
-      print(value);
       setState(() {
         _results = value["estates"];
         _nextPage = value["next"];

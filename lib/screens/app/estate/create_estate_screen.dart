@@ -236,6 +236,17 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     return imageFile == null ? null : imageFile.path;
   }
 
+  Future<dynamic> _selectMultipleImages() async {
+    final ImagePicker _picker = ImagePicker();
+    final List<XFile>? imageFiles =
+        await _picker.pickMultiImage(imageQuality: 30);
+    List<String> result = [];
+    imageFiles!.forEach((imageFile) {
+      result.add(imageFile.path);
+    });
+    return result.length == 0 ? null : result;
+  }
+
   Future<void> _selectMainImage() async {
     final image = await _selectImage();
     if (image == null) {
@@ -271,8 +282,10 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
         }
       });
     } else {
-      var photo = await MultipartFile.fromFile(File(image as String).path,
-          filename: "testimage.png");
+      var photo = await MultipartFile.fromFile(
+        File(image as String).path,
+        filename: "testimage.png",
+      );
 
       if (_extraImages[index] == null) {
         Provider.of<EstateProvider>(context, listen: false)
@@ -293,6 +306,43 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
         _currentExtraImageIndex = index + 1;
       });
     }
+  }
+
+  Future<dynamic> _selectExtraImages(index) async {
+    final List<String>? images = await _selectMultipleImages();
+    var pointer = index;
+    if (images != null) {
+      if (_extraImages[pointer] == null) {
+        images.forEach((image) async {
+          var photo = await MultipartFile.fromFile(
+            File(image as String).path,
+            filename: "testimage.png",
+          );
+          Provider.of<EstateProvider>(context, listen: false)
+              .uploadExtraPhoto(photo)
+              .then((value) {
+            print("uploaded");
+            print(pointer);
+            print(_extraImagesId);
+            _extraImagesId[pointer] = value;
+          });
+          pointer += 1;
+        });
+      } else {
+        String image = images[0];
+        var photo = await MultipartFile.fromFile(
+          File(image as String).path,
+          filename: "testimage.png",
+        );
+        Provider.of<EstateProvider>(context, listen: false)
+            .updateExtraPhoto(_extraImagesId[pointer], photo)
+            .then((value) {
+          _extraImagesId[pointer] = value;
+        });
+      }
+    }
+
+    return null;
   }
 
   @override
@@ -908,7 +958,13 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
             width: (100.w - 3.5 * defaultPadding) / 4,
             height: (100.w - 3.5 * defaultPadding) / 4,
             photo: _extraImages[index],
-            callback: () => _selectExtraImage(index),
+            callback: () {
+              if (_extraImages[index] == null) {
+                _selectExtraImages(index);
+              } else {
+                _selectExtraImage(index);
+              }
+            },
             disabled: index > _currentExtraImageIndex,
             iconScale: 1.5,
           ),

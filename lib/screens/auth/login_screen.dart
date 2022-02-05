@@ -5,6 +5,7 @@ import 'package:dachaturizm/components/text_link.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/helpers/clear_phone_number.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
+import 'package:dachaturizm/restartable_app.dart';
 import 'package:dachaturizm/screens/app/navigational_app_screen.dart';
 import 'package:dachaturizm/screens/auth/register_screen.dart';
 import 'package:dachaturizm/screens/auth/reset_password_step1_screen.dart';
@@ -124,7 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(height: defaultPadding),
                     FluidBigButton(
                       text: Locales.string(context, "log_in"),
-                      onPress: login,
+                      onPress: () => login(context),
                       loading: _isLoading,
                     ),
                     SizedBox(height: 1.5 * defaultPadding),
@@ -159,7 +160,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  login() {
+  login(BuildContext context) {
     setState(() {
       _isLoading = true;
     });
@@ -176,9 +177,10 @@ class _LoginScreenState extends State<LoginScreen> {
       } else {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setBool("noAuth", true);
-        Navigator.of(context)
-          // ..popUntil(ModalRoute.withName(NavigationalAppScreen.routeName))
-          ..pushReplacementNamed(NavigationalAppScreen.routeName);
+        RestartWidget.restartApp(context);
+        // Navigator.of(context)
+        //   // ..popUntil(ModalRoute.withName(NavigationalAppScreen.routeName))
+        //   ..pushReplacementNamed(NavigationalAppScreen.routeName);
       }
     });
   }

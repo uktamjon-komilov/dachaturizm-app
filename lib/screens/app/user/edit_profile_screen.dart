@@ -8,6 +8,7 @@ import 'package:dachaturizm/helpers/url_helper.dart';
 import 'package:dachaturizm/models/user_model.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
+import 'package:dachaturizm/restartable_app.dart';
 import 'package:dachaturizm/styles/input.dart';
 import 'package:dachaturizm/styles/text_styles.dart';
 import 'package:dio/dio.dart';
@@ -160,8 +161,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             : Scaffold(
                 appBar: buildNavigationalAppBar(
                     context, Locales.string(context, "editing"), () {
-                  Provider.of<AuthProvider>(context, listen: false)
-                      .getUserData();
+                  // Provider.of<AuthProvider>(context, listen: false)
+                  //     .getUserData()
+                  //     .then((_) {
+                  // Provider.of<NavigationScreenProvider>(context, listen: false)
+                  //     .changePageIndex(4);
+                  // });
+                  RestartWidget.restartApp(context);
                 }),
                 floatingActionButton: Container(
                   width: 100.w - 1.8 * defaultPadding,

@@ -4,11 +4,14 @@ import 'package:dachaturizm/components/text_input.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/models/category_model.dart';
 import 'package:dachaturizm/models/currency_model.dart';
+import 'package:dachaturizm/models/district_model.dart';
 import 'package:dachaturizm/models/facility_model.dart';
 import 'package:dachaturizm/models/popular_place_model.dart';
+import 'package:dachaturizm/models/region_model.dart';
 import 'package:dachaturizm/providers/currency_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/facility_provider.dart';
+import 'package:dachaturizm/providers/region_provider.dart';
 import 'package:dachaturizm/styles/text_styles.dart';
 import 'package:find_dropdown/find_dropdown.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +31,7 @@ class SearchFilersScreen extends StatefulWidget {
 class _SearchFilersScreenState extends State<SearchFilersScreen> {
   RangeValues _priceConstraints = RangeValues(0, 10000);
   int? _divisions;
+  int _resultCount = 0;
   RangeValues _selectedRange = RangeValues(0, 10000);
   bool _isInit = true;
   bool _isLoading = true;
@@ -36,7 +40,11 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
   int? _currentCurrencyId;
   String _currentPlace = "";
   List<PopularPlaceModel> _places = [];
-  void Function()? onFilterCallback;
+  String _currentRegion = "";
+  List<RegionModel> _regions = [];
+  String _currentDistrict = "";
+  List<DistrictModel> _districts = [];
+  dynamic Function()? onFilterCallback;
   int? _categoryId;
 
   TextEditingController _addressController = TextEditingController();
@@ -69,6 +77,7 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
           .then((value) async {
         await _changePriceRange(value[0].id);
       }),
+      Provider.of<RegionProvider>(context, listen: false).getAndSetRegions()
     ]);
 
     _sortingTypes = Provider.of<EstateProvider>(context, listen: false).sorting;
@@ -76,6 +85,10 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
         Provider.of<EstateProvider>(context, listen: false).filters["sorting"];
     _addressController.text =
         Provider.of<EstateProvider>(context, listen: false).filters["address"];
+
+    _regions = Provider.of<RegionProvider>(context, listen: false).regions;
+
+    print(_regions);
 
     setState(() {
       _isLoading = false;
@@ -161,6 +174,35 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
     });
   }
 
+  _getSearchResultsCount() async {
+    _setAllFilters();
+    if (_categoryId != null) {
+      CategoryModel category = CategoryModel(
+        id: _categoryId!.toInt(),
+        title: "",
+        slug: "",
+        icon: "",
+        foregroundColor: "",
+        backgroundColor: "",
+      );
+      Provider.of<EstateProvider>(context, listen: false)
+          .getSearchedResults(category: category)
+          .then((value) {
+        setState(() {
+          _resultCount = value["estates"].length;
+        });
+      });
+    } else {
+      Provider.of<EstateProvider>(context, listen: false)
+          .getSearchedResults()
+          .then((value) {
+        setState(() {
+          _resultCount = value["estates"].length;
+        });
+      });
+    }
+  }
+
   @override
   void didChangeDependencies() async {
     super.didChangeDependencies();
@@ -212,8 +254,8 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
           return true;
         },
         child: Scaffold(
-          appBar: buildNavigationalAppBar(
-              context, Locales.string(context, "filters"), () {
+          appBar: buildNavigationalAppBar(context,
+              Locales.string(context, "filters") + " (${_resultCount})", () {
             _clearFilters();
           }, [
             IconButton(
@@ -261,6 +303,69 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
                         ),
                         SizedBox(height: defaultPadding),
                         Text(
+                          Locales.string(context, "choose_region"),
+                          style: TextStyles.display5(),
+                        ),
+                        SizedBox(height: 12),
+                        Container(
+                          height: 45,
+                          margin: EdgeInsets.only(top: 10),
+                          child: SingleChildScrollView(
+                            physics: NeverScrollableScrollPhysics(),
+                            child: FindDropdown<String>(
+                              items: _regions
+                                  .map((region) => region.title)
+                                  .toList(),
+                              label: Locales.string(context, "choose_one"),
+                              labelVisible: false,
+                              selectedItem: _currentRegion,
+                              onChanged: (value) {
+                                _currentRegion = value as String;
+                                setState(() {
+                                  _districts = _regions.firstWhere(
+                                      (region) =>
+                                          region.title == _currentRegion,
+                                      orElse: () {
+                                    return RegionModel(
+                                      id: 0,
+                                      title: "",
+                                      translations: {},
+                                      districts: [],
+                                    );
+                                  }).districts;
+                                });
+                                _getSearchResultsCount();
+                              },
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: defaultPadding),
+                        Text(
+                          Locales.string(context, "choose_district"),
+                          style: TextStyles.display5(),
+                        ),
+                        SizedBox(height: 12),
+                        Container(
+                          height: 45,
+                          margin: EdgeInsets.only(top: 10),
+                          child: SingleChildScrollView(
+                            physics: NeverScrollableScrollPhysics(),
+                            child: FindDropdown<String>(
+                              items: _districts
+                                  .map((district) => district.title)
+                                  .toList(),
+                              label: Locales.string(context, "choose_one"),
+                              labelVisible: false,
+                              selectedItem: _currentDistrict,
+                              onChanged: (value) {
+                                _currentDistrict = value as String;
+                                _getSearchResultsCount();
+                              },
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: defaultPadding),
+                        Text(
                           Locales.string(context, "choose_popular_place"),
                           style: TextStyles.display5(),
                         ),
@@ -278,6 +383,7 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
                               selectedItem: _currentPlace,
                               onChanged: (value) {
                                 _currentPlace = value as String;
+                                _getSearchResultsCount();
                               },
                             ),
                           ),
@@ -414,7 +520,7 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
                 ),
               ),
               child: Text(
-                Locales.string(context, "show_results"),
+                Locales.string(context, "show_results") + " (${_resultCount})",
                 style: TextStyles.display6(),
               ),
             ),
@@ -425,9 +531,6 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
   }
 
   Widget _buildRangeSlider() {
-    print(_priceConstraints);
-    print(_priceConstraints);
-    print(_selectedRange);
     return RangeSlider(
       min: _priceConstraints.start,
       max: _priceConstraints.end,
@@ -439,6 +542,7 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
         setState(() {
           _selectedRange = newRange;
         });
+        _getSearchResultsCount();
       },
       activeColor: normalOrange,
     );

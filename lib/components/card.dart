@@ -80,7 +80,7 @@ class _EstateCardState extends State<EstateCard> {
                     height: 145,
                     placeholder: (context, _) => Image.asset(
                       "assets/images/square-placeholder.jpg",
-                      fit: BoxFit.contain,
+                      fit: BoxFit.cover,
                     ),
                   ),
                   widget.estate.isTop ? _showTopIndicator() : SizedBox.shrink()

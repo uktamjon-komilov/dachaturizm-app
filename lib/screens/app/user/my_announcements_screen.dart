@@ -185,12 +185,14 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
     return SafeArea(
       child: Scaffold(
         appBar: buildNavigationalAppBar(
-          context,
-          Locales.string(
             context,
-            "my_announcements",
-          ),
-        ),
+            Locales.string(
+              context,
+              "my_announcements",
+            ), () {
+          Provider.of<NavigationScreenProvider>(context, listen: false)
+              .changePageIndex(4);
+        }),
         bottomNavigationBar: _isLoading
             ? null
             : buildBottomNavigation(context, () {

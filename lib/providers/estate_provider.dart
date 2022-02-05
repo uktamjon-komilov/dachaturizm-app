@@ -133,6 +133,8 @@ class EstateProvider with ChangeNotifier {
   Map<String, dynamic> _filters = {
     "sorting": "latest",
     "address": "",
+    "region": 0,
+    "district": 0,
     "place": 0,
     "minPrice": 0.0,
     "maxPrice": 0.0,
@@ -157,6 +159,8 @@ class EstateProvider with ChangeNotifier {
             category == null ? null.toString() : category.id.toString(),
         "sorting": _filters["sorting"],
         "address": _filters["address"],
+        "region": _filters["region"].toString(),
+        "district": _filters["district"].toString(),
         "place": _filters["place"].toString(),
         "term": term ?? "",
         "min_price": _filters["minPrice"].toString(),
@@ -187,6 +191,14 @@ class EstateProvider with ChangeNotifier {
     _filters["address"] = address;
   }
 
+  filtersRegion(int regionId) {
+    _filters["region"] = regionId;
+  }
+
+  filtersDistrict(int districtId) {
+    _filters["district"] = districtId;
+  }
+
   filtersPlace(int id) {
     _filters["place"] = id;
   }
@@ -215,6 +227,8 @@ class EstateProvider with ChangeNotifier {
       "sorting": "latest",
       "address": "",
       "place": 0,
+      "region": 0,
+      "district": 0,
       "minPrice": 0.0,
       "maxPrice": 0.0,
       "priceType": null,
@@ -238,10 +252,8 @@ class EstateProvider with ChangeNotifier {
       category: category,
       extraArgs: extraArgs,
     );
-    print("worked");
     final url = "${baseUrl}api/estate/?${queryString}";
     final response = await _fetch(url);
-    print(url);
     await response.data["results"].forEach((item) async {
       EstateModel estate = await EstateModel.fromJson(item);
       estates.add(estate);
