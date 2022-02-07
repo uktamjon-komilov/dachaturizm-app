@@ -182,89 +182,96 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: buildNavigationalAppBar(
-            context,
-            Locales.string(
+    return WillPopScope(
+      onWillPop: () async {
+        Provider.of<NavigationScreenProvider>(context, listen: false)
+            .changePageIndex(4);
+        return true;
+      },
+      child: SafeArea(
+        child: Scaffold(
+          appBar: buildNavigationalAppBar(
               context,
-              "my_announcements",
-            ), () {
-          Provider.of<NavigationScreenProvider>(context, listen: false)
-              .changePageIndex(4);
-        }),
-        bottomNavigationBar: _isLoading
-            ? null
-            : buildBottomNavigation(context, () {
-                Navigator.of(context).pop();
-              }),
-        body: _isLoading
-            ? Center(
-                child: CircularProgressIndicator(),
-              )
-            : Container(
-                padding: EdgeInsets.all(defaultPadding),
-                child: RefreshIndicator(onRefresh: () async {
-                  _refresh();
-                }, child: LayoutBuilder(
-                  builder: (context, _) {
-                    if (_allEstates.length > 0) {
-                      return Column(
-                        children: [
-                          SizedBox(height: defaultPadding / 4),
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: [
-                                ..._show.keys
-                                    .map(
-                                      (key) => SmallButton(
-                                        Locales.string(context, key),
-                                        enabled: _show[key] as bool,
-                                        onPressed: () {
-                                          _changeShow(key);
-                                        },
-                                      ),
-                                    )
-                                    .toList(),
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: defaultPadding / 4),
-                          Expanded(
-                            child: SingleChildScrollView(
-                              child: Column(
-                                children: [..._estateBlockList()],
+              Locales.string(
+                context,
+                "my_announcements",
+              ), () {
+            Provider.of<NavigationScreenProvider>(context, listen: false)
+                .changePageIndex(4);
+          }),
+          bottomNavigationBar: _isLoading
+              ? null
+              : buildBottomNavigation(context, () {
+                  Navigator.of(context).pop();
+                }),
+          body: _isLoading
+              ? Center(
+                  child: CircularProgressIndicator(),
+                )
+              : Container(
+                  padding: EdgeInsets.all(defaultPadding),
+                  child: RefreshIndicator(onRefresh: () async {
+                    _refresh();
+                  }, child: LayoutBuilder(
+                    builder: (context, _) {
+                      if (_allEstates.length > 0) {
+                        return Column(
+                          children: [
+                            SizedBox(height: defaultPadding / 4),
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: [
+                                  ..._show.keys
+                                      .map(
+                                        (key) => SmallButton(
+                                          Locales.string(context, key),
+                                          enabled: _show[key] as bool,
+                                          onPressed: () {
+                                            _changeShow(key);
+                                          },
+                                        ),
+                                      )
+                                      .toList(),
+                                ],
                               ),
                             ),
-                          ),
-                        ],
-                      );
-                    } else {
-                      return Column(
-                        children: [
-                          NoResult(
-                            text:
-                                Locales.string(context, "no_your_own_estates"),
-                            photoPath: "assets/images/no_estates.png",
-                          ),
-                          FluidBigButton(
-                              onPress: () {
-                                Provider.of<NavigationScreenProvider>(context,
-                                        listen: false)
-                                    .changePageIndex(2);
-                                Navigator.of(context).popUntil(
-                                    ModalRoute.withName(
-                                        NavigationalAppScreen.routeName));
-                              },
-                              text:
-                                  Locales.string(context, "place_announcement"))
-                        ],
-                      );
-                    }
-                  },
-                )),
-              ),
+                            SizedBox(height: defaultPadding / 4),
+                            Expanded(
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  children: [..._estateBlockList()],
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      } else {
+                        return Column(
+                          children: [
+                            NoResult(
+                              text: Locales.string(
+                                  context, "no_your_own_estates"),
+                              photoPath: "assets/images/no_estates.png",
+                            ),
+                            FluidBigButton(
+                                onPress: () {
+                                  Provider.of<NavigationScreenProvider>(context,
+                                          listen: false)
+                                      .changePageIndex(2);
+                                  Navigator.of(context).popUntil(
+                                      ModalRoute.withName(
+                                          NavigationalAppScreen.routeName));
+                                },
+                                text: Locales.string(
+                                    context, "place_announcement"))
+                          ],
+                        );
+                      }
+                    },
+                  )),
+                ),
+        ),
       ),
     );
   }

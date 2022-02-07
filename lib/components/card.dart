@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/helpers/call_with_auth.dart';
+import 'package:dachaturizm/helpers/format_price.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/screens/app/estate/estate_detail_screen.dart';
@@ -127,7 +128,7 @@ class _EstateCardState extends State<EstateCard> {
                               },
                             ),
                             Text(
-                              "${widget.estate.weekdayPrice} ${widget.estate.priceType}",
+                              "${formatNumber(widget.estate.weekdayPrice.toInt())} ${widget.estate.priceType}",
                               style: TextStyles.display4()
                                   .copyWith(color: normalOrange),
                             )

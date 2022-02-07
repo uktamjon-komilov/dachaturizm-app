@@ -1,17 +1,16 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:dachaturizm/components/booked_days_hint.dart';
 import 'package:dachaturizm/components/chips.dart';
 import 'package:dachaturizm/components/fluid_big_button.dart';
 import 'package:dachaturizm/components/fluid_outlined_button.dart';
 import 'package:dachaturizm/constants.dart';
-import 'package:dachaturizm/helpers/calculate_distance.dart';
 import 'package:dachaturizm/helpers/call_with_auth.dart';
 import 'package:dachaturizm/helpers/url_helper.dart';
 import 'package:dachaturizm/models/booking_day.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/models/user_model.dart';
 import 'package:dachaturizm/screens/app/chat/chat_screen.dart';
+import 'package:dachaturizm/screens/app/estate/image_zoomer.dart';
 import 'package:dachaturizm/screens/app/estate/user_estates_screen.dart';
 import 'package:dachaturizm/styles/text_styles.dart';
 import "package:flutter/material.dart";
@@ -270,7 +269,7 @@ class DetailBuilder {
     );
   }
 
-  Widget buildSlideShow() {
+  Widget buildSlideShow(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(defaultPadding),
       child: ClipRRect(
@@ -282,23 +281,40 @@ class DetailBuilder {
           indicatorColor: normalOrange,
           indicatorBackgroundColor: lightGrey,
           children: [
-            CachedNetworkImage(
-              imageUrl: detail.photo,
-              fit: BoxFit.cover,
-              placeholder: (context, _) => Image.asset(
-                "assets/images/square-placeholder.jpg",
-                fit: BoxFit.cover,
-              ),
-            ),
             ...detail.photos
-                .map((item) => CachedNetworkImage(
-                      imageUrl: item.photo,
-                      fit: BoxFit.cover,
-                      placeholder: (context, _) => Image.asset(
-                        "assets/images/square-placeholder.jpg",
+                .map(
+                  (item) => GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) {
+                            return ImageZoomer();
+                          },
+                          settings: RouteSettings(
+                            arguments: {
+                              "photos": detail.photos
+                                  .map((item) => item.photo)
+                                  .toList(),
+                              "current": item.photo,
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                    child: Hero(
+                      tag: item.id,
+                      child: CachedNetworkImage(
+                        imageUrl: item.photo,
                         fit: BoxFit.cover,
+                        placeholder: (context, _) => Image.asset(
+                          "assets/images/square-placeholder.jpg",
+                          fit: BoxFit.cover,
+                        ),
                       ),
-                    ))
+                    ),
+                  ),
+                )
                 .toList()
           ],
           onPageChanged: (value) {

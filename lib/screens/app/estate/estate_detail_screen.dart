@@ -154,7 +154,7 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
                               child: HorizontalAd(_banner as EstateModel),
                             ),
                           ),
-                          _detailBuilder.buildSlideShow(),
+                          _detailBuilder.buildSlideShow(context),
                           Padding(
                             padding: const EdgeInsets.symmetric(
                               horizontal: defaultPadding,

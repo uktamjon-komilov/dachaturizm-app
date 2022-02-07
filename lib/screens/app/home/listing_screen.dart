@@ -222,6 +222,7 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
                             child: Row(
                               children: [
                                 SmallButton(Locales.string(context, "top"),
+                                    // + "(${_topEstates.length})",
                                     enabled: _showTop, onPressed: () {
                                   setState(() {
                                     _showTop = true;
@@ -229,6 +230,7 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
                                   });
                                 }),
                                 SmallButton(Locales.string(context, "simple"),
+                                    // + "(${_simpleEstates.length})",
                                     enabled: !_showTop, onPressed: () {
                                   setState(() {
                                     _showTop = false;

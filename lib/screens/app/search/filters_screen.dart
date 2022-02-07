@@ -129,6 +129,28 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
     Provider.of<EstateProvider>(context, listen: false)
         .filtersAddress(_addressController.text);
 
+    int regionId = _regions
+        .firstWhere((region) => region.title == _currentRegion, orElse: () {
+      return RegionModel(
+        id: 0,
+        title: "",
+        translations: {},
+        districts: [],
+      );
+    }).id;
+    Provider.of<EstateProvider>(context, listen: false).filtersRegion(regionId);
+
+    int districtId = _districts.firstWhere(
+        (district) => district.title == _currentDistrict, orElse: () {
+      return DistrictModel(
+        id: 0,
+        title: "",
+        translations: {},
+      );
+    }).id;
+    Provider.of<EstateProvider>(context, listen: false)
+        .filtersDistrict(districtId);
+
     if (_currentPlace != "") {
       int _currentPlaceId =
           _places.firstWhere((element) => element.title == _currentPlace).id;
@@ -188,6 +210,8 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
       Provider.of<EstateProvider>(context, listen: false)
           .getSearchedResults(category: category)
           .then((value) {
+        print(value["estates"]);
+        print(value["estates"].length);
         setState(() {
           _resultCount = value["estates"].length;
         });
@@ -196,6 +220,8 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
       Provider.of<EstateProvider>(context, listen: false)
           .getSearchedResults()
           .then((value) {
+        print(value["estates"]);
+        print(value["estates"].length);
         setState(() {
           _resultCount = value["estates"].length;
         });

@@ -122,6 +122,8 @@ class _ChatScreenState extends State<ChatScreen> {
       onWillPop: () async {
         Provider.of<NavigationScreenProvider>(context, listen: false)
             .refreshChatsScreen = true;
+        Provider.of<NavigationScreenProvider>(context, listen: false)
+            .changePageIndex(3);
         return true;
       },
       child: SafeArea(

@@ -38,6 +38,7 @@ class _UserPageScreenState extends State<UserPageScreen> {
     Provider.of<AuthProvider>(context, listen: false)
         .getUserData()
         .then((user) {
+      print(user);
       Provider.of<EstateProvider>(context, listen: false)
           .getStaticPages()
           .then((value) {
@@ -73,9 +74,7 @@ class _UserPageScreenState extends State<UserPageScreen> {
     }
     if (_isInit) {
       _isInit = false;
-      print("before refresh");
       await _refreshUser(context);
-      print("after refresh");
     }
     super.didChangeDependencies();
   }

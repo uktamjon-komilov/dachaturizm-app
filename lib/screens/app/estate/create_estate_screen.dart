@@ -310,34 +310,21 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
 
   Future<dynamic> _selectExtraImages(index) async {
     final List<String>? images = await _selectMultipleImages();
-    var pointer = index;
     if (images != null) {
-      if (_extraImages[pointer] == null) {
-        images.forEach((image) async {
-          var photo = await MultipartFile.fromFile(
-            File(image as String).path,
-            filename: "testimage.png",
-          );
-          Provider.of<EstateProvider>(context, listen: false)
-              .uploadExtraPhoto(photo)
-              .then((value) {
-            print("uploaded");
-            print(pointer);
-            print(_extraImagesId);
-            _extraImagesId[pointer] = value;
-          });
-          pointer += 1;
-        });
-      } else {
-        String image = images[0];
+      int length = images.length < 8 ? images.length : 8;
+      for (int i = index; i < length; i++) {
         var photo = await MultipartFile.fromFile(
-          File(image as String).path,
+          File(images[i]).path,
           filename: "testimage.png",
         );
-        Provider.of<EstateProvider>(context, listen: false)
-            .updateExtraPhoto(_extraImagesId[pointer], photo)
+        await Provider.of<EstateProvider>(context, listen: false)
+            .uploadExtraPhoto(photo)
             .then((value) {
-          _extraImagesId[pointer] = value;
+          _extraImagesId[i] = value;
+          _extraImages[i] = File(images[i]);
+        });
+        setState(() {
+          _currentExtraImageIndex = i + 1;
         });
       }
     }
@@ -958,13 +945,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
             width: (100.w - 3.5 * defaultPadding) / 4,
             height: (100.w - 3.5 * defaultPadding) / 4,
             photo: _extraImages[index],
-            callback: () {
-              if (_extraImages[index] == null) {
-                _selectExtraImages(index);
-              } else {
-                _selectExtraImage(index);
-              }
-            },
+            callback: () => _selectExtraImages(index),
             disabled: index > _currentExtraImageIndex,
             iconScale: 1.5,
           ),
