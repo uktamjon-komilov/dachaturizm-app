@@ -48,42 +48,40 @@ class _ServicesListScreenState extends State<ServicesListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: buildNavigationalAppBar(
-          context,
-          Locales.string(context, "services"),
-        ),
-        bottomNavigationBar: buildBottomNavigation(context, () {
-          Navigator.of(context).pop();
-        }),
-        body: _isLoading
-            ? Center(
-                child: CircularProgressIndicator(),
-              )
-            : SingleChildScrollView(
-                child: RefreshIndicator(
-                  onRefresh: () async {
-                    await _refresh(context);
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(
-                      defaultPadding,
-                      defaultPadding,
-                      defaultPadding,
-                      0,
-                    ),
-                    child: Column(
-                      children: [
-                        ..._services
-                            .map((service) => _buildServiceItem(service))
-                            .toList(),
-                      ],
-                    ),
+    return Scaffold(
+      appBar: buildNavigationalAppBar(
+        context,
+        Locales.string(context, "services"),
+      ),
+      bottomNavigationBar: buildBottomNavigation(context, () {
+        Navigator.of(context).pop();
+      }),
+      body: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : SingleChildScrollView(
+              child: RefreshIndicator(
+                onRefresh: () async {
+                  await _refresh(context);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    defaultPadding,
+                    defaultPadding,
+                    defaultPadding,
+                    0,
+                  ),
+                  child: Column(
+                    children: [
+                      ..._services
+                          .map((service) => _buildServiceItem(service))
+                          .toList(),
+                    ],
                   ),
                 ),
               ),
-      ),
+            ),
     );
   }
 

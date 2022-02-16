@@ -37,77 +37,75 @@ class _ServiceScreenState extends State<ServiceScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: buildNavigationalAppBar(context, _service!.title),
-        bottomNavigationBar: buildBottomNavigation(context, () {
-          Navigator.of(context)
-            ..pop()
-            ..pop();
-        }),
-        body: _isLoading
-            ? Center(
-                child: CircularProgressIndicator(),
-              )
-            : SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    defaultPadding,
-                    defaultPadding,
-                    defaultPadding,
-                    0,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(20),
-                        child: Container(
-                          height: 150,
-                          width: 100.w,
-                          child: Image.network(
-                            fixMediaUrl(_service!.photo),
-                            fit: BoxFit.cover,
+    return Scaffold(
+      appBar: buildNavigationalAppBar(context, _service!.title),
+      bottomNavigationBar: buildBottomNavigation(context, () {
+        Navigator.of(context)
+          ..pop()
+          ..pop();
+      }),
+      body: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  defaultPadding,
+                  defaultPadding,
+                  defaultPadding,
+                  0,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Container(
+                        height: 150,
+                        width: 100.w,
+                        child: Image.network(
+                          fixMediaUrl(_service!.photo),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 24),
+                    Text(
+                      _service!.content +
+                          _service!.content +
+                          _service!.content +
+                          _service!.content,
+                      style: TextStyle(
+                        fontSize: 13,
+                        height: 1.92,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    Visibility(
+                      visible: (_service!.email != null ||
+                          _service!.phone1 != null ||
+                          _service!.phone2 != null),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: defaultPadding),
+                          Text(
+                            Locales.string(context, "for_contact"),
+                            style: TextStyles.display1(),
                           ),
-                        ),
+                          SizedBox(height: defaultPadding),
+                          _buildContactPhones(),
+                          SizedBox(height: defaultPadding),
+                          _buildContactEmail(),
+                        ],
                       ),
-                      SizedBox(height: 24),
-                      Text(
-                        _service!.content +
-                            _service!.content +
-                            _service!.content +
-                            _service!.content,
-                        style: TextStyle(
-                          fontSize: 13,
-                          height: 1.92,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                      Visibility(
-                        visible: (_service!.email != null ||
-                            _service!.phone1 != null ||
-                            _service!.phone2 != null),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(height: defaultPadding),
-                            Text(
-                              Locales.string(context, "for_contact"),
-                              style: TextStyles.display1(),
-                            ),
-                            SizedBox(height: defaultPadding),
-                            _buildContactPhones(),
-                            SizedBox(height: defaultPadding),
-                            _buildContactEmail(),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 24),
-                    ],
-                  ),
+                    ),
+                    SizedBox(height: 24),
+                  ],
                 ),
               ),
-      ),
+            ),
     );
   }
 

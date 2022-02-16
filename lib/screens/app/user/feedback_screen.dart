@@ -43,8 +43,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-        child: Scaffold(
+    return Scaffold(
       appBar: buildNavigationalAppBar(
         context,
         Locales.string(context, "feedback"),
@@ -149,7 +148,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
           ),
         ),
       ),
-    ));
+    );
   }
 }
 

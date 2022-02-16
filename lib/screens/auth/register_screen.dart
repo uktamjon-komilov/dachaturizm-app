@@ -26,100 +26,97 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: _isLoading
-            ? Center(
-                child: CircularProgressIndicator(),
-              )
-            : Padding(
-                padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
-                child: Center(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          "assets/images/logo-icon.png",
-                          width: 120,
-                          fit: BoxFit.cover,
+    return Scaffold(
+      body: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : Padding(
+              padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
+              child: Center(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        "assets/images/logo-icon.png",
+                        width: 120,
+                        fit: BoxFit.cover,
+                      ),
+                      SizedBox(height: defaultPadding * 1.5),
+                      Text(
+                        Locales.string(context, "register"),
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w500,
+                          height: 1.25,
                         ),
-                        SizedBox(height: defaultPadding * 1.5),
-                        Text(
-                          Locales.string(context, "register"),
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w500,
-                            height: 1.25,
+                      ),
+                      SizedBox(height: defaultPadding / 2),
+                      Text(
+                        Locales.string(context, "new_profile_new_results"),
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          height: 1.43,
+                          color: greyishLight,
+                        ),
+                      ),
+                      SizedBox(height: 28),
+                      PhoneNumberField(
+                        controller: _phoneController,
+                        onFieldSubmitted: (value) {
+                          FocusScope.of(context).requestFocus(FocusNode());
+                        },
+                      ),
+                      SizedBox(height: defaultPadding),
+                      FluidBigButton(
+                        text: Locales.string(context, "next"),
+                        onPress: () {
+                          String phone = _phoneController.text
+                              .replaceAll(" ", "")
+                              .replaceAll("(", "")
+                              .replaceAll(")", "");
+                          if (phone.length > 11) {
+                            setState(() {
+                              _isLoading = true;
+                            });
+                            Provider.of<AuthProvider>(context, listen: false)
+                                .checkUser(phone)
+                                .then((value) {
+                              if (value["status"]) {
+                                setState(() {
+                                  _isLoading = false;
+                                });
+                                Navigator.of(context).pushNamed(
+                                    OTPConfirmationScreen.routeName,
+                                    arguments: phone);
+                              }
+                            });
+                          }
+                        },
+                      ),
+                      SizedBox(height: defaultPadding * 1.5),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            Locales.string(context, "have_profile?"),
+                            style: TextStyle(fontSize: 12),
                           ),
-                        ),
-                        SizedBox(height: defaultPadding / 2),
-                        Text(
-                          Locales.string(context, "new_profile_new_results"),
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                            height: 1.43,
-                            color: greyishLight,
-                          ),
-                        ),
-                        SizedBox(height: 28),
-                        PhoneNumberField(
-                          controller: _phoneController,
-                          onFieldSubmitted: (value) {
-                            FocusScope.of(context).requestFocus(FocusNode());
-                          },
-                        ),
-                        SizedBox(height: defaultPadding),
-                        FluidBigButton(
-                          text: Locales.string(context, "next"),
-                          onPress: () {
-                            String phone = _phoneController.text
-                                .replaceAll(" ", "")
-                                .replaceAll("(", "")
-                                .replaceAll(")", "");
-                            if (phone.length > 11) {
-                              setState(() {
-                                _isLoading = true;
-                              });
-                              Provider.of<AuthProvider>(context, listen: false)
-                                  .checkUser(phone)
-                                  .then((value) {
-                                if (value["status"]) {
-                                  setState(() {
-                                    _isLoading = false;
-                                  });
-                                  Navigator.of(context).pushNamed(
-                                      OTPConfirmationScreen.routeName,
-                                      arguments: phone);
-                                }
-                              });
-                            }
-                          },
-                        ),
-                        SizedBox(height: defaultPadding * 1.5),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text(
-                              Locales.string(context, "have_profile?"),
-                              style: TextStyle(fontSize: 12),
-                            ),
-                            SizedBox(width: 10),
-                            TextLinkButton(Locales.string(context, "log_in"),
-                                () {
-                              Navigator.of(context)
-                                  .pushReplacementNamed(LoginScreen.routeName);
-                            }),
-                          ],
-                        ),
-                      ],
-                    ),
+                          SizedBox(width: 10),
+                          TextLinkButton(Locales.string(context, "log_in"), () {
+                            Navigator.of(context)
+                                .pushReplacementNamed(LoginScreen.routeName);
+                          }),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),
-      ),
+            ),
     );
   }
 }

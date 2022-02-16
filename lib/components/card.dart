@@ -6,6 +6,7 @@ import 'package:dachaturizm/helpers/format_price.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/screens/app/estate/estate_detail_screen.dart';
+import 'package:dachaturizm/screens/app/estate/image_zoomer.dart';
 import 'package:dachaturizm/styles/text_styles.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -68,20 +69,36 @@ class _EstateCardState extends State<EstateCard> {
             children: [
               Stack(
                 children: [
-                  // Ink.image(
-                  //   height: 145,
-                  //   fit: BoxFit.cover,
-                  //   image: NetworkImage(
-                  //     widget.estate.photo,
-                  //   ),
-                  // ),
-                  CachedNetworkImage(
-                    imageUrl: widget.estate.photo,
-                    fit: BoxFit.cover,
-                    height: 145,
-                    placeholder: (context, _) => Image.asset(
-                      "assets/images/square-placeholder.jpg",
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) {
+                            return ImageZoomer();
+                          },
+                          settings: RouteSettings(
+                            arguments: {
+                              "photos": [
+                                widget.estate.photo,
+                                ...widget.estate.photos
+                                    .map((item) => item.photo)
+                                    .toList(),
+                              ],
+                              "current": widget.estate.photo,
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                    child: CachedNetworkImage(
+                      imageUrl: widget.estate.photo,
                       fit: BoxFit.cover,
+                      height: 145,
+                      placeholder: (context, _) => Image.asset(
+                        "assets/images/square-placeholder.jpg",
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                   widget.estate.isTop ? _showTopIndicator() : SizedBox.shrink()

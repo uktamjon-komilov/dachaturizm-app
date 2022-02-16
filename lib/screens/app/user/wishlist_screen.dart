@@ -55,53 +55,51 @@ class _WishlistScreenState extends State<WishlistScreen> {
             .refreshHomePage = true;
         return true;
       },
-      child: SafeArea(
-        child: Scaffold(
-          appBar: buildNavigationalAppBar(
-            context,
-            Locales.string(context, "wishlist"),
-          ),
-          bottomNavigationBar: buildBottomNavigation(context, () {
-            Navigator.of(context).pop();
-          }),
-          body: _isLoading
-              ? Center(
-                  child: CircularProgressIndicator(),
-                )
-              : RefreshIndicator(
-                  onRefresh: () async => await _refresh(),
-                  child: Container(
-                    width: 100.w,
-                    height: 100.h,
-                    child: SingleChildScrollView(
-                      physics: AlwaysScrollableScrollPhysics(),
-                      child: Column(
-                        children: [
-                          (_estates.length == 0)
-                              ? NoResult(
-                                  photoPath: "assets/images/e-commerce.png",
-                                  text: Locales.string(
-                                      context, "no_wishlist_items"),
-                                )
-                              : Container(
-                                  padding: EdgeInsets.all(defaultPadding),
-                                  width: 100.w,
-                                  child: Wrap(
-                                    alignment: WrapAlignment.start,
-                                    children: [
-                                      ..._estates
-                                          .map((estate) =>
-                                              EstateCard(estate: estate))
-                                          .toList(),
-                                    ],
-                                  ),
+      child: Scaffold(
+        appBar: buildNavigationalAppBar(
+          context,
+          Locales.string(context, "wishlist"),
+        ),
+        bottomNavigationBar: buildBottomNavigation(context, () {
+          Navigator.of(context).pop();
+        }),
+        body: _isLoading
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : RefreshIndicator(
+                onRefresh: () async => await _refresh(),
+                child: Container(
+                  width: 100.w,
+                  height: 100.h,
+                  child: SingleChildScrollView(
+                    physics: AlwaysScrollableScrollPhysics(),
+                    child: Column(
+                      children: [
+                        (_estates.length == 0)
+                            ? NoResult(
+                                photoPath: "assets/images/e-commerce.png",
+                                text: Locales.string(
+                                    context, "no_wishlist_items"),
+                              )
+                            : Container(
+                                padding: EdgeInsets.all(defaultPadding),
+                                width: 100.w,
+                                child: Wrap(
+                                  alignment: WrapAlignment.start,
+                                  children: [
+                                    ..._estates
+                                        .map((estate) =>
+                                            EstateCard(estate: estate))
+                                        .toList(),
+                                  ],
                                 ),
-                        ],
-                      ),
+                              ),
+                      ],
                     ),
                   ),
                 ),
-        ),
+              ),
       ),
     );
   }

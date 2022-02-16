@@ -55,168 +55,166 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
   Widget build(BuildContext context) {
     final phone = ModalRoute.of(context)?.settings.arguments as String;
 
-    return SafeArea(
-      child: Scaffold(
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
-          child: Form(
-            key: _form,
-            child: Center(
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      "assets/images/logo-icon.png",
-                      width: 120,
-                      fit: BoxFit.cover,
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
+        child: Form(
+          key: _form,
+          child: Center(
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    "assets/images/logo-icon.png",
+                    width: 120,
+                    fit: BoxFit.cover,
+                  ),
+                  SizedBox(height: defaultPadding * 1.5),
+                  Text(
+                    Locales.string(context, "create_profile"),
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w500,
+                      height: 1.25,
                     ),
-                    SizedBox(height: defaultPadding * 1.5),
-                    Text(
-                      Locales.string(context, "create_profile"),
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w500,
-                        height: 1.25,
-                      ),
+                  ),
+                  SizedBox(height: defaultPadding / 2),
+                  Text(
+                    Locales.string(context, "new_profile_new_results"),
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      height: 1.43,
+                      color: greyishLight,
                     ),
-                    SizedBox(height: defaultPadding / 2),
-                    Text(
-                      Locales.string(context, "new_profile_new_results"),
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        height: 1.43,
-                        color: greyishLight,
-                      ),
+                  ),
+                  SizedBox(height: 28),
+                  _buildTextInput(
+                    context,
+                    hintText: "first_name_hint_text",
+                    iconData: Icons.person,
+                    focusNode: _firstNameFocusNode,
+                    nextFocusNode: _lastNameFocusNode,
+                    controller: _firstNameController,
+                  ),
+                  _buildTextInput(
+                    context,
+                    hintText: "last_name_hint_text",
+                    iconData: Icons.person,
+                    focusNode: _lastNameFocusNode,
+                    nextFocusNode: _newPasswordFocusNode,
+                    controller: _lastNameController,
+                  ),
+                  _buildTextInput(
+                    context,
+                    hintText: "new_password_hint",
+                    iconData: Icons.lock,
+                    suffixIcon: Icons.remove_red_eye,
+                    onPressed: () {
+                      setState(() {
+                        _hidePassword = !_hidePassword;
+                      });
+                    },
+                    obscureText: _hidePassword,
+                    focusNode: _newPasswordFocusNode,
+                    nextFocusNode: _newPasswordFocusNode,
+                    controller: _newPasswordController,
+                  ),
+                  _buildTextInput(
+                    context,
+                    hintText: "new_confirm_password_hint",
+                    iconData: Icons.lock,
+                    suffixIcon: Icons.remove_red_eye,
+                    onPressed: () {
+                      setState(() {
+                        _hidePassword = !_hidePassword;
+                      });
+                    },
+                    obscureText: _hidePassword,
+                    focusNode: _confirmPasswordFocusNode,
+                    controller: _confirmPasswordController,
+                  ),
+                  CheckboxListTile(
+                    title: Text(
+                      Locales.string(context, "i_agree_to_the_terms"),
+                      style: TextStyle(fontSize: 12),
                     ),
-                    SizedBox(height: 28),
-                    _buildTextInput(
-                      context,
-                      hintText: "first_name_hint_text",
-                      iconData: Icons.person,
-                      focusNode: _firstNameFocusNode,
-                      nextFocusNode: _lastNameFocusNode,
-                      controller: _firstNameController,
-                    ),
-                    _buildTextInput(
-                      context,
-                      hintText: "last_name_hint_text",
-                      iconData: Icons.person,
-                      focusNode: _lastNameFocusNode,
-                      nextFocusNode: _newPasswordFocusNode,
-                      controller: _lastNameController,
-                    ),
-                    _buildTextInput(
-                      context,
-                      hintText: "new_password_hint",
-                      iconData: Icons.lock,
-                      suffixIcon: Icons.remove_red_eye,
-                      onPressed: () {
-                        setState(() {
-                          _hidePassword = !_hidePassword;
-                        });
-                      },
-                      obscureText: _hidePassword,
-                      focusNode: _newPasswordFocusNode,
-                      nextFocusNode: _newPasswordFocusNode,
-                      controller: _newPasswordController,
-                    ),
-                    _buildTextInput(
-                      context,
-                      hintText: "new_confirm_password_hint",
-                      iconData: Icons.lock,
-                      suffixIcon: Icons.remove_red_eye,
-                      onPressed: () {
-                        setState(() {
-                          _hidePassword = !_hidePassword;
-                        });
-                      },
-                      obscureText: _hidePassword,
-                      focusNode: _confirmPasswordFocusNode,
-                      controller: _confirmPasswordController,
-                    ),
-                    CheckboxListTile(
-                      title: Text(
-                        Locales.string(context, "i_agree_to_the_terms"),
-                        style: TextStyle(fontSize: 12),
-                      ),
-                      controlAffinity: ListTileControlAffinity.leading,
-                      value: _agreeTerms,
-                      activeColor: normalOrange,
-                      onChanged: (value) {
-                        setState(() {
-                          _agreeTerms = !_agreeTerms;
-                        });
-                      },
-                    ),
-                    TextLinkButton(Locales.string(context, "terms_of_use"), () {
-                      UrlLauncher.launch(
-                          "${baseFrontUrl}staticpages/terms-of-use");
-                    }),
-                    SizedBox(
-                      height: 16,
-                    ),
-                    _somethingWrong
-                        ? LocaleText(
-                            "something_went_wrong_form_text",
-                            style: TextStyle(
-                              color: Colors.red,
-                            ),
-                          )
-                        : Container(),
-                    _userAlreadyExists
-                        ? Text(
-                            Locales.string(
-                                context, "user_already_exists_with_this_phone"),
-                            style: TextStyle(
-                              color: Colors.red,
-                            ),
-                          )
-                        : Container(),
-                    SizedBox(height: 16),
-                    Visibility(
-                      visible: _agreeTerms,
-                      child: FluidBigButton(
-                          text: Locales.string(context, "create_profile"),
-                          onPress: () {
-                            if (_form.currentState!.validate()) {
-                              setState(() {
-                                _somethingWrong = false;
-                              });
-                              if (_userAlreadyExists) {
-                                Navigator.of(context).pop();
-                              }
-                              Provider.of<AuthProvider>(context, listen: false)
-                                  .signUp(
-                                      phone,
-                                      _newPasswordController.text,
-                                      _firstNameController.text,
-                                      _lastNameController.text)
-                                  .then((value) {
-                                print(value);
-                                if (value.containsKey("status") &&
-                                    value["status"] == false) {
-                                  setState(() {
-                                    _userAlreadyExists = true;
-                                  });
-                                } else if (value.containsKey("id") &&
-                                    value["id"] > 0) {
-                                  Provider.of<AuthProvider>(context,
-                                          listen: false)
-                                      .login(phone, _newPasswordController.text)
-                                      .then((_) {
-                                    Navigator.of(context)
-                                      ..pushReplacementNamed(
-                                          NavigationalAppScreen.routeName);
-                                  });
-                                }
-                              });
+                    controlAffinity: ListTileControlAffinity.leading,
+                    value: _agreeTerms,
+                    activeColor: normalOrange,
+                    onChanged: (value) {
+                      setState(() {
+                        _agreeTerms = !_agreeTerms;
+                      });
+                    },
+                  ),
+                  TextLinkButton(Locales.string(context, "terms_of_use"), () {
+                    UrlLauncher.launch(
+                        "${baseFrontUrl}staticpages/terms-of-use");
+                  }),
+                  SizedBox(
+                    height: 16,
+                  ),
+                  _somethingWrong
+                      ? LocaleText(
+                          "something_went_wrong_form_text",
+                          style: TextStyle(
+                            color: Colors.red,
+                          ),
+                        )
+                      : Container(),
+                  _userAlreadyExists
+                      ? Text(
+                          Locales.string(
+                              context, "user_already_exists_with_this_phone"),
+                          style: TextStyle(
+                            color: Colors.red,
+                          ),
+                        )
+                      : Container(),
+                  SizedBox(height: 16),
+                  Visibility(
+                    visible: _agreeTerms,
+                    child: FluidBigButton(
+                        text: Locales.string(context, "create_profile"),
+                        onPress: () {
+                          if (_form.currentState!.validate()) {
+                            setState(() {
+                              _somethingWrong = false;
+                            });
+                            if (_userAlreadyExists) {
+                              Navigator.of(context).pop();
                             }
-                          }),
-                    ),
-                  ],
-                ),
+                            Provider.of<AuthProvider>(context, listen: false)
+                                .signUp(
+                                    phone,
+                                    _newPasswordController.text,
+                                    _firstNameController.text,
+                                    _lastNameController.text)
+                                .then((value) {
+                              print(value);
+                              if (value.containsKey("status") &&
+                                  value["status"] == false) {
+                                setState(() {
+                                  _userAlreadyExists = true;
+                                });
+                              } else if (value.containsKey("id") &&
+                                  value["id"] > 0) {
+                                Provider.of<AuthProvider>(context,
+                                        listen: false)
+                                    .login(phone, _newPasswordController.text)
+                                    .then((_) {
+                                  Navigator.of(context)
+                                    ..pushReplacementNamed(
+                                        NavigationalAppScreen.routeName);
+                                });
+                              }
+                            });
+                          }
+                        }),
+                  ),
+                ],
               ),
             ),
           ),

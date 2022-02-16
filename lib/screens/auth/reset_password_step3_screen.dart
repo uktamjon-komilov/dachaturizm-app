@@ -45,78 +45,76 @@ class _ResetPasswordStep3State extends State<ResetPasswordStep3> {
     final Map<String, dynamic> data =
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
 
-    return SafeArea(
-      child: Scaffold(
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
-          child: Form(
-            key: _form,
-            child: Center(
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      "assets/images/logo-icon.png",
-                      width: 120,
-                      fit: BoxFit.cover,
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
+        child: Form(
+          key: _form,
+          child: Center(
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    "assets/images/logo-icon.png",
+                    width: 120,
+                    fit: BoxFit.cover,
+                  ),
+                  SizedBox(height: defaultPadding * 1.5),
+                  Text(
+                    Locales.string(context, "new_password"),
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w500,
+                      height: 1.25,
                     ),
-                    SizedBox(height: defaultPadding * 1.5),
-                    Text(
-                      Locales.string(context, "new_password"),
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w500,
-                        height: 1.25,
-                      ),
+                  ),
+                  SizedBox(height: defaultPadding / 2),
+                  Text(
+                    Locales.string(context, "renew_profile_password"),
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      height: 1.43,
+                      color: greyishLight,
                     ),
-                    SizedBox(height: defaultPadding / 2),
-                    Text(
-                      Locales.string(context, "renew_profile_password"),
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        height: 1.43,
-                        color: greyishLight,
-                      ),
-                    ),
-                    SizedBox(height: 28),
-                    _buildTextInput(
-                      context,
-                      hintText: "new_password_hint",
-                      iconData: Icons.lock,
-                      suffixIcon: Icons.remove_red_eye,
-                      onPressed: () {
-                        setState(() {
-                          _hidePassword = !_hidePassword;
-                        });
-                      },
-                      obscureText: _hidePassword,
-                      focusNode: _newPasswordFocusNode,
-                      nextFocusNode: _newPasswordFocusNode,
-                      controller: _newPasswordController,
-                    ),
-                    _buildTextInput(
-                      context,
-                      hintText: "new_confirm_password_hint",
-                      iconData: Icons.lock,
-                      suffixIcon: Icons.remove_red_eye,
-                      onPressed: () {
-                        setState(() {
-                          _hidePassword = !_hidePassword;
-                        });
-                      },
-                      obscureText: _hidePassword,
-                      focusNode: _confirmPasswordFocusNode,
-                      controller: _confirmPasswordController,
-                    ),
-                    FluidBigButton(
-                      text: Locales.string(context, "create_profile"),
-                      onPress: () =>
-                          resetPassword3(context, data["phone"], data["code"]),
-                    ),
-                  ],
-                ),
+                  ),
+                  SizedBox(height: 28),
+                  _buildTextInput(
+                    context,
+                    hintText: "new_password_hint",
+                    iconData: Icons.lock,
+                    suffixIcon: Icons.remove_red_eye,
+                    onPressed: () {
+                      setState(() {
+                        _hidePassword = !_hidePassword;
+                      });
+                    },
+                    obscureText: _hidePassword,
+                    focusNode: _newPasswordFocusNode,
+                    nextFocusNode: _newPasswordFocusNode,
+                    controller: _newPasswordController,
+                  ),
+                  _buildTextInput(
+                    context,
+                    hintText: "new_confirm_password_hint",
+                    iconData: Icons.lock,
+                    suffixIcon: Icons.remove_red_eye,
+                    onPressed: () {
+                      setState(() {
+                        _hidePassword = !_hidePassword;
+                      });
+                    },
+                    obscureText: _hidePassword,
+                    focusNode: _confirmPasswordFocusNode,
+                    controller: _confirmPasswordController,
+                  ),
+                  FluidBigButton(
+                    text: Locales.string(context, "create_profile"),
+                    onPress: () =>
+                        resetPassword3(context, data["phone"], data["code"]),
+                  ),
+                ],
               ),
             ),
           ),

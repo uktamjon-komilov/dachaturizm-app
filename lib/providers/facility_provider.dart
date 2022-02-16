@@ -15,8 +15,12 @@ class FacilityProvider with ChangeNotifier {
     return [..._facilities];
   }
 
-  Future<List<FacilityModel>> getFacilities() async {
-    const url = "${baseUrl}api/facilities/";
+  Future<List<FacilityModel>> getFacilities([String categoryId = ""]) async {
+    String url = "${baseUrl}api/facilities/";
+    if (categoryId != "") {
+      url += "?category=${categoryId}";
+    }
+    print(url);
     final response = await dio.get(url);
     List<FacilityModel> facilities = [];
     if (response.statusCode as int >= 200 || response.statusCode as int < 300) {

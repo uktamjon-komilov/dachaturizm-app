@@ -63,58 +63,56 @@ class _MyBalanceScreenState extends State<MyBalanceScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: buildNavigationalAppBar(
-          context,
-          Locales.string(context, "my_balance"),
-        ),
-        bottomNavigationBar: buildBottomNavigation(context, () {
-          Navigator.of(context).pop();
-        }),
-        body: _isLoading
-            ? Center(
-                child: CircularProgressIndicator(),
-              )
-            : Container(
-                padding: EdgeInsets.fromLTRB(
-                  defaultPadding,
-                  defaultPadding,
-                  defaultPadding,
-                  0,
-                ),
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildCardBlock(),
-                      SizedBox(height: defaultPadding / 2),
-                      Divider(
-                        color: lightGrey,
-                        thickness: 1,
-                        height: 0,
-                      ),
-                      SizedBox(height: defaultPadding / 2),
-                      _buildTransactionsList(
-                        Locales.string(context, "last_payments"),
-                        _inTransactions,
-                      ),
-                      SizedBox(height: defaultPadding / 2),
-                      Divider(
-                        color: lightGrey,
-                        thickness: 1,
-                        height: 0,
-                      ),
-                      SizedBox(height: defaultPadding / 2),
-                      _buildTransactionsList(
-                        Locales.string(context, "last_charges"),
-                        _outTransactions,
-                      ),
-                    ],
-                  ),
+    return Scaffold(
+      appBar: buildNavigationalAppBar(
+        context,
+        Locales.string(context, "my_balance"),
+      ),
+      bottomNavigationBar: buildBottomNavigation(context, () {
+        Navigator.of(context).pop();
+      }),
+      body: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : Container(
+              padding: EdgeInsets.fromLTRB(
+                defaultPadding,
+                defaultPadding,
+                defaultPadding,
+                0,
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildCardBlock(),
+                    SizedBox(height: defaultPadding / 2),
+                    Divider(
+                      color: lightGrey,
+                      thickness: 1,
+                      height: 0,
+                    ),
+                    SizedBox(height: defaultPadding / 2),
+                    _buildTransactionsList(
+                      Locales.string(context, "last_payments"),
+                      _inTransactions,
+                    ),
+                    SizedBox(height: defaultPadding / 2),
+                    Divider(
+                      color: lightGrey,
+                      thickness: 1,
+                      height: 0,
+                    ),
+                    SizedBox(height: defaultPadding / 2),
+                    _buildTransactionsList(
+                      Locales.string(context, "last_charges"),
+                      _outTransactions,
+                    ),
+                  ],
                 ),
               ),
-      ),
+            ),
     );
   }
 

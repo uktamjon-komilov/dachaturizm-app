@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/screens/app/estate/estate_detail_screen.dart';
@@ -35,17 +36,18 @@ class HorizontalAd extends StatelessWidget {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(10),
           child: Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: NetworkImage(
-                  estate.photo,
-                ),
-                fit: BoxFit.cover,
-              ),
-            ),
             child: Stack(
               fit: StackFit.expand,
               children: [
+                CachedNetworkImage(
+                  imageUrl: estate.photo,
+                  fit: BoxFit.cover,
+                  height: 145,
+                  placeholder: (context, _) => Image.asset(
+                    "assets/images/hap.jpg",
+                    fit: BoxFit.cover,
+                  ),
+                ),
                 Positioned(
                   top: 0,
                   left: 0,

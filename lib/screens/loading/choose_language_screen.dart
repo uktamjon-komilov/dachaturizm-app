@@ -5,7 +5,6 @@ import 'package:dachaturizm/helpers/locale_helper.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sizer/sizer.dart';
 
 class ChooseLangugageScreen extends StatefulWidget {
   const ChooseLangugageScreen({Key? key}) : super(key: key);
@@ -21,56 +20,54 @@ class _ChooseLangugageScreenState extends State<ChooseLangugageScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: Container(
-          padding: EdgeInsets.fromLTRB(defaultPadding, 110, defaultPadding, 0),
-          width: double.infinity,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                width: 110,
-                height: 110,
-                child: Image.asset(
-                  "assets/images/languages.png",
-                  fit: BoxFit.cover,
-                ),
+    return Scaffold(
+      body: Container(
+        padding: EdgeInsets.fromLTRB(defaultPadding, 110, defaultPadding, 0),
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              width: 110,
+              height: 110,
+              child: Image.asset(
+                "assets/images/languages.png",
+                fit: BoxFit.cover,
               ),
-              SizedBox(height: 105),
-              Text(
-                Locales.string(context, "choose_language"),
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  height: 1.2,
-                  letterSpacing: 0.4,
-                ),
+            ),
+            SizedBox(height: 105),
+            Text(
+              Locales.string(context, "choose_language"),
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                height: 1.2,
+                letterSpacing: 0.4,
               ),
-              SizedBox(height: 36),
-              Column(
-                children: [
-                  _buildLangitem("uz"),
-                  SizedBox(height: 8),
-                  _buildLangitem("ru"),
-                  SizedBox(height: 8),
-                  _buildLangitem("en"),
-                ],
-              ),
-              SizedBox(height: 52),
-              FluidBigButton(
-                text: Locales.string(context, "next"),
-                onPress: () async {
-                  if (chosenLang == "") return;
-                  changeLocale(context, chosenLang);
-                  setNotFirstTime();
-                  Navigator.pushReplacementNamed(
-                      context, AuthTypeScreen.routeName);
-                },
-                disabled: chosenLang == "",
-              )
-            ],
-          ),
+            ),
+            SizedBox(height: 36),
+            Column(
+              children: [
+                _buildLangitem("uz"),
+                SizedBox(height: 8),
+                _buildLangitem("ru"),
+                SizedBox(height: 8),
+                _buildLangitem("en"),
+              ],
+            ),
+            SizedBox(height: 52),
+            FluidBigButton(
+              text: Locales.string(context, "next"),
+              onPress: () async {
+                if (chosenLang == "") return;
+                changeLocale(context, chosenLang);
+                setNotFirstTime();
+                Navigator.pushReplacementNamed(
+                    context, AuthTypeScreen.routeName);
+              },
+              disabled: chosenLang == "",
+            )
+          ],
         ),
       ),
     );

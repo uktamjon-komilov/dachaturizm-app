@@ -62,71 +62,68 @@ class _UserEstatesScreenState extends State<UserEstatesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: buildNavigationalAppBar(
-            context, Locales.string(context, "announcer")),
-        bottomNavigationBar: buildBottomNavigation(context, () {
-          Navigator.of(context)
-              .popUntil(ModalRoute.withName(NavigationalAppScreen.routeName));
-        }),
-        body: _isLoading
-            ? Center(
-                child: CircularProgressIndicator(),
-              )
-            : SingleChildScrollView(
-                child: Column(
-                  children: [
-                    buildUserDetails(context, _user),
-                    Container(
-                      width: 100.w,
-                      padding: EdgeInsets.fromLTRB(
-                        defaultPadding,
-                        24,
-                        defaultPadding,
-                        defaultPadding,
+    return Scaffold(
+      appBar: buildNavigationalAppBar(
+          context, Locales.string(context, "announcer")),
+      bottomNavigationBar: buildBottomNavigation(context, () {
+        Navigator.of(context)
+            .popUntil(ModalRoute.withName(NavigationalAppScreen.routeName));
+      }),
+      body: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : SingleChildScrollView(
+              child: Column(
+                children: [
+                  buildUserDetails(context, _user),
+                  Container(
+                    width: 100.w,
+                    padding: EdgeInsets.fromLTRB(
+                      defaultPadding,
+                      24,
+                      defaultPadding,
+                      defaultPadding,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(30),
+                        topRight: Radius.circular(30),
                       ),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(30),
-                          topRight: Radius.circular(30),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          Locales.string(
+                            context,
+                            "announcers_other_ads",
+                          ),
+                          style: TextStyles.display2(),
                         ),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            Locales.string(
-                              context,
-                              "announcers_other_ads",
-                            ),
-                            style: TextStyles.display2(),
-                          ),
-                          Visibility(
-                            visible: _userEstates.length > 0,
-                            child: Container(
-                              width: 100.w,
-                              padding: EdgeInsets.only(top: defaultPadding),
-                              child: Wrap(
-                                alignment: WrapAlignment.spaceBetween,
-                                runSpacing: 6,
-                                children: [
-                                  ..._userEstates
-                                      .map((estate) =>
-                                          EstateCard(estate: estate))
-                                      .toList(),
-                                ],
-                              ),
+                        Visibility(
+                          visible: _userEstates.length > 0,
+                          child: Container(
+                            width: 100.w,
+                            padding: EdgeInsets.only(top: defaultPadding),
+                            child: Wrap(
+                              alignment: WrapAlignment.spaceBetween,
+                              runSpacing: 6,
+                              children: [
+                                ..._userEstates
+                                    .map((estate) => EstateCard(estate: estate))
+                                    .toList(),
+                              ],
                             ),
                           ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
               ),
-      ),
+            ),
     );
   }
 }

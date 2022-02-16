@@ -133,68 +133,65 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
       share_url += "estate/${type.slug}/${detail.id}/";
     } catch (e) {}
 
-    return SafeArea(
-      child: Scaffold(
-        appBar: _buildAppBar(context, share_url, share_title),
-        body: isLoading
-            ? Center(
-                child: CircularProgressIndicator(),
-              )
-            : Column(
-                children: [
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          Visibility(
-                            visible: _banner != null,
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.only(top: defaultPadding),
-                              child: HorizontalAd(_banner as EstateModel),
-                            ),
+    return Scaffold(
+      appBar: _buildAppBar(context, share_url, share_title),
+      body: isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Visibility(
+                          visible: _banner != null,
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: defaultPadding),
+                            child: HorizontalAd(_banner as EstateModel),
                           ),
-                          _detailBuilder.buildSlideShow(context),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: defaultPadding,
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _detailBuilder.buildTitle(),
-                                _detailBuilder.buildRatingRow(context),
-                                _detailBuilder.buildPriceRow(
-                                  context,
-                                  showCalendar,
-                                ),
-                                _detailBuilder.buildCustomCalendar(
-                                    context, _showCalendar),
-                                _detailBuilder.drawDivider(),
-                                SizedBox(height: defaultPadding),
-                                _detailBuilder.buildDescription(context),
-                                _detailBuilder.buildAddressBox(context),
-                                _detailBuilder.buildChips(),
-                                _detailBuilder.buildAnnouncerBox(context),
-                                buildRatingResults(context, _estateRating),
-                                SizedBox(height: 20),
-                                _buildRatingSaver(context),
-                                SizedBox(height: 10),
-                                _buildSimilarEstates(context),
-                                SizedBox(height: 10),
-                                _buildExtraInfo(context),
-                                SizedBox(height: 10),
-                              ],
-                            ),
+                        ),
+                        _detailBuilder.buildSlideShow(context),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: defaultPadding,
                           ),
-                        ],
-                      ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _detailBuilder.buildTitle(),
+                              _detailBuilder.buildRatingRow(context),
+                              _detailBuilder.buildPriceRow(
+                                context,
+                                showCalendar,
+                              ),
+                              _detailBuilder.buildCustomCalendar(
+                                  context, _showCalendar),
+                              _detailBuilder.drawDivider(),
+                              SizedBox(height: defaultPadding),
+                              _detailBuilder.buildDescription(context),
+                              _detailBuilder.buildAddressBox(context),
+                              _detailBuilder.buildChips(),
+                              _detailBuilder.buildAnnouncerBox(context),
+                              buildRatingResults(context, _estateRating),
+                              SizedBox(height: 20),
+                              _buildRatingSaver(context),
+                              SizedBox(height: 10),
+                              _buildSimilarEstates(context),
+                              SizedBox(height: 10),
+                              _buildExtraInfo(context),
+                              SizedBox(height: 10),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  _detailBuilder.buildContactBox(context, fromChat, _userId),
-                ],
-              ),
-      ),
+                ),
+                _detailBuilder.buildContactBox(context, fromChat, _userId),
+              ],
+            ),
     );
   }
 
