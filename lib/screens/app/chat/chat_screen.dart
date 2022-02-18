@@ -127,9 +127,7 @@ class _ChatScreenState extends State<ChatScreen> {
         return true;
       },
       child: Scaffold(
-        appBar: buildNavigationalAppBar(context, sender!.fullname, () {
-          Navigator.of(context).pop();
-        }, [
+        appBar: buildNavigationalAppBar(context, sender!.fullname, () {}, [
           sender!.photo == ""
               ? IconButton(
                   onPressed: () {},

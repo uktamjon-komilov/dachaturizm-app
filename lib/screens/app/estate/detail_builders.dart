@@ -317,9 +317,7 @@ class DetailBuilder {
                 )
                 .toList()
           ],
-          onPageChanged: (value) {
-            print('Page changed: $value');
-          },
+          onPageChanged: (value) {},
           // autoPlayInterval: 3000,
           isLoop: true,
         ),
@@ -389,9 +387,7 @@ class DetailBuilder {
             ),
             Spacer(),
             IconButton(
-              onPressed: () {
-                print("hi");
-              },
+              onPressed: () {},
               icon: Icon(
                 Icons.arrow_forward_ios_rounded,
                 color: normalGrey,

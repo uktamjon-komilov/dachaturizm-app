@@ -43,8 +43,8 @@ class EstateProvider with ChangeNotifier {
     return response;
   }
 
-  Future<Map<int, List<EstateModel>>> _setTopEstates(dynamic data,
-      CategoryModel category, Map<int, List<EstateModel>> result) async {
+  Future<Map<int, List<EstateModel>>> _setTopEstates(
+      data, CategoryModel category, Map<int, List<EstateModel>> result) async {
     await data["results"].forEach((item) async {
       EstateModel estate = await EstateModel.fromJson(item);
       result[category.id]!.add(estate);
@@ -67,8 +67,9 @@ class EstateProvider with ChangeNotifier {
         data = response.data;
         estates = await _setTopEstates(data, categories[i], estates);
         while (data["links"]["next"] != null) {
-          data = await _fetch(data["links"]["next"]);
-          estates = await _setTopEstates(data, categories[i], estates);
+          response = await _fetch(data["links"]["next"]);
+          estates = await _setTopEstates(response.data, categories[i], estates);
+          data = response.data;
         }
       }
     }
@@ -339,10 +340,7 @@ class EstateProvider with ChangeNotifier {
     if (categoryId != null) {
       data["category"] = categoryId;
     }
-    print(url);
-    print(data);
     final response = await dio.post(url, data: data);
-    print(response.data);
     return response.data;
   }
 
@@ -399,8 +397,6 @@ class EstateProvider with ChangeNotifier {
         "district": data["region"].translations["ru"]["title"],
       }
     };
-
-    print(translations);
 
     if (data.containsKey("title")) {
       translations[locale.toString()]["title"] = data["title"];
@@ -480,8 +476,6 @@ class EstateProvider with ChangeNotifier {
       tempData["booked_days"] = "[${data['booked_days'].join(',')}]";
     }
 
-    print(tempData);
-
     return tempData;
   }
 
@@ -489,12 +483,10 @@ class EstateProvider with ChangeNotifier {
   Future<Map<String, dynamic>> createEstate(Map<String, dynamic> data) async {
     const url = "${baseUrl}api/estate/";
     String refresh = await auth.getRefreshToken();
-    print("refresh");
     if (refresh == null || refresh == "") {
       return {"statusCode": 400};
     }
     String access = await auth.getAccessToken();
-    print("access");
     Options options = Options(
       headers: {
         "Content-type": "multipart/form-data",
@@ -507,7 +499,6 @@ class EstateProvider with ChangeNotifier {
     try {
       FormData formData = FormData.fromMap(tempData);
       final response = await dio.post(url, data: formData, options: options);
-      print("uploaded");
       return {"statusCode": response.statusCode};
     } catch (e) {
       print(e);
@@ -533,7 +524,6 @@ class EstateProvider with ChangeNotifier {
     try {
       FormData formData = FormData.fromMap(tempData);
       var response = await dio.patch(url, data: formData, options: options);
-      print(response);
       return {"statusCode": response.statusCode};
     } catch (e) {
       print(e);
@@ -609,7 +599,6 @@ class EstateProvider with ChangeNotifier {
     } else {
       url = "${baseUrl}api/estate/myestates/?term=${term}";
     }
-    print(url);
     final access = await auth.getAccessToken();
     try {
       final response = await dio.get(
@@ -639,9 +628,7 @@ class EstateProvider with ChangeNotifier {
   Future<EstateModel?> getMyLastEstate() async {
     const url = "${baseUrl}api/estate/last/";
     final access = await auth.getAccessToken();
-    print(url);
     try {
-      print(url);
       final response = await dio.get(
         url,
         options: Options(headers: {
@@ -649,7 +636,6 @@ class EstateProvider with ChangeNotifier {
           "Authorization": "Bearer ${access}",
         }),
       );
-      print(response);
       if (response.statusCode as int >= 200 ||
           response.statusCode as int < 300) {
         EstateModel estate = await EstateModel.fromJson(response.data);
@@ -658,24 +644,19 @@ class EstateProvider with ChangeNotifier {
     } catch (e) {
       print(e);
     }
-    print("no");
     return null;
   }
 
   // Advertise estate
   Future<bool> advertise(String slug, int estateId) async {
     final url = "${baseUrl}api/advertise/${slug}/${estateId}/";
-    print(url);
     final access = await auth.getAccessToken();
     try {
-      print("try");
       final response = await dio.post(url,
           options: Options(headers: {
             "Content-type": "application/json",
             "Authorization": "Bearer ${access}"
           }));
-      print(response);
-      print(response.data);
       if (response.statusCode as int >= 200 ||
           response.statusCode as int < 300) {
         return true;
@@ -684,7 +665,6 @@ class EstateProvider with ChangeNotifier {
     } catch (e) {
       print(e);
     }
-    print(false);
     return false;
   }
 

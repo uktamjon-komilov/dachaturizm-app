@@ -127,7 +127,6 @@ class _ResetPasswordStep1State extends State<ResetPasswordStep1> {
       Map<String, bool> result =
           await Provider.of<AuthProvider>(context, listen: false)
               .resetPassword1(phone);
-      print(result);
       if (result["status"] as bool) {
         setState(() {
           _isLoading = false;

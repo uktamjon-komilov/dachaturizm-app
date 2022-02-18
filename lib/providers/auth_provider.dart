@@ -93,7 +93,6 @@ class AuthProvider with ChangeNotifier {
       ),
       data: json.encode({"phone": phone}),
     );
-    print(response);
     if (response.statusCode as int >= 200 || response.statusCode as int < 300) {
       return response.data;
     }
@@ -173,7 +172,6 @@ class AuthProvider with ChangeNotifier {
         }
       }
     } catch (e) {
-      print("debugging");
       print(e);
     }
     return {"status": false};
@@ -445,10 +443,8 @@ class AuthProvider with ChangeNotifier {
 
   Future sendFeedback(String phone, String name, String text) async {
     const url = "${baseUrl}api/feedback/";
-    print(url);
     final response =
         await dio.post(url, data: {"phone": phone, "name": name, "text": text});
-    print(response);
     if (response.statusCode as int >= 200 || response.statusCode as int < 300) {
       return true;
     }

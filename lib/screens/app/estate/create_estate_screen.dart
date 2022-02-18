@@ -430,7 +430,6 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
               return RegionModel(
                   id: 0, title: "", districts: [], translations: {});
             }).districts;
-            print(_currentRegion);
             _currentDistrict = _districts
                 .firstWhere((district) => district.title == value.district,
                     orElse: () {
@@ -482,7 +481,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
         Provider.of<FacilityProvider>(context, listen: false).facilities;
     List<CategoryModel> categories =
         Provider.of<EstateTypesProvider>(context, listen: false).categories;
-    print(categories);
+
     List<CurrencyModel> currencies =
         Provider.of<CurrencyProvider>(context, listen: false).currencies;
 
@@ -966,10 +965,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
           label: Locales.string(context, "choose_one"),
           labelVisible: false,
           selectedItem: value,
-          onChanged: onChanged ??
-              (value) {
-                print(value);
-              },
+          onChanged: onChanged ?? (value) {},
           validate: (String? item) {
             if (item == null)
               return Locales.string(context, "required_field");
@@ -1133,7 +1129,6 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
               ),
             ),
             selectedDayPredicate: (day) {
-              print(_selectedDays);
               return _selectedDays.contains(BookingDay.toObj(day));
             },
             startingDayOfWeek: StartingDayOfWeek.monday,

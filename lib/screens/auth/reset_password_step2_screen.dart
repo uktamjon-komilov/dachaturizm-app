@@ -29,7 +29,6 @@ class _ResetPasswordStep2State extends State<ResetPasswordStep2> {
     super.didChangeDependencies();
     if (_isInit) {
       _isInit = false;
-      print(await SmsAutoFill().getAppSignature);
     }
   }
 
@@ -84,7 +83,6 @@ class _ResetPasswordStep2State extends State<ResetPasswordStep2> {
                       PinFieldAutoFill(
                         currentCode: _code,
                         onCodeSubmitted: (value) {
-                          print(value);
                           resetPasswordStep2(context, phone, value);
                         },
                         onCodeChanged: (value) {
@@ -92,7 +90,6 @@ class _ResetPasswordStep2State extends State<ResetPasswordStep2> {
                           if (value!.length == 5) {
                             resetPasswordStep2(context, phone, value);
                           }
-                          print(value);
                         },
                         codeLength: 5,
                       ),

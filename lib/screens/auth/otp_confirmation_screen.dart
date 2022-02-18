@@ -33,7 +33,6 @@ class _OTPConfirmationScreenState extends State<OTPConfirmationScreen> {
     super.didChangeDependencies();
     if (_isInit) {
       _isInit = false;
-      print(await SmsAutoFill().getAppSignature);
     }
   }
 
@@ -105,15 +104,12 @@ class _OTPConfirmationScreenState extends State<OTPConfirmationScreen> {
                       // ),
                       PinFieldAutoFill(
                         currentCode: _code,
-                        onCodeSubmitted: (value) {
-                          print(value);
-                        },
+                        onCodeSubmitted: (value) {},
                         onCodeChanged: (value) {
                           // _code = value.toString();
                           if (value!.length == 5) {
                             checkCode(context, phone, value);
                           }
-                          print(value);
                         },
                         codeLength: 5,
                       ),

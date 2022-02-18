@@ -38,7 +38,6 @@ class _UserPageScreenState extends State<UserPageScreen> {
     Provider.of<AuthProvider>(context, listen: false)
         .getUserData()
         .then((user) {
-      print(user);
       Provider.of<EstateProvider>(context, listen: false)
           .getStaticPages()
           .then((value) {

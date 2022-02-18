@@ -193,7 +193,6 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                                     _firstNameController.text,
                                     _lastNameController.text)
                                 .then((value) {
-                              print(value);
                               if (value.containsKey("status") &&
                                   value["status"] == false) {
                                 setState(() {

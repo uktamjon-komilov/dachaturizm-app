@@ -140,9 +140,7 @@ class _EstateCardState extends State<EstateCard> {
                                 color: yellowish,
                               ),
                               unratedColor: Color(0xFFEDEDED),
-                              onRatingUpdate: (rating) {
-                                print(rating);
-                              },
+                              onRatingUpdate: (rating) {},
                             ),
                             Text(
                               "${formatNumber(widget.estate.weekdayPrice.toInt())} ${widget.estate.priceType}",

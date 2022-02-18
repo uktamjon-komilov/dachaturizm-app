@@ -88,8 +88,6 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
 
     _regions = Provider.of<RegionProvider>(context, listen: false).regions;
 
-    print(_regions);
-
     setState(() {
       _isLoading = false;
     });
@@ -210,8 +208,6 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
       Provider.of<EstateProvider>(context, listen: false)
           .getSearchedResults(category: category)
           .then((value) {
-        print(value["estates"]);
-        print(value["estates"].length);
         setState(() {
           _resultCount = value["estates"].length;
         });
@@ -220,8 +216,6 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
       Provider.of<EstateProvider>(context, listen: false)
           .getSearchedResults()
           .then((value) {
-        print(value["estates"]);
-        print(value["estates"].length);
         setState(() {
           _resultCount = value["estates"].length;
         });

@@ -20,7 +20,6 @@ class FacilityProvider with ChangeNotifier {
     if (categoryId != "") {
       url += "?category=${categoryId}";
     }
-    print(url);
     final response = await dio.get(url);
     List<FacilityModel> facilities = [];
     if (response.statusCode as int >= 200 || response.statusCode as int < 300) {

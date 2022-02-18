@@ -41,7 +41,6 @@ class _RenewPasswordScreenState extends State<RenewPasswordScreen> {
         if (data["status"]) {
           snackBarMessage = Locales.string(context, "your_password_renewed");
         } else {
-          print(data);
           switch (data["detail"]) {
             case "OLD_PASSWORD_WRONG":
               snackBarMessage = Locales.string(context, "old_password_wrong");
