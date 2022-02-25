@@ -14,10 +14,10 @@ import 'package:dachaturizm/models/currency_model.dart';
 import 'package:dachaturizm/models/district_model.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/models/facility_model.dart';
-import 'package:dachaturizm/models/popular_place_model.dart';
 import 'package:dachaturizm/models/region_model.dart';
 import 'package:dachaturizm/models/category_model.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
+import 'package:dachaturizm/providers/create_estate_provider.dart';
 import 'package:dachaturizm/providers/currency_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/facility_provider.dart';
@@ -59,11 +59,8 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
   int _descriptionMaxLength = 1000;
   EstateModel? _estate;
   int _estateId = 0;
-  List<RegionModel> _regions = [];
   List<DistrictModel> _districts = [];
-  List<CategoryModel> _categories = [];
   List<CurrencyModel> _currencies = [];
-  List<PopularPlaceModel> _popular_places = [];
   String errors = "";
   GlobalKey<FormState> _form = GlobalKey<FormState>();
   ScrollController _scrollController = ScrollController();
@@ -147,15 +144,20 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     Map<String, dynamic> data = {};
     data["photo"] = _mainImageId;
     data["photos"] = _extraImagesId;
-    data["estate_type"] = _categories
+    data["estate_type"] = Provider.of<EstateTypesProvider>(context,
+            listen: false)
+        .categories
         .firstWhere((element) => element.title == _currentSection.toString())
         .id;
     data["title"] = _titleController.text;
-    data["region"] = _regions
+    data["region"] = Provider.of<FacilityProvider>(context, listen: false)
+        .regions
         .firstWhere((region) => region.title.toString() == _currentRegion);
     data["district"] = _districts.firstWhere(
         (district) => district.title.toString() == _currentDistrict);
-    data["popular_place_id"] = _popular_places
+    data["popular_place_id"] = Provider.of<FacilityProvider>(context,
+            listen: false)
+        .places
         .firstWhere((place) => place.title.toString() == _currentPopularPlace)
         .id;
     data["address"] = _addressController.text;
@@ -191,7 +193,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
       _isUploading = true;
       _isSubmitted = false;
     });
-    Provider.of<EstateProvider>(context, listen: false)
+    Provider.of<CreateEstateProvider>(context, listen: false)
         .updateEstate(_estateId, data, _estate)
         .then((value) async {
       _resetInputs();
@@ -263,7 +265,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     var photo = await MultipartFile.fromFile(_mainImage.path,
         filename: "testimage.png");
 
-    Provider.of<EstateProvider>(context, listen: false)
+    Provider.of<CreateEstateProvider>(context, listen: false)
         .uploadTempPhoto(photo)
         .then((value) {
       _mainImageId = value;
@@ -288,13 +290,13 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
       );
 
       if (_extraImages[index] == null) {
-        Provider.of<EstateProvider>(context, listen: false)
+        Provider.of<CreateEstateProvider>(context, listen: false)
             .uploadExtraPhoto(photo)
             .then((value) {
           _extraImagesId[index] = value;
         });
       } else {
-        Provider.of<EstateProvider>(context, listen: false)
+        Provider.of<CreateEstateProvider>(context, listen: false)
             .updateExtraPhoto(_extraImagesId[index], photo)
             .then((value) {
           _extraImagesId[index] = value;
@@ -317,7 +319,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
           File(images[i]).path,
           filename: "testimage.png",
         );
-        await Provider.of<EstateProvider>(context, listen: false)
+        await Provider.of<CreateEstateProvider>(context, listen: false)
             .uploadExtraPhoto(photo)
             .then((value) {
           _extraImagesId[i] = value;
@@ -342,27 +344,8 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     });
     Future.delayed(Duration.zero).then((_) async {
       Future.wait([
-        Provider.of<FacilityProvider>(context, listen: false)
-            .getAddresses()
-            .then((value) {
-          setState(() {
-            _regions = value;
-          });
-        }),
-        Provider.of<FacilityProvider>(context, listen: false)
-            .getPopularPlaces()
-            .then((value) {
-          setState(() {
-            _popular_places = value;
-          });
-        }),
-        Provider.of<FacilityProvider>(context, listen: false).getFacilities(),
-        Provider.of<CurrencyProvider>(context, listen: false).getCurrencies(),
-        Provider.of<EstateTypesProvider>(context, listen: false)
-            .getCategories()
-            .then((value) => _categories = value),
         Provider.of<AuthProvider>(context, listen: false)
-            .getUserData()
+            .getUserDataWithoutNotifying()
             .then((user) {
           if (user.runtimeType.toString() == "UserModel") {
             _announcerController.text = "${user!.firstName} ${user.lastName}";
@@ -370,8 +353,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
           }
         }),
       ]).then((_) async {
-        Map data = ModalRoute.of(context)?.settings.arguments as Map;
-        String locale = await getCurrentLocale();
+        Map? data = ModalRoute.of(context)?.settings.arguments as Map?;
         if (data == null) return;
         if (data.containsKey("estateId") && _estateId == 0) {
           _estateId = int.parse(data["estateId"]);
@@ -403,30 +385,36 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
             _currentCurrencyId = _currencies
                 .firstWhere((currency) => currency.title == value.priceType)
                 .id;
-            _currentSection = _categories
-                .firstWhere((category) => category.id == value.typeId,
+            _currentSection =
+                Provider.of<EstateTypesProvider>(context, listen: false)
+                    .categories
+                    .firstWhere((category) => category.id == value.typeId,
+                        orElse: () {
+                      return CategoryModel(
+                        id: 0,
+                        title: "",
+                        slug: "",
+                        icon: "",
+                        foregroundColor: "",
+                        backgroundColor: "",
+                      );
+                    })
+                    .title
+                    .toString();
+            _currentRegion =
+                Provider.of<FacilityProvider>(context, listen: false)
+                    .regions
+                    .firstWhere((region) => region.title == value.region,
+                        orElse: () {
+                      return RegionModel(
+                          id: 0, title: "", translations: {}, districts: []);
+                    })
+                    .title
+                    .toString();
+            _districts = Provider.of<FacilityProvider>(context, listen: false)
+                .regions
+                .firstWhere((region) => region.id.toString() == _currentRegion,
                     orElse: () {
-                  return CategoryModel(
-                    id: 0,
-                    title: "",
-                    slug: "",
-                    icon: "",
-                    foregroundColor: "",
-                    backgroundColor: "",
-                  );
-                })
-                .title
-                .toString();
-            _currentRegion = _regions
-                .firstWhere((region) => region.title == value.region,
-                    orElse: () {
-                  return RegionModel(
-                      id: 0, title: "", translations: {}, districts: []);
-                })
-                .title
-                .toString();
-            _districts = _regions.firstWhere(
-                (region) => region.id.toString() == _currentRegion, orElse: () {
               return RegionModel(
                   id: 0, title: "", districts: [], translations: {});
             }).districts;
@@ -615,7 +603,11 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                             style: TextStyles.display9(),
                           ),
                           _buildSelectionRow(
-                              _regions.map((region) => region.title).toList(),
+                              Provider.of<FacilityProvider>(context,
+                                      listen: false)
+                                  .regions
+                                  .map((region) => region.title)
+                                  .toList(),
                               _currentRegion,
                               Locales.string(context, "choose_region"),
                               onChanged: (value) {
@@ -628,7 +620,10 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                                 });
                               } else {
                                 setState(() {
-                                  _districts = _regions
+                                  _districts = Provider.of<FacilityProvider>(
+                                          context,
+                                          listen: false)
+                                      .regions
                                       .firstWhere((region) =>
                                           region.title.toString() ==
                                           _currentRegion)
@@ -659,7 +654,9 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                             style: TextStyles.display9(),
                           ),
                           _buildSelectionRow(
-                              _popular_places
+                              Provider.of<FacilityProvider>(context,
+                                      listen: false)
+                                  .places
                                   .map((place) => place.title)
                                   .toList(),
                               _currentPopularPlace,

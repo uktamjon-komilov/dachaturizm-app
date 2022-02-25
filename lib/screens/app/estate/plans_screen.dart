@@ -7,6 +7,7 @@ import 'package:dachaturizm/models/user_model.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/providers/banner_provider.dart';
 import 'package:dachaturizm/providers/category_provider.dart';
+import 'package:dachaturizm/providers/create_estate_provider.dart';
 import 'package:dachaturizm/providers/currency_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
@@ -95,7 +96,8 @@ class _PlansScreenState extends State<PlansScreen> {
                     setState(() {
                       _isLoading = true;
                     });
-                    await Provider.of<EstateProvider>(context, listen: false)
+                    await Provider.of<CreateEstateProvider>(context,
+                            listen: false)
                         .createEstate(_data);
                     EstateModel? estate = await Provider.of<EstateProvider>(
                             context,

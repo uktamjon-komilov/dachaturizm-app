@@ -265,7 +265,7 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<UserModel?> getUserDataWithoutNotifying() async {
-    int userId = await getUserId();
+    int? userId = await getUserId();
     if (userId != null) {
       final url = "${baseUrl}api/users/${userId}/";
       final response = await dio.get(url);

@@ -1,11 +1,13 @@
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/providers/banner_provider.dart';
+import 'package:dachaturizm/providers/create_estate_provider.dart';
 import 'package:dachaturizm/providers/currency_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/facility_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/providers/region_provider.dart';
+import 'package:dachaturizm/providers/static_pages_provider.dart';
 import 'package:dachaturizm/restartable_app.dart';
 import 'package:dachaturizm/screens/app/chat/chat_list_screen.dart';
 import 'package:dachaturizm/screens/app/chat/chat_screen.dart';
@@ -75,10 +77,16 @@ void main() async {
             value: CurrencyProvider(dio: dio),
           ),
           ChangeNotifierProvider.value(
-            value: RegionProvider(),
+            value: StaticPagesProvider(dio: dio),
+          ),
+          ChangeNotifierProvider.value(
+            value: RegionProvider(dio: dio),
           ),
           ChangeNotifierProvider.value(
             value: auth,
+          ),
+          ChangeNotifierProvider.value(
+            value: CreateEstateProvider(dio: dio, auth: auth),
           ),
           ChangeNotifierProxyProvider<AuthProvider, EstateProvider>(
             create: (context) => EstateProvider(dio: dio, auth: auth),
@@ -107,6 +115,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  bool _isInit = true;
+
   @override
   void initState() {
     super.initState();
@@ -120,6 +130,18 @@ class _MyAppState extends State<MyApp> {
         ),
       ),
     );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_isInit) {
+      _isInit = false;
+      Provider.of<RegionProvider>(context, listen: false).getAndSetRegions();
+      Provider.of<StaticPagesProvider>(context, listen: false).getStaticPages();
+      Provider.of<FacilityProvider>(context, listen: false).fetchAll();
+      Provider.of<CurrencyProvider>(context, listen: false).getCurrencies();
+    }
   }
 
   @override

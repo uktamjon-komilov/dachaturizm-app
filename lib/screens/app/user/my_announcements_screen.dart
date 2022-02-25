@@ -73,7 +73,8 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
 
     Future.wait([
       _fetchEstates(),
-      Provider.of<AuthProvider>(context, listen: false).getUserData(),
+      Provider.of<AuthProvider>(context, listen: false)
+          .getUserDataWithoutNotifying(),
       Provider.of<CurrencyProvider>(context, listen: false)
           .fetchAdPlans()
           .then((value) {

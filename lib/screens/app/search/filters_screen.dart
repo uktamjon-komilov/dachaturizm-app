@@ -6,7 +6,6 @@ import 'package:dachaturizm/models/category_model.dart';
 import 'package:dachaturizm/models/currency_model.dart';
 import 'package:dachaturizm/models/district_model.dart';
 import 'package:dachaturizm/models/facility_model.dart';
-import 'package:dachaturizm/models/popular_place_model.dart';
 import 'package:dachaturizm/models/region_model.dart';
 import 'package:dachaturizm/providers/currency_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
@@ -39,7 +38,6 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
   String? _currentSort;
   int? _currentCurrencyId;
   String _currentPlace = "";
-  List<PopularPlaceModel> _places = [];
   String _currentRegion = "";
   List<RegionModel> _regions = [];
   String _currentDistrict = "";
@@ -64,21 +62,6 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
     } catch (e) {
       print(e);
     }
-
-    await Future.wait([
-      Provider.of<FacilityProvider>(context, listen: false).getFacilities(),
-      Provider.of<FacilityProvider>(context, listen: false)
-          .getPopularPlaces()
-          .then((value) {
-        _places = value;
-      }),
-      Provider.of<CurrencyProvider>(context, listen: false)
-          .getCurrencies()
-          .then((value) async {
-        await _changePriceRange(value[0].id);
-      }),
-      Provider.of<RegionProvider>(context, listen: false).getAndSetRegions()
-    ]);
 
     _sortingTypes = Provider.of<EstateProvider>(context, listen: false).sorting;
     _currentSort =
@@ -151,7 +134,10 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
 
     if (_currentPlace != "") {
       int _currentPlaceId =
-          _places.firstWhere((element) => element.title == _currentPlace).id;
+          Provider.of<FacilityProvider>(context, listen: false)
+              .places
+              .firstWhere((element) => element.title == _currentPlace)
+              .id;
       Provider.of<EstateProvider>(context, listen: false)
           .filtersPlace(_currentPlaceId);
     }
@@ -394,7 +380,11 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
                         child: SingleChildScrollView(
                           physics: NeverScrollableScrollPhysics(),
                           child: FindDropdown<String>(
-                            items: _places.map((place) => place.title).toList(),
+                            items: Provider.of<FacilityProvider>(context,
+                                    listen: false)
+                                .places
+                                .map((place) => place.title)
+                                .toList(),
                             label: Locales.string(context, "choose_one"),
                             labelVisible: false,
                             selectedItem: _currentPlace,

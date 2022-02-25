@@ -14,7 +14,7 @@ class CurrencyProvider with ChangeNotifier {
     return [..._currencies];
   }
 
-  Future<List<CurrencyModel>> getCurrencies() async {
+  Future getCurrencies() async {
     const url = "${baseUrl}api/currencies/";
     List<CurrencyModel> currencies = [];
     final response = await dio.get(url);
@@ -27,7 +27,6 @@ class CurrencyProvider with ChangeNotifier {
     }
     _currencies = currencies;
     notifyListeners();
-    return [..._currencies];
   }
 
   Future<List<AdPlan>> fetchAdPlans() async {
