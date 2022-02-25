@@ -452,7 +452,13 @@ class DetailBuilder {
             ),
             Expanded(
               child: FluidBigButton(
-                onPress: () => UrlLauncher.launch("tel://${detail.phone}"),
+                onPress: () {
+                  String phone = detail.phone;
+                  if(!detail.phone.startsWith("+")){
+                    phone = "+" + phone;
+                  }
+                  UrlLauncher.launch("tel://${phone}");
+                },
                 child: Text(
                   Locales.string(context, "direct_call"),
                   style: TextStyle(

@@ -24,7 +24,6 @@ class MessageModel {
   });
 
   static Future<MessageModel> fromJson(data) async {
-    print(data["estate_detail"]);
     late EstateModel estate;
     try {
       estate = await EstateModel.fromJson(data["estate_detail"]);

@@ -63,13 +63,22 @@ void main() async {
       child: MultiProvider(
         providers: [
           ChangeNotifierProvider.value(
-            value: auth,
-          ),
-          ChangeNotifierProvider.value(
             value: BannerProvider(dio: dio),
           ),
           ChangeNotifierProvider.value(
             value: EstateTypesProvider(dio: dio),
+          ),
+          ChangeNotifierProvider.value(
+            value: FacilityProvider(dio: dio),
+          ),
+          ChangeNotifierProvider.value(
+            value: CurrencyProvider(dio: dio),
+          ),
+          ChangeNotifierProvider.value(
+            value: RegionProvider(),
+          ),
+          ChangeNotifierProvider.value(
+            value: auth,
           ),
           ChangeNotifierProxyProvider<AuthProvider, EstateProvider>(
             create: (context) => EstateProvider(dio: dio, auth: auth),
@@ -80,15 +89,6 @@ void main() async {
               auth: AuthProvider(dio: dio),
             ),
             update: (context, auth, _) => NavigationScreenProvider(auth: auth),
-          ),
-          ChangeNotifierProvider.value(
-            value: FacilityProvider(dio: dio),
-          ),
-          ChangeNotifierProvider.value(
-            value: CurrencyProvider(dio: dio),
-          ),
-          ChangeNotifierProvider.value(
-            value: RegionProvider(),
           ),
         ],
         child: MyApp(dio: dio),

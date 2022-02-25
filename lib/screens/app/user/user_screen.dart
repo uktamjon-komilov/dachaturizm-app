@@ -2,7 +2,6 @@ import 'package:dachaturizm/components/profile_item.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/helpers/call_with_auth.dart';
 import 'package:dachaturizm/models/static_page_model.dart';
-import 'package:dachaturizm/models/user_model.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
@@ -173,7 +172,7 @@ class _UserPageScreenState extends State<UserPageScreen> {
             visible: userExists,
             child: ProfileListItem(
                 title: Locales.string(context, "my_favourites"),
-                iconData: Icons.favorite_outline_rounded,
+                iconData: Icons.favorite,
                 callback: () async {
                   await callWithAuth(context, () async {
                     final wishlist = WishlistScreen();

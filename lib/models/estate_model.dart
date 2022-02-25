@@ -87,13 +87,15 @@ class EstateModel {
 
   static Future<EstateModel> fromJson(data) async {
     String locale = await getCurrentLocale();
+    
+    final localData = data["translations"][locale];
 
     return EstateModel(
       id: data.containsKey("id") ? data["id"] : 0,
-      title: data["translations"][locale]["title"],
-      description: data["translations"][locale]["description"],
-      region: data["translations"][locale]["region"],
-      district: data["translations"][locale]["district"],
+      title: localData["title"],
+      description: localData["description"],
+      region: localData.containsKey("region") ? localData["region"] : "",
+      district: localData.containsKey("district") ? localData["district"] : "",
       priceType: data["price_type"]["translations"][locale]["title"],
       rating: data["rating"],
       views: data["views"],

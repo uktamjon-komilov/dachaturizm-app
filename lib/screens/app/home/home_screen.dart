@@ -231,7 +231,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
     return Visibility(
       visible: banners.length > 0,
       child: Container(
-        height: 190,
+        height: 280,
         child: ListView(
           scrollDirection: Axis.horizontal,
           physics: AlwaysScrollableScrollPhysics(),
@@ -244,16 +244,19 @@ class _HomePageScreenState extends State<HomePageScreen> {
   }
 
   Widget _buildBannerItem(EstateModel estate) {
-    return Row(
-      children: [
-        HorizontalAd(
-          estate,
-          width: 100.w * 0.8,
-        ),
-        SizedBox(
-          width: defaultPadding,
-        ),
-      ],
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: Row(
+        children: [
+          HorizontalAd(
+            estate,
+            // width: 100.w * 0.8,
+          ),
+          SizedBox(
+            width: defaultPadding,
+          ),
+        ],
+      ),
     );
   }
 

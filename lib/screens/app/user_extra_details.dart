@@ -6,6 +6,7 @@ import 'package:flutter_locales/flutter_locales.dart';
 
 Widget buildUserDetails(BuildContext context, UserModel? user,
     [bool showBalance = false]) {
+
   return Visibility(
     visible: user != null, 
     child: Container(
