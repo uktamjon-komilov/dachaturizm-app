@@ -67,42 +67,48 @@ class _EstateCardState extends State<EstateCard> {
           },
           child: Column(
             children: [
-              Stack(
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) {
-                            return ImageZoomer();
-                          },
-                          settings: RouteSettings(
-                            arguments: {
-                              "photos": [
-                                widget.estate.photo,
-                                ...widget.estate.photos
-                                    .map((item) => item.photo)
-                                    .toList(),
-                              ],
-                              "current": widget.estate.photo,
+              Container(
+                width: (100.w - 2.25 * defaultPadding) / 2,
+                child: Stack(
+                  fit: StackFit.passthrough,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) {
+                              return ImageZoomer();
                             },
+                            settings: RouteSettings(
+                              arguments: {
+                                "photos": [
+                                  widget.estate.photo,
+                                  ...widget.estate.photos
+                                      .map((item) => item.photo)
+                                      .toList(),
+                                ],
+                                "current": widget.estate.photo,
+                              },
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                    child: CachedNetworkImage(
-                      imageUrl: widget.estate.photo,
-                      fit: BoxFit.cover,
-                      height: 145,
-                      placeholder: (context, _) => Image.asset(
-                        "assets/images/square-placeholder.jpg",
+                        );
+                      },
+                      child: CachedNetworkImage(
+                        imageUrl: widget.estate.photo,
                         fit: BoxFit.cover,
+                        height: 145,
+                        placeholder: (context, _) => Image.asset(
+                          "assets/images/square-placeholder.jpg",
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
-                  ),
-                  widget.estate.isTop ? _showTopIndicator() : SizedBox.shrink()
-                ],
+                    widget.estate.isTop
+                        ? _showTopIndicator()
+                        : SizedBox.shrink()
+                  ],
+                ),
               ),
               Expanded(
                 child: Row(

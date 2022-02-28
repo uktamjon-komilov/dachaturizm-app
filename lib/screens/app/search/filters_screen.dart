@@ -45,7 +45,7 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
   dynamic Function()? onFilterCallback;
   int? _categoryId;
 
-  TextEditingController _addressController = TextEditingController();
+  // TextEditingController _addressController = TextEditingController();
   TextEditingController _minPriceController = TextEditingController();
   TextEditingController _maxPriceController = TextEditingController();
 
@@ -66,8 +66,8 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
     _sortingTypes = Provider.of<EstateProvider>(context, listen: false).sorting;
     _currentSort =
         Provider.of<EstateProvider>(context, listen: false).filters["sorting"];
-    _addressController.text =
-        Provider.of<EstateProvider>(context, listen: false).filters["address"];
+    // _addressController.text =
+    //     Provider.of<EstateProvider>(context, listen: false).filters["address"];
 
     _regions = Provider.of<RegionProvider>(context, listen: false).regions;
 
@@ -107,8 +107,8 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
   }
 
   _setAllFilters() {
-    Provider.of<EstateProvider>(context, listen: false)
-        .filtersAddress(_addressController.text);
+    // Provider.of<EstateProvider>(context, listen: false)
+    //     .filtersAddress(_addressController.text);
 
     int regionId = _regions
         .firstWhere((region) => region.title == _currentRegion, orElse: () {
@@ -226,7 +226,7 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
 
   @override
   void dispose() {
-    _addressController.dispose();
+    // _addressController.dispose();
     _minPriceController.dispose();
     _maxPriceController.dispose();
     super.dispose();
@@ -297,16 +297,16 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
                           _currentSort as String),
                       SizedBox(height: defaultPadding / 2),
                       Divider(height: 0),
-                      SizedBox(height: defaultPadding),
-                      Text(
-                        Locales.string(context, "enter_address"),
-                        style: TextStyles.display5(),
-                      ),
-                      SizedBox(height: 12),
-                      TextInput(
-                        hintText: Locales.string(context, "address"),
-                        controller: _addressController,
-                      ),
+                      // SizedBox(height: defaultPadding),
+                      // Text(
+                      //   Locales.string(context, "enter_address"),
+                      //   style: TextStyles.display5(),
+                      // ),
+                      // SizedBox(height: 12),
+                      // TextInput(
+                      //   hintText: Locales.string(context, "address"),
+                      //   controller: _addressController,
+                      // ),
                       SizedBox(height: defaultPadding),
                       Text(
                         Locales.string(context, "choose_region"),

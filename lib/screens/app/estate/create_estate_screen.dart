@@ -7,7 +7,6 @@ import 'package:dachaturizm/components/normal_input.dart';
 import 'package:dachaturizm/components/small_button.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/helpers/call_with_auth.dart';
-import 'package:dachaturizm/helpers/locale_helper.dart';
 import 'package:dachaturizm/helpers/url_helper.dart';
 import 'package:dachaturizm/models/booking_day.dart';
 import 'package:dachaturizm/models/currency_model.dart';
@@ -53,8 +52,11 @@ class EstateCreationPageScreen extends StatefulWidget {
 class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
   bool _isLoading = false;
   bool _isUploading = false;
+  bool _mainImageUploading = false;
+  List<bool> _extraImagesLoading = List.generate(8, (index) => false);
   bool _isSubmitted = false;
   bool _isEditing = false;
+  bool _filtersOpen = false;
   int _currentExtraImageIndex = 7;
   int _descriptionMaxLength = 1000;
   EstateModel? _estate;
@@ -95,23 +97,26 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
   String _locationName = "";
 
   void _resetInputs() {
-    _mainImage = null;
-    _extraImages = List.generate(8, (_) => null);
-    _currentSection = "";
-    _titleController.text = "";
-    _descriptionController.text = "";
-    _announcerController.text = "";
-    _phoneController.text = "";
-    _addressController.text = "";
-    _weekdayPriceController.text = "";
-    _weekendPriceController.text = "";
-    _currentCurrencyId = 0;
-    _currentRegion = "";
-    _currentDistrict = "";
-    _facilities = [];
-    _longtitude = 0.0;
-    _latitute = 0.0;
-    _locationName = "";
+    setState(() {
+      _mainImage = null;
+      _extraImages = List.generate(8, (_) => null);
+      _currentSection = "";
+      _titleController.text = "";
+      _descriptionController.text = "";
+      _announcerController.text = "";
+      _phoneController.text = "";
+      _addressController.text = "";
+      _weekdayPriceController.text = "";
+      _weekendPriceController.text = "";
+      _currentCurrencyId = 0;
+      _currentRegion = "";
+      _currentDistrict = "";
+      _currentPopularPlace = "";
+      _facilities = [];
+      _longtitude = 0.0;
+      _latitute = 0.0;
+      _locationName = "";
+    });
   }
 
   List<String> get _bookedDays {
@@ -234,14 +239,14 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
   Future<dynamic> _selectImage() async {
     final ImagePicker _picker = ImagePicker();
     final XFile? imageFile =
-        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 20);
+        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 100);
     return imageFile == null ? null : imageFile.path;
   }
 
   Future<dynamic> _selectMultipleImages() async {
     final ImagePicker _picker = ImagePicker();
     final List<XFile>? imageFiles =
-        await _picker.pickMultiImage(imageQuality: 30);
+        await _picker.pickMultiImage(imageQuality: 100);
     List<String> result = [];
     imageFiles!.forEach((imageFile) {
       result.add(imageFile.path);
@@ -265,9 +270,15 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     var photo = await MultipartFile.fromFile(_mainImage.path,
         filename: "testimage.png");
 
+    setState(() {
+      _mainImageUploading = true;
+    });
     Provider.of<CreateEstateProvider>(context, listen: false)
         .uploadTempPhoto(photo)
         .then((value) {
+      setState(() {
+        _mainImageUploading = false;
+      });
       _mainImageId = value;
     });
   }
@@ -284,6 +295,12 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
         }
       });
     } else {
+      setState(() {
+        _extraImages[index] = File(image as String);
+        _currentExtraImageIndex = index + 1;
+        _extraImagesLoading[index] = true;
+      });
+
       var photo = await MultipartFile.fromFile(
         File(image as String).path,
         filename: "testimage.png",
@@ -304,8 +321,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
       }
 
       setState(() {
-        _extraImages[index] = File(image as String);
-        _currentExtraImageIndex = index + 1;
+        _extraImagesLoading[index] = false;
       });
     }
   }
@@ -315,6 +331,11 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     if (images != null) {
       int length = images.length < 8 ? images.length : 8;
       for (int i = index; i < length; i++) {
+        _extraImages[i] = File(images[i]);
+        _extraImagesLoading[i] = true;
+      }
+      setState(() {});
+      for (int i = index; i < length; i++) {
         var photo = await MultipartFile.fromFile(
           File(images[i]).path,
           filename: "testimage.png",
@@ -323,10 +344,9 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
             .uploadExtraPhoto(photo)
             .then((value) {
           _extraImagesId[i] = value;
-          _extraImages[i] = File(images[i]);
         });
         setState(() {
-          _currentExtraImageIndex = i + 1;
+          _extraImagesLoading[i] = false;
         });
       }
     }
@@ -555,6 +575,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                                 callback: _selectMainImage,
                                 disabled: false,
                                 height: 45.w,
+                                uploading: _mainImageUploading,
                               ),
                             ],
                           ),
@@ -585,18 +606,43 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                                 return SmallButton(category.title,
                                     enabled: _currentSection == category.title,
                                     onPressed: () {
+                                  setState(() {
+                                    _currentSection = category.title;
+                                  });
                                   Provider.of<FacilityProvider>(context,
                                           listen: false)
                                       .getFacilities(category.id.toString())
                                       .then((_) {
-                                    setState(() {
-                                      _currentSection = category.title;
-                                    });
+                                    setState(() {});
                                   });
                                 });
                               }).toList()
                             ],
                           ),
+                          VerticalHorizontalSizedBox(),
+                          ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                _filtersOpen = !_filtersOpen;
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              primary: Colors.white,
+                              shadowColor: Colors.transparent,
+                              elevation: 0,
+                              side: BorderSide(
+                                color: disabledGrey,
+                                width: 1,
+                              ),
+                            ),
+                            child: Text(
+                              Locales.string(context, "adding_filters") +
+                                  (_filtersOpen ? " ▼" : " ▲"),
+                              style: TextStyles.display9(),
+                            ),
+                          ),
+                          VerticalHorizontalHalfSizedBox(),
+                          _buildFacilitiesGrid(facilities),
                           VerticalHorizontalSizedBox(),
                           Text(
                             Locales.string(context, "region"),
@@ -762,13 +808,6 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                           BookedDaysHint(),
                           VerticalHorizontalSizedBox(),
                           Text(
-                            Locales.string(context, "adding_filters"),
-                            style: TextStyles.display9(),
-                          ),
-                          VerticalHorizontalHalfSizedBox(),
-                          _buildFacilitiesGrid(facilities),
-                          VerticalHorizontalSizedBox(),
-                          Text(
                             Locales.string(context, "contact"),
                             style: TextStyles.display9(),
                           ),
@@ -884,6 +923,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     Function? callback,
     double? width,
     double? height,
+    bool uploading = false,
     bool disabled = true,
     double iconScale = 1,
   }) {
@@ -920,10 +960,15 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                         fixMediaUrl(photo),
                         fit: BoxFit.cover,
                       )
-                    : Image.file(
-                        photo as File,
-                        fit: BoxFit.cover,
-                      ),
+                    : (uploading
+                        ? Transform.scale(
+                            scale: 0.5,
+                            child: CircularProgressIndicator(),
+                          )
+                        : Image.file(
+                            photo as File,
+                            fit: BoxFit.cover,
+                          )),
           ),
         ),
       ),
@@ -944,6 +989,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
             callback: () => _selectExtraImages(index),
             disabled: index > _currentExtraImageIndex,
             iconScale: 1.5,
+            uploading: _extraImagesLoading[index],
           ),
         ),
       ],
@@ -1067,26 +1113,29 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
   }
 
   Widget _buildFacilitiesGrid(List<FacilityModel> facilities) {
-    return Wrap(
-      alignment: WrapAlignment.spaceBetween,
-      children: [
-        ...facilities.map((facility) {
-          int index = facilities.indexOf(facility);
-          return CustomCheckbox(
-            value: _facilities.contains(facility.id),
-            title: facilities[index].title,
-            onTap: () {
-              setState(() {
-                if (_facilities.contains(facility.id)) {
-                  _facilities.remove(facility.id);
-                } else {
-                  _facilities.add(facility.id);
-                }
-              });
-            },
-          );
-        }).toList()
-      ],
+    return Visibility(
+      visible: _filtersOpen,
+      child: Wrap(
+        alignment: WrapAlignment.spaceBetween,
+        children: [
+          ...facilities.map((facility) {
+            int index = facilities.indexOf(facility);
+            return CustomCheckbox(
+              value: _facilities.contains(facility.id),
+              title: facilities[index].title,
+              onTap: () {
+                setState(() {
+                  if (_facilities.contains(facility.id)) {
+                    _facilities.remove(facility.id);
+                  } else {
+                    _facilities.add(facility.id);
+                  }
+                });
+              },
+            );
+          }).toList()
+        ],
+      ),
     );
   }
 

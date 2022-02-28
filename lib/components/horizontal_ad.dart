@@ -23,7 +23,7 @@ class HorizontalAd extends StatelessWidget {
             arguments: {"id": estate.id, "typeId": estate.typeId});
       },
       child: Container(
-        height: 280,
+        height: 200,
         width: width == null ? (100.w - 2 * defaultPadding) : width,
         decoration:
             BoxDecoration(borderRadius: BorderRadius.circular(10), boxShadow: [
@@ -44,7 +44,7 @@ class HorizontalAd extends StatelessWidget {
                   fit: BoxFit.cover,
                   height: 145,
                   placeholder: (context, _) => Image.asset(
-                    "assets/images/hap.jpg",
+                    "assets/images/square-placeholder.jpg",
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -54,7 +54,8 @@ class HorizontalAd extends StatelessWidget {
                     top: 0,
                     left: 0,
                     child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 28),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 28),
                       width: 152,
                       height: 150,
                       decoration: BoxDecoration(color: Color(0xCC3B2F43)),

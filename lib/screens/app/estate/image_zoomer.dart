@@ -37,10 +37,11 @@ class _ImageZoomerState extends State<ImageZoomer> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Container(
         height: 100.h,
         width: 100.w,
-        decoration: BoxDecoration(color: Colors.black),
+        // decoration: BoxDecoration(color: Colors.black),
         child: Stack(
           children: [
             Container(

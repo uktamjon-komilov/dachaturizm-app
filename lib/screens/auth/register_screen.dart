@@ -5,10 +5,8 @@ import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/screens/auth/login_screen.dart';
 import 'package:dachaturizm/screens/auth/otp_confirmation_screen.dart';
-import 'package:dachaturizm/styles/input.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_locales/flutter_locales.dart';
-import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:provider/provider.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -23,6 +21,7 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
   final _phoneController = TextEditingController();
   bool _isLoading = false;
+  bool _userAlreadyExists = false;
 
   @override
   Widget build(BuildContext context) {
@@ -84,19 +83,34 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             Provider.of<AuthProvider>(context, listen: false)
                                 .checkUser(phone)
                                 .then((value) {
+                              setState(() {
+                                _isLoading = false;
+                              });
                               if (value["status"]) {
-                                setState(() {
-                                  _isLoading = false;
-                                });
                                 Navigator.of(context).pushNamed(
                                     OTPConfirmationScreen.routeName,
                                     arguments: phone);
+                              } else {
+                                setState(() {
+                                  _userAlreadyExists = true;
+                                });
                               }
                             });
                           }
                         },
                       ),
-                      SizedBox(height: defaultPadding * 1.5),
+                      SizedBox(height: defaultPadding * 0.75),
+                      Visibility(
+                        visible: _userAlreadyExists,
+                        child: Text(
+                          Locales.string(
+                              context, "user_already_exists_with_this_phone"),
+                          style: TextStyle(
+                            color: Colors.red,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: defaultPadding * 0.75),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,

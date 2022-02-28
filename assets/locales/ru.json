@@ -196,5 +196,6 @@
     "last_charges": "Последние платежи",
     "renewed": "Обновлено",
     "you_dont_have_transactions": "У вас нет транзакций",
-    "other_settings": "Другие настройки"
+    "other_settings": "Другие настройки",
+    "refresh_to_get_new_results": "Пожалуйста, обновите страницу, чтобы получить новые результаты"
 }
