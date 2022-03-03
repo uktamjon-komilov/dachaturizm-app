@@ -6,7 +6,6 @@ import 'package:dachaturizm/models/category_model.dart';
 import 'package:dachaturizm/models/currency_model.dart';
 import 'package:dachaturizm/models/district_model.dart';
 import 'package:dachaturizm/models/facility_model.dart';
-import 'package:dachaturizm/models/popular_place_model.dart';
 import 'package:dachaturizm/models/region_model.dart';
 import 'package:dachaturizm/providers/currency_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
@@ -39,7 +38,6 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
   String? _currentSort;
   int? _currentCurrencyId;
   String _currentPlace = "";
-  List<PopularPlaceModel> _places = [];
   String _currentRegion = "";
   List<RegionModel> _regions = [];
   String _currentDistrict = "";
@@ -47,7 +45,7 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
   dynamic Function()? onFilterCallback;
   int? _categoryId;
 
-  TextEditingController _addressController = TextEditingController();
+  // TextEditingController _addressController = TextEditingController();
   TextEditingController _minPriceController = TextEditingController();
   TextEditingController _maxPriceController = TextEditingController();
 
@@ -65,30 +63,13 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
       print(e);
     }
 
-    await Future.wait([
-      Provider.of<FacilityProvider>(context, listen: false).getFacilities(),
-      Provider.of<FacilityProvider>(context, listen: false)
-          .getPopularPlaces()
-          .then((value) {
-        _places = value;
-      }),
-      Provider.of<CurrencyProvider>(context, listen: false)
-          .getCurrencies()
-          .then((value) async {
-        await _changePriceRange(value[0].id);
-      }),
-      Provider.of<RegionProvider>(context, listen: false).getAndSetRegions()
-    ]);
-
     _sortingTypes = Provider.of<EstateProvider>(context, listen: false).sorting;
     _currentSort =
         Provider.of<EstateProvider>(context, listen: false).filters["sorting"];
-    _addressController.text =
-        Provider.of<EstateProvider>(context, listen: false).filters["address"];
+    // _addressController.text =
+    //     Provider.of<EstateProvider>(context, listen: false).filters["address"];
 
     _regions = Provider.of<RegionProvider>(context, listen: false).regions;
-
-    print(_regions);
 
     setState(() {
       _isLoading = false;
@@ -126,8 +107,8 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
   }
 
   _setAllFilters() {
-    Provider.of<EstateProvider>(context, listen: false)
-        .filtersAddress(_addressController.text);
+    // Provider.of<EstateProvider>(context, listen: false)
+    //     .filtersAddress(_addressController.text);
 
     int regionId = _regions
         .firstWhere((region) => region.title == _currentRegion, orElse: () {
@@ -153,7 +134,10 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
 
     if (_currentPlace != "") {
       int _currentPlaceId =
-          _places.firstWhere((element) => element.title == _currentPlace).id;
+          Provider.of<FacilityProvider>(context, listen: false)
+              .places
+              .firstWhere((element) => element.title == _currentPlace)
+              .id;
       Provider.of<EstateProvider>(context, listen: false)
           .filtersPlace(_currentPlaceId);
     }
@@ -210,8 +194,6 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
       Provider.of<EstateProvider>(context, listen: false)
           .getSearchedResults(category: category)
           .then((value) {
-        print(value["estates"]);
-        print(value["estates"].length);
         setState(() {
           _resultCount = value["estates"].length;
         });
@@ -220,8 +202,6 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
       Provider.of<EstateProvider>(context, listen: false)
           .getSearchedResults()
           .then((value) {
-        print(value["estates"]);
-        print(value["estates"].length);
         setState(() {
           _resultCount = value["estates"].length;
         });
@@ -246,7 +226,7 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
 
   @override
   void dispose() {
-    _addressController.dispose();
+    // _addressController.dispose();
     _minPriceController.dispose();
     _maxPriceController.dispose();
     super.dispose();
@@ -273,282 +253,279 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
       _currentCurrencyId = priceType;
     }
 
-    return SafeArea(
-      child: WillPopScope(
-        onWillPop: () async {
+    return WillPopScope(
+      onWillPop: () async {
+        _clearFilters();
+        return true;
+      },
+      child: Scaffold(
+        appBar: buildNavigationalAppBar(
+            context, Locales.string(context, "filters") + " (${_resultCount})",
+            () {
           _clearFilters();
-          return true;
-        },
-        child: Scaffold(
-          appBar: buildNavigationalAppBar(context,
-              Locales.string(context, "filters") + " (${_resultCount})", () {
-            _clearFilters();
-          }, [
-            IconButton(
-              onPressed: () {
-                _clearFilters();
-                onFilterCallback!();
-                Navigator.of(context).pop();
-              },
-              icon: Icon(Icons.refresh_rounded),
-              color: greyishLight,
-            ),
-          ]),
-          body: _isLoading
-              ? Center(
-                  child: CircularProgressIndicator(),
-                )
-              : SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(
-                      defaultPadding,
-                      defaultPadding,
-                      defaultPadding,
-                      0,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          Locales.string(context, "sort_by"),
-                          style: TextStyles.display5(),
-                        ),
-                        _buildOrderFilers(_sortingTypes as List<String>,
-                            _currentSort as String),
-                        SizedBox(height: defaultPadding / 2),
-                        Divider(height: 0),
-                        SizedBox(height: defaultPadding),
-                        Text(
-                          Locales.string(context, "enter_address"),
-                          style: TextStyles.display5(),
-                        ),
-                        SizedBox(height: 12),
-                        TextInput(
-                          hintText: Locales.string(context, "address"),
-                          controller: _addressController,
-                        ),
-                        SizedBox(height: defaultPadding),
-                        Text(
-                          Locales.string(context, "choose_region"),
-                          style: TextStyles.display5(),
-                        ),
-                        SizedBox(height: 12),
-                        Container(
-                          height: 45,
-                          margin: EdgeInsets.only(top: 10),
-                          child: SingleChildScrollView(
-                            physics: NeverScrollableScrollPhysics(),
-                            child: FindDropdown<String>(
-                              items: _regions
-                                  .map((region) => region.title)
-                                  .toList(),
-                              label: Locales.string(context, "choose_one"),
-                              labelVisible: false,
-                              selectedItem: _currentRegion,
-                              onChanged: (value) {
-                                _currentRegion = value as String;
-                                setState(() {
-                                  _districts = _regions.firstWhere(
-                                      (region) =>
-                                          region.title == _currentRegion,
-                                      orElse: () {
-                                    return RegionModel(
-                                      id: 0,
-                                      title: "",
-                                      translations: {},
-                                      districts: [],
-                                    );
-                                  }).districts;
-                                });
-                                _getSearchResultsCount();
-                              },
-                            ),
+        }, [
+          IconButton(
+            onPressed: () {
+              _clearFilters();
+              onFilterCallback!();
+              Navigator.of(context).pop();
+            },
+            icon: Icon(Icons.refresh_rounded),
+            color: greyishLight,
+          ),
+        ]),
+        body: _isLoading
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    defaultPadding,
+                    defaultPadding,
+                    defaultPadding,
+                    0,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        Locales.string(context, "sort_by"),
+                        style: TextStyles.display5(),
+                      ),
+                      _buildOrderFilers(_sortingTypes as List<String>,
+                          _currentSort as String),
+                      SizedBox(height: defaultPadding / 2),
+                      Divider(height: 0),
+                      // SizedBox(height: defaultPadding),
+                      // Text(
+                      //   Locales.string(context, "enter_address"),
+                      //   style: TextStyles.display5(),
+                      // ),
+                      // SizedBox(height: 12),
+                      // TextInput(
+                      //   hintText: Locales.string(context, "address"),
+                      //   controller: _addressController,
+                      // ),
+                      SizedBox(height: defaultPadding),
+                      Text(
+                        Locales.string(context, "choose_region"),
+                        style: TextStyles.display5(),
+                      ),
+                      SizedBox(height: 12),
+                      Container(
+                        height: 45,
+                        margin: EdgeInsets.only(top: 10),
+                        child: SingleChildScrollView(
+                          physics: NeverScrollableScrollPhysics(),
+                          child: FindDropdown<String>(
+                            items:
+                                _regions.map((region) => region.title).toList(),
+                            label: Locales.string(context, "choose_one"),
+                            labelVisible: false,
+                            selectedItem: _currentRegion,
+                            onChanged: (value) {
+                              _currentRegion = value as String;
+                              setState(() {
+                                _districts = _regions.firstWhere(
+                                    (region) => region.title == _currentRegion,
+                                    orElse: () {
+                                  return RegionModel(
+                                    id: 0,
+                                    title: "",
+                                    translations: {},
+                                    districts: [],
+                                  );
+                                }).districts;
+                              });
+                              _getSearchResultsCount();
+                            },
                           ),
                         ),
-                        SizedBox(height: defaultPadding),
-                        Text(
-                          Locales.string(context, "choose_district"),
-                          style: TextStyles.display5(),
-                        ),
-                        SizedBox(height: 12),
-                        Container(
-                          height: 45,
-                          margin: EdgeInsets.only(top: 10),
-                          child: SingleChildScrollView(
-                            physics: NeverScrollableScrollPhysics(),
-                            child: FindDropdown<String>(
-                              items: _districts
-                                  .map((district) => district.title)
-                                  .toList(),
-                              label: Locales.string(context, "choose_one"),
-                              labelVisible: false,
-                              selectedItem: _currentDistrict,
-                              onChanged: (value) {
-                                _currentDistrict = value as String;
-                                _getSearchResultsCount();
-                              },
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: defaultPadding),
-                        Text(
-                          Locales.string(context, "choose_popular_place"),
-                          style: TextStyles.display5(),
-                        ),
-                        SizedBox(height: 12),
-                        Container(
-                          height: 45,
-                          margin: EdgeInsets.only(top: 10),
-                          child: SingleChildScrollView(
-                            physics: NeverScrollableScrollPhysics(),
-                            child: FindDropdown<String>(
-                              items:
-                                  _places.map((place) => place.title).toList(),
-                              label: Locales.string(context, "choose_one"),
-                              labelVisible: false,
-                              selectedItem: _currentPlace,
-                              onChanged: (value) {
-                                _currentPlace = value as String;
-                                _getSearchResultsCount();
-                              },
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: defaultPadding),
-                        Text(
-                          Locales.string(context, "set_price"),
-                          style: TextStyles.display5(),
-                        ),
-                        SizedBox(height: 12),
-                        Container(
-                          width: 100.w,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Container(
-                                width: 50.w - 1.375 * defaultPadding,
-                                child: TextInput(
-                                  controller: _minPriceController,
-                                  hintText:
-                                      _selectedRange.start.toStringAsFixed(1),
-                                ),
-                              ),
-                              Container(
-                                width: 50.w - 1.375 * defaultPadding,
-                                child: TextInput(
-                                  controller: _maxPriceController,
-                                  hintText:
-                                      _selectedRange.end.toStringAsFixed(1),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        _buildRangeSlider(),
-                        Row(
-                          children: [
-                            ...currencies.map((currency) {
-                              bool isActive = _currentCurrencyId == null
-                                  ? currencies.indexOf(currency) == 0
-                                  : _currentCurrencyId == currency.id;
-                              bool isFirst = currencies.indexOf(currency) == 0;
-                              bool isLast = currencies.indexOf(currency) ==
-                                  currencies.length - 1;
-
-                              return Expanded(
-                                child: ElevatedButton(
-                                  onPressed: () async {
-                                    _changeCurrency(currency.id);
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    primary:
-                                        isActive ? normalOrange : inputGrey,
-                                    elevation: 0,
-                                    shadowColor: Colors.transparent,
-                                    minimumSize: Size(0, 40),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: isFirst
-                                          ? BorderRadius.only(
-                                              topLeft: Radius.circular(15),
-                                              bottomLeft: Radius.circular(15),
-                                            )
-                                          : (isLast
-                                              ? BorderRadius.only(
-                                                  topRight: Radius.circular(15),
-                                                  bottomRight:
-                                                      Radius.circular(15),
-                                                )
-                                              : BorderRadius.zero),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    currency.title,
-                                    style: TextStyles.display1().copyWith(
-                                      letterSpacing: 0.3,
-                                      color:
-                                          isActive ? inputGrey : greyishLight,
-                                      height: 1.3,
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ],
-                        ),
-                        SizedBox(height: defaultPadding / 2),
-                        Divider(height: 0),
-                        SizedBox(height: defaultPadding),
-                        Text(
-                          Locales.string(context, "extra_filters"),
-                          style: TextStyles.display5(),
-                        ),
-                        SizedBox(height: 12),
-                        Wrap(
-                          children: [
-                            ...facilities
-                                .map(
-                                  (facility) => CustomCheckbox(
-                                    title: facility.title,
-                                    value:
-                                        checkedFacilities.contains(facility.id),
-                                    onTap: () {
-                                      setState(() {
-                                        Provider.of<EstateProvider>(context,
-                                                listen: false)
-                                            .filtersToggleFacility(facility.id);
-                                      });
-                                    },
-                                  ),
-                                )
+                      ),
+                      SizedBox(height: defaultPadding),
+                      Text(
+                        Locales.string(context, "choose_district"),
+                        style: TextStyles.display5(),
+                      ),
+                      SizedBox(height: 12),
+                      Container(
+                        height: 45,
+                        margin: EdgeInsets.only(top: 10),
+                        child: SingleChildScrollView(
+                          physics: NeverScrollableScrollPhysics(),
+                          child: FindDropdown<String>(
+                            items: _districts
+                                .map((district) => district.title)
                                 .toList(),
+                            label: Locales.string(context, "choose_one"),
+                            labelVisible: false,
+                            selectedItem: _currentDistrict,
+                            onChanged: (value) {
+                              _currentDistrict = value as String;
+                              _getSearchResultsCount();
+                            },
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: defaultPadding),
+                      Text(
+                        Locales.string(context, "choose_popular_place"),
+                        style: TextStyles.display5(),
+                      ),
+                      SizedBox(height: 12),
+                      Container(
+                        height: 45,
+                        margin: EdgeInsets.only(top: 10),
+                        child: SingleChildScrollView(
+                          physics: NeverScrollableScrollPhysics(),
+                          child: FindDropdown<String>(
+                            items: Provider.of<FacilityProvider>(context,
+                                    listen: false)
+                                .places
+                                .map((place) => place.title)
+                                .toList(),
+                            label: Locales.string(context, "choose_one"),
+                            labelVisible: false,
+                            selectedItem: _currentPlace,
+                            onChanged: (value) {
+                              _currentPlace = value as String;
+                              _getSearchResultsCount();
+                            },
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: defaultPadding),
+                      Text(
+                        Locales.string(context, "set_price"),
+                        style: TextStyles.display5(),
+                      ),
+                      SizedBox(height: 12),
+                      Container(
+                        width: 100.w,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              width: 50.w - 1.375 * defaultPadding,
+                              child: TextInput(
+                                controller: _minPriceController,
+                                hintText:
+                                    _selectedRange.start.toStringAsFixed(1),
+                              ),
+                            ),
+                            Container(
+                              width: 50.w - 1.375 * defaultPadding,
+                              child: TextInput(
+                                controller: _maxPriceController,
+                                hintText: _selectedRange.end.toStringAsFixed(1),
+                              ),
+                            ),
                           ],
                         ),
-                        SizedBox(height: 5 * defaultPadding),
-                      ],
-                    ),
+                      ),
+                      _buildRangeSlider(),
+                      Row(
+                        children: [
+                          ...currencies.map((currency) {
+                            bool isActive = _currentCurrencyId == null
+                                ? currencies.indexOf(currency) == 0
+                                : _currentCurrencyId == currency.id;
+                            bool isFirst = currencies.indexOf(currency) == 0;
+                            bool isLast = currencies.indexOf(currency) ==
+                                currencies.length - 1;
+
+                            return Expanded(
+                              child: ElevatedButton(
+                                onPressed: () async {
+                                  _changeCurrency(currency.id);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  primary: isActive ? normalOrange : inputGrey,
+                                  elevation: 0,
+                                  shadowColor: Colors.transparent,
+                                  minimumSize: Size(0, 40),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: isFirst
+                                        ? BorderRadius.only(
+                                            topLeft: Radius.circular(15),
+                                            bottomLeft: Radius.circular(15),
+                                          )
+                                        : (isLast
+                                            ? BorderRadius.only(
+                                                topRight: Radius.circular(15),
+                                                bottomRight:
+                                                    Radius.circular(15),
+                                              )
+                                            : BorderRadius.zero),
+                                  ),
+                                ),
+                                child: Text(
+                                  currency.title,
+                                  style: TextStyles.display1().copyWith(
+                                    letterSpacing: 0.3,
+                                    color: isActive ? inputGrey : greyishLight,
+                                    height: 1.3,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ],
+                      ),
+                      SizedBox(height: defaultPadding / 2),
+                      Divider(height: 0),
+                      SizedBox(height: defaultPadding),
+                      Text(
+                        Locales.string(context, "extra_filters"),
+                        style: TextStyles.display5(),
+                      ),
+                      SizedBox(height: 12),
+                      Wrap(
+                        children: [
+                          ...facilities
+                              .map(
+                                (facility) => CustomCheckbox(
+                                  title: facility.title,
+                                  value:
+                                      checkedFacilities.contains(facility.id),
+                                  onTap: () {
+                                    setState(() {
+                                      Provider.of<EstateProvider>(context,
+                                              listen: false)
+                                          .filtersToggleFacility(facility.id);
+                                    });
+                                  },
+                                ),
+                              )
+                              .toList(),
+                        ],
+                      ),
+                      SizedBox(height: 5 * defaultPadding),
+                    ],
                   ),
                 ),
-          floatingActionButton: Container(
-            width: 100.w - 2 * defaultPadding,
-            height: 48,
-            child: ElevatedButton(
-              onPressed: () {
-                _setAllFilters();
-                onFilterCallback!();
-                Navigator.of(context).pop();
-              },
-              style: ElevatedButton.styleFrom(
-                primary: normalOrange,
-                elevation: 0,
-                shadowColor: Colors.transparent,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
               ),
-              child: Text(
-                Locales.string(context, "show_results") + " (${_resultCount})",
-                style: TextStyles.display6(),
+        floatingActionButton: Container(
+          width: 100.w - 2 * defaultPadding,
+          height: 48,
+          child: ElevatedButton(
+            onPressed: () {
+              _setAllFilters();
+              onFilterCallback!();
+              Navigator.of(context).pop();
+            },
+            style: ElevatedButton.styleFrom(
+              primary: normalOrange,
+              elevation: 0,
+              shadowColor: Colors.transparent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
               ),
+            ),
+            child: Text(
+              Locales.string(context, "show_results") + " (${_resultCount})",
+              style: TextStyles.display6(),
             ),
           ),
         ),

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dachaturizm/components/card.dart';
 import 'package:dachaturizm/components/category_item.dart';
 import 'package:dachaturizm/components/horizontal_ad.dart';
@@ -17,6 +19,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 
 class HomePageScreen extends StatefulWidget {
   const HomePageScreen({Key? key}) : super(key: key);
@@ -31,6 +34,9 @@ class _HomePageScreenState extends State<HomePageScreen> {
   bool _isLoading = true;
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
+
+  int _topBannerIndex = 0;
+  final CarouselController _topBannerController = CarouselController();
 
   Future<void> _refreshHomePage() async {
     Future.delayed(Duration.zero).then((_) async {
@@ -123,33 +129,54 @@ class _HomePageScreenState extends State<HomePageScreen> {
                         child: Column(
                           children: [
                             _buidlCategoryRow(context, categories),
-                            SizedBox(height: defaultPadding * 1.5),
-                            _buildSearchBar(context),
-                            _buildTopBannerBlock(context, topBanners),
-                            SizedBox(height: defaultPadding * 1.5),
-                            Container(
-                              padding: EdgeInsets.fromLTRB(
-                                defaultPadding,
-                                24,
-                                defaultPadding,
-                                defaultPadding,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.grey[100],
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(30),
-                                  topRight: Radius.circular(30),
+                            SizedBox(height: defaultPadding * 0.5),
+                            // _buildSearchBar(context),
+                            _buildBannerBlock(
+                                context, topBanners, _topBannerIndex),
+                            SizedBox(height: defaultPadding * 0.5),
+                            Visibility(
+                              visible: categories.length > 0 &&
+                                  Provider.of<BannerProvider>(context)
+                                          .banners
+                                          .keys
+                                          .length >
+                                      0 &&
+                                  Provider.of<EstateProvider>(context)
+                                          .topEstates
+                                          .keys
+                                          .length >
+                                      0,
+                              replacement: Container(
+                                height: 150,
+                                margin: EdgeInsets.symmetric(vertical: 20),
+                                child: Center(
+                                  child: Column(
+                                    children: [
+                                      IconButton(
+                                        icon: Icon(
+                                          Icons.refresh,
+                                          color: disabledGrey,
+                                        ),
+                                        iconSize: 50,
+                                        onPressed: () {
+                                          _refreshHomePage();
+                                        },
+                                      ),
+                                      SizedBox(height: 20),
+                                      Text(
+                                        Locales.string(context,
+                                            "refresh_to_get_new_results"),
+                                        style: TextStyle(
+                                          color: disabledGrey,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
-                              child: Column(
-                                children: [
-                                  ...categories
-                                      .map(
-                                          (item) => _buildEstateTypeBlock(item))
-                                      .toList(),
-                                ],
-                              ),
-                            ),
+                              child: _showCategoryRelatedItems(categories),
+                            )
                           ],
                         ),
                       ),
@@ -158,6 +185,29 @@ class _HomePageScreenState extends State<HomePageScreen> {
                 ],
               ),
             ),
+    );
+  }
+
+  Widget _showCategoryRelatedItems(List<CategoryModel> categories) {
+    return Container(
+      padding: EdgeInsets.fromLTRB(
+        defaultPadding,
+        24,
+        defaultPadding,
+        defaultPadding,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.grey[100],
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(30),
+          topRight: Radius.circular(30),
+        ),
+      ),
+      child: Column(
+        children: [
+          ...categories.map((item) => _buildEstateTypeBlock(item)).toList(),
+        ],
+      ),
     );
   }
 
@@ -206,37 +256,34 @@ class _HomePageScreenState extends State<HomePageScreen> {
     }
   }
 
-  Widget _buildTopBannerBlock(BuildContext context, List? banners) {
-    if (banners!.length > 4) banners = banners.sublist(0, 4);
-
+  Widget _buildBannerBlock(
+      BuildContext context, List? banners, int currentIndex) {
     return Visibility(
-      visible: banners.length == 0,
+      visible: banners!.length > 0,
       child: Container(
-        height: 190,
-        padding: EdgeInsets.symmetric(horizontal: defaultPadding),
-        child: ListView(
-          scrollDirection: Axis.horizontal,
-          physics: AlwaysScrollableScrollPhysics(),
+        height: 210,
+        child: Column(
           children: [
-            ...banners.map((banner) => _buildBannerItem(banner)).toList()
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBannerBlock(BuildContext context, List? banners) {
-    if (banners!.length > 4) banners = banners.sublist(0, 4);
-
-    return Visibility(
-      visible: banners.length > 0,
-      child: Container(
-        height: 190,
-        child: ListView(
-          scrollDirection: Axis.horizontal,
-          physics: AlwaysScrollableScrollPhysics(),
-          children: [
-            ...banners.map((banner) => _buildBannerItem(banner)).toList()
+            CarouselSlider(
+              options: CarouselOptions(
+                height: 200,
+                viewportFraction: 1,
+                initialPage: 0,
+                enableInfiniteScroll: true,
+                autoPlay: true,
+                autoPlayInterval: Duration(seconds: 3),
+                autoPlayAnimationDuration: Duration(milliseconds: 800),
+                autoPlayCurve: Curves.fastOutSlowIn,
+                scrollDirection: Axis.horizontal,
+              ),
+              items: banners.map((banner) {
+                return Builder(
+                  builder: (BuildContext context) {
+                    return _buildBannerItem(banner);
+                  },
+                );
+              }).toList(),
+            ),
           ],
         ),
       ),
@@ -244,16 +291,11 @@ class _HomePageScreenState extends State<HomePageScreen> {
   }
 
   Widget _buildBannerItem(EstateModel estate) {
-    return Row(
-      children: [
-        HorizontalAd(
-          estate,
-          width: 100.w * 0.8,
-        ),
-        SizedBox(
-          width: defaultPadding,
-        ),
-      ],
+    return Container(
+      padding: const EdgeInsets.only(top: 10),
+      child: HorizontalAd(
+        estate,
+      ),
     );
   }
 
@@ -284,7 +326,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
               ],
             ),
             _buildCardsBlock(context, topEstates),
-            _buildBannerBlock(context, banners)
+            _buildBannerBlock(context, banners, _topBannerIndex)
           ],
         ),
       ),

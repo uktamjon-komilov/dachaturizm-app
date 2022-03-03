@@ -1,11 +1,9 @@
 import 'package:dachaturizm/components/profile_item.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/helpers/call_with_auth.dart';
-import 'package:dachaturizm/models/static_page_model.dart';
-import 'package:dachaturizm/models/user_model.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
-import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
+import 'package:dachaturizm/providers/static_pages_provider.dart';
 import 'package:dachaturizm/restartable_app.dart';
 import 'package:dachaturizm/screens/app/user/change_language.dart';
 import 'package:dachaturizm/screens/app/user/edit_profile_screen.dart';
@@ -30,24 +28,7 @@ class UserPageScreen extends StatefulWidget {
 }
 
 class _UserPageScreenState extends State<UserPageScreen> {
-  bool _someChange = false;
-  bool _isInit = true;
-  List<StaticPageModel> _staticPages = [];
-
-  Future _refreshUser(BuildContext context) async {
-    Provider.of<AuthProvider>(context, listen: false)
-        .getUserData()
-        .then((user) {
-      print(user);
-      Provider.of<EstateProvider>(context, listen: false)
-          .getStaticPages()
-          .then((value) {
-        setState(() {
-          _staticPages = value;
-        });
-      });
-    });
-  }
+  // bool _someChange = false;
 
   _navigateTo(page) async {
     Map result = await Navigator.push(
@@ -56,27 +37,11 @@ class _UserPageScreenState extends State<UserPageScreen> {
         builder: (context) => page,
       ),
     ) as Map;
-    if (result != null && result.containsKey("change")) {
-      setState(() {
-        _someChange = true;
-      });
-    }
-  }
-
-  @override
-  void didChangeDependencies() async {
-    if (_someChange) {
-      _refreshUser(context).then((_) {
-        Provider.of<NavigationScreenProvider>(context, listen: false)
-            .changePageIndex(4);
-      });
-      _someChange = false;
-    }
-    if (_isInit) {
-      _isInit = false;
-      await _refreshUser(context);
-    }
-    super.didChangeDependencies();
+    // if (result != null && result.containsKey("change")) {
+    //   setState(() {
+    //     _someChange = true;
+    //   });
+    // }
   }
 
   @override
@@ -96,7 +61,8 @@ class _UserPageScreenState extends State<UserPageScreen> {
               _buildSettingsList(),
               SizedBox(height: 1.5 * defaultPadding),
               ColumnTitle(Locales.string(context, "other_settings")),
-              ..._staticPages
+              ...Provider.of<StaticPagesProvider>(context)
+                  .pages
                   .map((page) => SettingsItem(
                       title: page.title,
                       callback: () {
@@ -174,7 +140,7 @@ class _UserPageScreenState extends State<UserPageScreen> {
             visible: userExists,
             child: ProfileListItem(
                 title: Locales.string(context, "my_favourites"),
-                iconData: Icons.favorite_outline_rounded,
+                iconData: Icons.favorite,
                 callback: () async {
                   await callWithAuth(context, () async {
                     final wishlist = WishlistScreen();

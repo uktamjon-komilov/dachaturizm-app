@@ -1,23 +1,25 @@
-import 'dart:convert';
-
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/models/region_model.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import "package:http/http.dart" as http;
 
 class RegionProvider with ChangeNotifier {
+  final Dio dio;
+
+  RegionProvider({required this.dio});
+
   List<RegionModel> _regions = [];
 
   List<RegionModel> get regions {
     return [..._regions];
   }
 
-  Future<List<RegionModel>> getAndSetRegions() async {
+  Future getAndSetRegions() async {
     const url = "${baseUrl}api/address/";
     List<RegionModel> regions = [];
-    final response = await http.get(Uri.parse(url));
-    if (response.statusCode >= 200 || response.statusCode < 300) {
-      final extractedData = json.decode(utf8.decode(response.bodyBytes));
+    final response = await dio.get(url);
+    if (response.statusCode as int >= 200 || response.statusCode as int < 300) {
+      final extractedData = response.data;
       for (int i = 0; i < extractedData.length; i++) {
         RegionModel region = await RegionModel.fromJson(extractedData[i]);
         regions.add(region);
@@ -25,6 +27,5 @@ class RegionProvider with ChangeNotifier {
     }
     _regions = regions;
     notifyListeners();
-    return [..._regions];
   }
 }

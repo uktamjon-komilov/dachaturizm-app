@@ -50,108 +50,106 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
-          child: Form(
-            child: Center(
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      "assets/images/logo-turizm.png",
-                      width: 120,
-                      fit: BoxFit.cover,
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
+        child: Form(
+          child: Center(
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    "assets/images/logo-turizm.png",
+                    width: 120,
+                    fit: BoxFit.cover,
+                  ),
+                  SizedBox(height: defaultPadding * 1.5),
+                  Text(
+                    Locales.string(context, "log_in"),
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w500,
+                      height: 1.25,
                     ),
-                    SizedBox(height: defaultPadding * 1.5),
-                    Text(
-                      Locales.string(context, "log_in"),
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w500,
-                        height: 1.25,
-                      ),
+                  ),
+                  SizedBox(height: defaultPadding / 2),
+                  Text(
+                    Locales.string(context, "welcome"),
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      height: 1.43,
+                      color: greyishLight,
                     ),
-                    SizedBox(height: defaultPadding / 2),
-                    Text(
-                      Locales.string(context, "welcome"),
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        height: 1.43,
-                        color: greyishLight,
-                      ),
-                    ),
-                    SizedBox(height: 28),
-                    PhoneNumberField(
-                      controller: _phoneController,
-                      onFieldSubmitted: (value) {
-                        FocusScope.of(context).requestFocus(_passwordFocusNode);
-                      },
-                      onChanged: (value) {
-                        if (_wrongCredentials) {
-                          setState(() {
-                            _wrongCredentials = false;
-                          });
-                        }
-                      },
-                    ),
-                    SizedBox(height: 8),
-                    PasswordInputField(
-                      focusNode: _passwordFocusNode,
-                      controller: _passwordController,
-                      onChanged: (value) {
-                        if (_wrongCredentials) {
-                          setState(() {
-                            _wrongCredentials = false;
-                          });
-                        }
-                      },
-                    ),
-                    Visibility(
-                      visible: _wrongCredentials,
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: defaultPadding),
-                        child: Text(
-                          Locales.string(context, "wrong_login_and_password"),
-                          style: TextStyle(
-                            color: Colors.red,
-                          ),
+                  ),
+                  SizedBox(height: 28),
+                  PhoneNumberField(
+                    controller: _phoneController,
+                    onFieldSubmitted: (value) {
+                      FocusScope.of(context).requestFocus(_passwordFocusNode);
+                    },
+                    onChanged: (value) {
+                      if (_wrongCredentials) {
+                        setState(() {
+                          _wrongCredentials = false;
+                        });
+                      }
+                    },
+                  ),
+                  SizedBox(height: 8),
+                  PasswordInputField(
+                    focusNode: _passwordFocusNode,
+                    controller: _passwordController,
+                    onChanged: (value) {
+                      if (_wrongCredentials) {
+                        setState(() {
+                          _wrongCredentials = false;
+                        });
+                      }
+                    },
+                  ),
+                  Visibility(
+                    visible: _wrongCredentials,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: defaultPadding),
+                      child: Text(
+                        Locales.string(context, "wrong_login_and_password"),
+                        style: TextStyle(
+                          color: Colors.red,
                         ),
                       ),
                     ),
-                    SizedBox(height: defaultPadding),
-                    FluidBigButton(
-                      text: Locales.string(context, "log_in"),
-                      onPress: () => login(context),
-                      loading: _isLoading,
-                    ),
-                    SizedBox(height: 1.5 * defaultPadding),
-                    TextLinkButton(Locales.string(context, "forgot_password?"),
-                        () {
-                      Navigator.of(context)
-                          .pushReplacementNamed(ResetPasswordStep1.routeName);
-                    }),
-                    SizedBox(height: defaultPadding * 1.5),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          Locales.string(context, "no_profile?"),
-                          style: TextStyle(fontSize: 12),
-                        ),
-                        SizedBox(width: 10),
-                        TextLinkButton(Locales.string(context, "register"), () {
-                          Navigator.of(context)
-                              .pushReplacementNamed(RegisterScreen.routeName);
-                        }),
-                      ],
-                    ),
-                  ],
-                ),
+                  ),
+                  SizedBox(height: defaultPadding),
+                  FluidBigButton(
+                    text: Locales.string(context, "log_in"),
+                    onPress: () => login(context),
+                    loading: _isLoading,
+                  ),
+                  SizedBox(height: 1.5 * defaultPadding),
+                  TextLinkButton(Locales.string(context, "forgot_password?"),
+                      () {
+                    Navigator.of(context)
+                        .pushReplacementNamed(ResetPasswordStep1.routeName);
+                  }),
+                  SizedBox(height: defaultPadding * 1.5),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        Locales.string(context, "no_profile?"),
+                        style: TextStyle(fontSize: 12),
+                      ),
+                      SizedBox(width: 10),
+                      TextLinkButton(Locales.string(context, "register"), () {
+                        Navigator.of(context)
+                            .pushReplacementNamed(RegisterScreen.routeName);
+                      }),
+                    ],
+                  ),
+                ],
               ),
             ),
           ),

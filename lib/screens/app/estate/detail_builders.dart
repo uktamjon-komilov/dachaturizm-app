@@ -317,9 +317,7 @@ class DetailBuilder {
                 )
                 .toList()
           ],
-          onPageChanged: (value) {
-            print('Page changed: $value');
-          },
+          onPageChanged: (value) {},
           // autoPlayInterval: 3000,
           isLoop: true,
         ),
@@ -389,9 +387,7 @@ class DetailBuilder {
             ),
             Spacer(),
             IconButton(
-              onPressed: () {
-                print("hi");
-              },
+              onPressed: () {},
               icon: Icon(
                 Icons.arrow_forward_ios_rounded,
                 color: normalGrey,
@@ -456,7 +452,13 @@ class DetailBuilder {
             ),
             Expanded(
               child: FluidBigButton(
-                onPress: () => UrlLauncher.launch("tel://${detail.phone}"),
+                onPress: () {
+                  String phone = detail.phone;
+                  if(!detail.phone.startsWith("+")){
+                    phone = "+" + phone;
+                  }
+                  UrlLauncher.launch("tel://${phone}");
+                },
                 child: Text(
                   Locales.string(context, "direct_call"),
                   style: TextStyle(

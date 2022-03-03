@@ -31,26 +31,24 @@ class _StaticPageScreenState extends State<StaticPageScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: buildNavigationalAppBar(
-          context,
-          _page == null ? "" : _page!.title,
+    return Scaffold(
+      appBar: buildNavigationalAppBar(
+        context,
+        _page == null ? "" : _page!.title,
+      ),
+      bottomNavigationBar: buildBottomNavigation(context, () {
+        Navigator.of(context).pop();
+      }),
+      body: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          defaultPadding,
+          defaultPadding,
+          defaultPadding,
+          0,
         ),
-        bottomNavigationBar: buildBottomNavigation(context, () {
-          Navigator.of(context).pop();
-        }),
-        body: Padding(
-          padding: const EdgeInsets.fromLTRB(
-            defaultPadding,
-            defaultPadding,
-            defaultPadding,
-            0,
-          ),
-          child: SingleChildScrollView(
-            child: Html(
-              data: _page!.content,
-            ),
+        child: SingleChildScrollView(
+          child: Html(
+            data: _page!.content,
           ),
         ),
       ),

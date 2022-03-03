@@ -43,57 +43,56 @@ class _NavigationalAppScreenState extends State<NavigationalAppScreen>
             .changePageIndex(0);
         return false;
       },
-      child: SafeArea(
-        child: Scaffold(
-          appBar: AppBar(
-            automaticallyImplyLeading: false,
-            toolbarHeight: currentIndex == 0 ? 78 : null,
-            centerTitle: currentIndex == 0 ? false : true,
-            title: Consumer<NavigationScreenProvider>(
-                builder: (context, navigator, _) {
-              if (navigator.currentIndex == 0) {
-                return Container(
-                  padding: EdgeInsets.only(left: 8),
-                  child: Image.asset(
-                    "assets/images/logo-horizontal-sm.png",
-                    height: 40,
-                  ),
-                );
-              }
-              return Text(
-                Locales.string(context, appBarTitles[navigator.currentIndex]),
-                style:
-                    TextStyles.display2().copyWith(fontWeight: FontWeight.w700),
-              );
-            }),
-            actions: [
-              Padding(
-                padding: const EdgeInsets.only(right: 5),
-                child: IconButton(
-                  onPressed: () async {
-                    await callWithAuth(context, () async {
-                      Navigator.of(context).pushNamed(WishlistScreen.routeName);
-                    });
-                  },
-                  icon: Icon(
-                    Icons.favorite_border_rounded,
-                    size: 24,
-                    color: darkPurple,
-                  ),
+      child: Scaffold(
+        resizeToAvoidBottomInset: true,
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          toolbarHeight: currentIndex == 0 ? 78 : null,
+          centerTitle: currentIndex == 0 ? false : true,
+          title: Consumer<NavigationScreenProvider>(
+              builder: (context, navigator, _) {
+            if (navigator.currentIndex == 0) {
+              return Container(
+                padding: EdgeInsets.only(left: 8),
+                child: Image.asset(
+                  "assets/images/logo-horizontal-sm.png",
+                  height: 40,
                 ),
-              )
-            ],
-          ),
-          body: Consumer<NavigationScreenProvider>(
-            builder: (context, navigator, _) {
-              return IndexedStack(
-                index: navigator.currentIndex,
-                children: screens,
               );
-            },
-          ),
-          bottomNavigationBar: buildBottomNavigation(context),
+            }
+            return Text(
+              Locales.string(context, appBarTitles[navigator.currentIndex]),
+              style:
+                  TextStyles.display2().copyWith(fontWeight: FontWeight.w700),
+            );
+          }),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 5),
+              child: IconButton(
+                onPressed: () async {
+                  await callWithAuth(context, () async {
+                    Navigator.of(context).pushNamed(WishlistScreen.routeName);
+                  });
+                },
+                icon: Icon(
+                  Icons.favorite_border_rounded,
+                  size: 24,
+                  color: darkPurple,
+                ),
+              ),
+            )
+          ],
         ),
+        body: Consumer<NavigationScreenProvider>(
+          builder: (context, navigator, _) {
+            return IndexedStack(
+              index: navigator.currentIndex,
+              children: screens,
+            );
+          },
+        ),
+        bottomNavigationBar: buildBottomNavigation(context),
       ),
     );
   }

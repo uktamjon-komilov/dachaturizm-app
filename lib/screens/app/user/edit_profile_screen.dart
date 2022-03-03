@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dachaturizm/components/app_bar.dart';
 import 'package:dachaturizm/components/fluid_big_button.dart';
 import 'package:dachaturizm/constants.dart';
@@ -140,149 +141,145 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget build(BuildContext context) {
     UserModel? user = Provider.of<AuthProvider>(context, listen: false).user;
 
-    return WillPopScope(
-      onWillPop: () async {
-        Provider.of<NavigationScreenProvider>(context, listen: false)
-            .changePageIndex(4);
-        Provider.of<AuthProvider>(context, listen: false)
-            .getUserData()
-            .then((value) {
-          return true;
-        });
-        return true;
-      },
-      child: SafeArea(
-        child: (_isLoading || user == null)
-            ? Scaffold(
-                body: Center(
-                  child: CircularProgressIndicator(),
+    return (_isLoading || user == null)
+        ? Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          )
+        : WillPopScope(
+            onWillPop: () async {
+              Provider.of<NavigationScreenProvider>(context, listen: false)
+                  .changePageIndex(4);
+              return true;
+            },
+            child: Scaffold(
+              appBar: buildNavigationalAppBar(
+                  context, Locales.string(context, "editing"), () {
+                Provider.of<NavigationScreenProvider>(context, listen: false)
+                    .changePageIndex(4);
+              }),
+              floatingActionButton: Container(
+                width: 100.w - 1.8 * defaultPadding,
+                child: FluidBigButton(
+                  text: Locales.string(context, "save"),
+                  onPress: _saveDetails,
                 ),
-              )
-            : Scaffold(
-                appBar: buildNavigationalAppBar(
-                    context, Locales.string(context, "editing"), () {
-                  // Provider.of<AuthProvider>(context, listen: false)
-                  //     .getUserData()
-                  //     .then((_) {
-                  // Provider.of<NavigationScreenProvider>(context, listen: false)
-                  //     .changePageIndex(4);
-                  // });
-                  RestartWidget.restartApp(context);
-                }),
-                floatingActionButton: Container(
-                  width: 100.w - 1.8 * defaultPadding,
-                  child: FluidBigButton(
-                    text: Locales.string(context, "save"),
-                    onPress: _saveDetails,
-                  ),
-                ),
-                body: Container(
-                  width: 100.w,
-                  padding: EdgeInsets.all(defaultPadding),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          _selectProfileImage();
-                        },
-                        child: Container(
-                          padding: EdgeInsets.only(bottom: defaultPadding),
-                          decoration: BoxDecoration(
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.05),
-                                blurRadius: 15,
-                              ),
-                            ],
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: Container(
-                              width: 150,
-                              height: 150,
-                              child: Stack(
-                                children: [
-                                  _profileImage != null
-                                      ? Image.file(
-                                          _profileImage,
-                                          fit: BoxFit.cover,
-                                          width: 100.w,
-                                          height: 100.w,
-                                        )
-                                      : user.photo == null
-                                          ? Image.asset(
-                                              "assets/images/panda.jpg",
-                                              fit: BoxFit.cover,
-                                              width: 100.w,
-                                              height: 100.w,
-                                            )
-                                          : Image.network(
-                                              fixMediaUrl(user.photo),
-                                              fit: BoxFit.cover,
-                                              width: 100.w,
-                                              height: 100.w,
-                                            ),
-                                  Center(
-                                    child: Icon(
-                                      Icons.camera_alt_rounded,
-                                      color: Colors.white,
-                                      size: 40,
-                                    ),
-                                    // Image.asset("assets/images/camera.png"),
+              ),
+              body: Container(
+                width: 100.w,
+                padding: EdgeInsets.all(defaultPadding),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        _selectProfileImage();
+                      },
+                      child: Container(
+                        padding: EdgeInsets.only(bottom: defaultPadding),
+                        decoration: BoxDecoration(
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 15,
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Container(
+                            width: 150,
+                            height: 150,
+                            child: Stack(
+                              children: [
+                                _profileImage != null
+                                    ? Image.file(
+                                        _profileImage,
+                                        fit: BoxFit.cover,
+                                        width: 100.w,
+                                        height: 100.w,
+                                      )
+                                    : user.photo == null
+                                        ? Image.asset(
+                                            "assets/images/user.jpg",
+                                            fit: BoxFit.cover,
+                                            width: 100.w,
+                                            height: 100.w,
+                                          )
+                                        : CachedNetworkImage(
+                                            imageUrl: fixMediaUrl(user.photo),
+                                            fit: BoxFit.cover,
+                                            width: 100.w,
+                                            height: 100.w,
+                                            placeholder: (context, _) {
+                                              return Image.asset(
+                                                "assets/images/user.jpg",
+                                                fit: BoxFit.cover,
+                                                width: 100.w,
+                                                height: 100.w,
+                                              );
+                                            },
+                                          ),
+                                Center(
+                                  child: Icon(
+                                    Icons.camera_alt_rounded,
+                                    color: Colors.white,
+                                    size: 40,
                                   ),
-                                ],
-                              ),
+                                  // Image.asset("assets/images/camera.png"),
+                                ),
+                              ],
                             ),
                           ),
                         ),
                       ),
-                      SizedBox(height: defaultPadding * 1.5),
-                      TextFormField(
-                        controller: _firstNameController,
-                        decoration: InputDecoration(
-                          border: InputStyles.inputBorder(),
-                          focusedBorder: InputStyles.focusBorder(),
-                          enabledBorder: InputStyles.enabledBorder(),
-                          hintText: Locales.string(context, "first_name"),
-                          label: Text(
-                            Locales.string(context, "first_name"),
-                          ),
+                    ),
+                    SizedBox(height: defaultPadding * 1.5),
+                    TextFormField(
+                      controller: _firstNameController,
+                      decoration: InputDecoration(
+                        border: InputStyles.inputBorder(),
+                        focusedBorder: InputStyles.focusBorder(),
+                        enabledBorder: InputStyles.enabledBorder(),
+                        hintText: Locales.string(context, "first_name"),
+                        label: Text(
+                          Locales.string(context, "first_name"),
                         ),
                       ),
-                      SizedBox(height: defaultPadding * 1.5),
-                      TextFormField(
-                        controller: _lastNameController,
-                        decoration: InputDecoration(
-                          border: InputStyles.inputBorder(),
-                          focusedBorder: InputStyles.focusBorder(),
-                          enabledBorder: InputStyles.enabledBorder(),
-                          hintText: Locales.string(context, "last_name"),
-                          label: Text(
-                            Locales.string(context, "last_name"),
-                          ),
+                    ),
+                    SizedBox(height: defaultPadding * 1.5),
+                    TextFormField(
+                      controller: _lastNameController,
+                      decoration: InputDecoration(
+                        border: InputStyles.inputBorder(),
+                        focusedBorder: InputStyles.focusBorder(),
+                        enabledBorder: InputStyles.enabledBorder(),
+                        hintText: Locales.string(context, "last_name"),
+                        label: Text(
+                          Locales.string(context, "last_name"),
                         ),
                       ),
-                      SizedBox(height: defaultPadding * 1.5),
-                      TextFormField(
-                        controller: _phoneController,
-                        decoration: InputDecoration(
-                          border: InputStyles.inputBorder(),
-                          focusedBorder: InputStyles.focusBorder(),
-                          enabledBorder: InputStyles.enabledBorder(),
-                          hintText: Locales.string(context, "phone"),
-                          label: Text(Locales.string(context, "phone")),
-                        ),
-                        inputFormatters: [
-                          MaskTextInputFormatter(mask: "+998 ## ### ## ##")
-                        ],
+                    ),
+                    SizedBox(height: defaultPadding * 1.5),
+                    TextFormField(
+                      controller: _phoneController,
+                      decoration: InputDecoration(
+                        border: InputStyles.inputBorder(),
+                        focusedBorder: InputStyles.focusBorder(),
+                        enabledBorder: InputStyles.enabledBorder(),
+                        hintText: Locales.string(context, "phone"),
+                        label: Text(Locales.string(context, "phone")),
                       ),
-                    ],
-                  ),
+                      inputFormatters: [
+                        MaskTextInputFormatter(mask: "+998 ## ### ## ##")
+                      ],
+                    ),
+                  ],
                 ),
               ),
-      ),
-    );
+            ),
+          );
   }
 }

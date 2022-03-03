@@ -69,70 +69,68 @@ class _BalanceScreenState extends State<BalanceScreen>
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: buildNavigationalAppBar(
-            context, Locales.string(context, "payment"), () {
-          Navigator.of(context).pop();
-        }),
-        floatingActionButton: Container(
-          width: 100.w - 1.8 * defaultPadding,
-          child: FluidBigButton(
-            text: Locales.string(context, "ready"),
-            onPress: () async {
-              double? amount = double.tryParse(_amountController.text
-                  .toString()
-                  .replaceAll(",", "")
-                  .replaceAll(".", ""));
-              if (amount != null) {
-                String? url = await _getPaymentUrl(amount);
-                if (url.runtimeType.toString() == "String" &&
-                    await UrlLauncher.canLaunch(url as String)) {
-                  UrlLauncher.launch(url);
-                }
+    return Scaffold(
+      appBar: buildNavigationalAppBar(
+          context, Locales.string(context, "payment"), () {
+        Navigator.of(context).pop();
+      }),
+      floatingActionButton: Container(
+        width: 100.w - 1.8 * defaultPadding,
+        child: FluidBigButton(
+          text: Locales.string(context, "ready"),
+          onPress: () async {
+            double? amount = double.tryParse(_amountController.text
+                .toString()
+                .replaceAll(",", "")
+                .replaceAll(".", ""));
+            if (amount != null) {
+              String? url = await _getPaymentUrl(amount);
+              if (url.runtimeType.toString() == "String" &&
+                  await UrlLauncher.canLaunch(url as String)) {
+                UrlLauncher.launch(url);
               }
-            },
-          ),
+            }
+          },
         ),
-        body: Container(
-          padding: EdgeInsets.fromLTRB(
-            defaultPadding,
-            defaultPadding,
-            defaultPadding,
-            0,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CustomText(Locales.string(context, "amount")),
-              SizedBox(height: defaultPadding * 3 / 4),
-              _buildInputField(),
-              Text(
-                Locales.string(context, "enter_payment_amount"),
-                style: TextStyle(
-                  fontSize: 10,
-                  height: 1.5,
-                  letterSpacing: 0.3,
-                  fontWeight: FontWeight.w600,
-                  color: greyishLight,
-                ),
+      ),
+      body: Container(
+        padding: EdgeInsets.fromLTRB(
+          defaultPadding,
+          defaultPadding,
+          defaultPadding,
+          0,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            CustomText(Locales.string(context, "amount")),
+            SizedBox(height: defaultPadding * 3 / 4),
+            _buildInputField(),
+            Text(
+              Locales.string(context, "enter_payment_amount"),
+              style: TextStyle(
+                fontSize: 10,
+                height: 1.5,
+                letterSpacing: 0.3,
+                fontWeight: FontWeight.w600,
+                color: greyishLight,
               ),
-              SizedBox(height: 1.5 * defaultPadding),
-              CustomText(Locales.string(context, "payment_method")),
-              SizedBox(height: defaultPadding * 3 / 4),
-              ...paymentMethods
-                  .map((method) => PaymentButton(
-                        title: method,
-                        active: _activePayment == method,
-                        onPressed: () {
-                          setState(() {
-                            _activePayment = method;
-                          });
-                        },
-                      ))
-                  .toList(),
-            ],
-          ),
+            ),
+            SizedBox(height: 1.5 * defaultPadding),
+            CustomText(Locales.string(context, "payment_method")),
+            SizedBox(height: defaultPadding * 3 / 4),
+            ...paymentMethods
+                .map((method) => PaymentButton(
+                      title: method,
+                      active: _activePayment == method,
+                      onPressed: () {
+                        setState(() {
+                          _activePayment = method;
+                        });
+                      },
+                    ))
+                .toList(),
+          ],
         ),
       ),
     );

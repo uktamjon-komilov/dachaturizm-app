@@ -25,9 +25,10 @@ class ChatListScreen extends StatefulWidget {
 class _ChatListScreenState extends State<ChatListScreen> {
   List<MessageModel> _chats = [];
   bool _isLoading = false;
+  bool _isInit = true;
   int _userId = 0;
 
-  _refreshMyChats() async {
+  _refreshMyChats(BuildContext context) async {
     Future.delayed(Duration.zero).then((_) {
       Provider.of<AuthProvider>(context, listen: false)
           .getMyChats()
@@ -54,20 +55,16 @@ class _ChatListScreenState extends State<ChatListScreen> {
     if (shouldRefresh) {
       Provider.of<NavigationScreenProvider>(context, listen: false)
           .refreshChatsScreen = false;
-      await _refreshMyChats();
+      await _refreshMyChats(context);
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(Duration.zero).then((_) async {
-      _userId =
-          await Provider.of<AuthProvider>(context, listen: false).getUserId();
-      // Timer.periodic(Duration(seconds: 5), (timer) async {
-      //   await _refreshMyChats();
-      // });
-    });
+    // if (_isInit) {
+    //   _isInit = false;
+    //   _userId =
+    //       await Provider.of<AuthProvider>(context, listen: false).getUserId();
+    //   Timer.periodic(Duration(seconds: 30), (timer) async {
+    //     await _refreshMyChats(context);
+    //   });
+    // }
   }
 
   @override
@@ -75,7 +72,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: () {
-          return _refreshMyChats();
+          return _refreshMyChats(context);
         },
         child: Container(
           child: _isLoading

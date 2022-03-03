@@ -36,44 +36,43 @@ class _ImageZoomerState extends State<ImageZoomer> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: Container(
-          height: 100.h,
-          width: 100.w,
-          decoration: BoxDecoration(color: Colors.black),
-          child: Stack(
-            children: [
-              Container(
-                height: 100.h,
-                width: 100.w,
-                child: PageView.builder(
-                    itemCount: photos.length,
-                    controller: controller,
-                    itemBuilder: (context, index) {
-                      return PhotoView(
-                        tightMode: true,
-                        imageProvider: NetworkImage(
-                          photos[index],
-                        ),
-                      );
-                    }),
-              ),
-              Positioned(
-                top: 10,
-                left: 10,
-                child: IconButton(
-                  icon: Icon(
-                    Icons.arrow_back,
-                    color: Colors.white,
-                  ),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Container(
+        height: 100.h,
+        width: 100.w,
+        // decoration: BoxDecoration(color: Colors.black),
+        child: Stack(
+          children: [
+            Container(
+              height: 100.h,
+              width: 100.w,
+              child: PageView.builder(
+                  itemCount: photos.length,
+                  controller: controller,
+                  itemBuilder: (context, index) {
+                    return PhotoView(
+                      tightMode: true,
+                      imageProvider: NetworkImage(
+                        photos[index],
+                      ),
+                    );
+                  }),
+            ),
+            Positioned(
+              top: 10,
+              left: 10,
+              child: IconButton(
+                icon: Icon(
+                  Icons.arrow_back,
+                  color: Colors.white,
                 ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

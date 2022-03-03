@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 class FacilityProvider with ChangeNotifier {
   final Dio dio;
   List<FacilityModel> _facilities = [];
+  List<RegionModel> _regions = [];
+  List<PopularPlaceModel> _places = [];
 
   FacilityProvider({required this.dio});
 
@@ -15,8 +17,27 @@ class FacilityProvider with ChangeNotifier {
     return [..._facilities];
   }
 
-  Future<List<FacilityModel>> getFacilities() async {
-    const url = "${baseUrl}api/facilities/";
+  List<RegionModel> get regions {
+    return [..._regions];
+  }
+
+  List<PopularPlaceModel> get places {
+    return [..._places];
+  }
+
+  Future fetchAll() async {
+    Future.wait([
+      this.getFacilities(),
+      this.getAddresses(),
+      this.getPopularPlaces(),
+    ]);
+  }
+
+  Future getFacilities([String categoryId = ""]) async {
+    String url = "${baseUrl}api/facilities/";
+    if (categoryId != "") {
+      url += "?category=${categoryId}";
+    }
     final response = await dio.get(url);
     List<FacilityModel> facilities = [];
     if (response.statusCode as int >= 200 || response.statusCode as int < 300) {
@@ -28,8 +49,6 @@ class FacilityProvider with ChangeNotifier {
       _facilities = facilities;
       notifyListeners();
     }
-
-    return [...facilities];
   }
 
   Future getAddresses() async {
@@ -42,7 +61,8 @@ class FacilityProvider with ChangeNotifier {
         regions.add(region);
       }
     }
-    return regions;
+    _regions = regions;
+    notifyListeners();
   }
 
   Future getPopularPlaces() async {
@@ -55,6 +75,7 @@ class FacilityProvider with ChangeNotifier {
         places.add(place);
       }
     }
-    return places;
+    _places = places;
+    notifyListeners();
   }
 }

@@ -1,11 +1,13 @@
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/providers/banner_provider.dart';
+import 'package:dachaturizm/providers/create_estate_provider.dart';
 import 'package:dachaturizm/providers/currency_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/facility_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/providers/region_provider.dart';
+import 'package:dachaturizm/providers/static_pages_provider.dart';
 import 'package:dachaturizm/restartable_app.dart';
 import 'package:dachaturizm/screens/app/chat/chat_list_screen.dart';
 import 'package:dachaturizm/screens/app/chat/chat_screen.dart';
@@ -42,6 +44,7 @@ import 'package:dachaturizm/screens/splash_screen.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -51,6 +54,7 @@ import 'providers/category_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Locales.init(["en", "uz", "ru"]);
   Dio dio = Dio();
 
@@ -61,13 +65,28 @@ void main() async {
       child: MultiProvider(
         providers: [
           ChangeNotifierProvider.value(
-            value: auth,
-          ),
-          ChangeNotifierProvider.value(
             value: BannerProvider(dio: dio),
           ),
           ChangeNotifierProvider.value(
             value: EstateTypesProvider(dio: dio),
+          ),
+          ChangeNotifierProvider.value(
+            value: FacilityProvider(dio: dio),
+          ),
+          ChangeNotifierProvider.value(
+            value: CurrencyProvider(dio: dio),
+          ),
+          ChangeNotifierProvider.value(
+            value: StaticPagesProvider(dio: dio),
+          ),
+          ChangeNotifierProvider.value(
+            value: RegionProvider(dio: dio),
+          ),
+          ChangeNotifierProvider.value(
+            value: auth,
+          ),
+          ChangeNotifierProvider.value(
+            value: CreateEstateProvider(dio: dio, auth: auth),
           ),
           ChangeNotifierProxyProvider<AuthProvider, EstateProvider>(
             create: (context) => EstateProvider(dio: dio, auth: auth),
@@ -78,15 +97,6 @@ void main() async {
               auth: AuthProvider(dio: dio),
             ),
             update: (context, auth, _) => NavigationScreenProvider(auth: auth),
-          ),
-          ChangeNotifierProvider.value(
-            value: FacilityProvider(dio: dio),
-          ),
-          ChangeNotifierProvider.value(
-            value: CurrencyProvider(dio: dio),
-          ),
-          ChangeNotifierProvider.value(
-            value: RegionProvider(),
           ),
         ],
         child: MyApp(dio: dio),
@@ -105,6 +115,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  bool _isInit = true;
+
   @override
   void initState() {
     super.initState();
@@ -118,6 +130,18 @@ class _MyAppState extends State<MyApp> {
         ),
       ),
     );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_isInit) {
+      _isInit = false;
+      Provider.of<RegionProvider>(context, listen: false).getAndSetRegions();
+      Provider.of<StaticPagesProvider>(context, listen: false).getStaticPages();
+      Provider.of<FacilityProvider>(context, listen: false).fetchAll();
+      Provider.of<CurrencyProvider>(context, listen: false).getCurrencies();
+    }
   }
 
   @override

@@ -7,17 +7,16 @@ import 'package:dachaturizm/components/normal_input.dart';
 import 'package:dachaturizm/components/small_button.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/helpers/call_with_auth.dart';
-import 'package:dachaturizm/helpers/locale_helper.dart';
 import 'package:dachaturizm/helpers/url_helper.dart';
 import 'package:dachaturizm/models/booking_day.dart';
 import 'package:dachaturizm/models/currency_model.dart';
 import 'package:dachaturizm/models/district_model.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/models/facility_model.dart';
-import 'package:dachaturizm/models/popular_place_model.dart';
 import 'package:dachaturizm/models/region_model.dart';
 import 'package:dachaturizm/models/category_model.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
+import 'package:dachaturizm/providers/create_estate_provider.dart';
 import 'package:dachaturizm/providers/currency_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/facility_provider.dart';
@@ -53,17 +52,17 @@ class EstateCreationPageScreen extends StatefulWidget {
 class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
   bool _isLoading = false;
   bool _isUploading = false;
+  bool _mainImageUploading = false;
+  List<bool> _extraImagesLoading = List.generate(8, (index) => false);
   bool _isSubmitted = false;
   bool _isEditing = false;
-  int _currentExtraImageIndex = 0;
+  bool _filtersOpen = false;
+  int _currentExtraImageIndex = 7;
   int _descriptionMaxLength = 1000;
   EstateModel? _estate;
   int _estateId = 0;
-  List<RegionModel> _regions = [];
   List<DistrictModel> _districts = [];
-  List<CategoryModel> _categories = [];
   List<CurrencyModel> _currencies = [];
-  List<PopularPlaceModel> _popular_places = [];
   String errors = "";
   GlobalKey<FormState> _form = GlobalKey<FormState>();
   ScrollController _scrollController = ScrollController();
@@ -98,23 +97,26 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
   String _locationName = "";
 
   void _resetInputs() {
-    _mainImage = null;
-    _extraImages = List.generate(8, (_) => null);
-    _currentSection = "";
-    _titleController.text = "";
-    _descriptionController.text = "";
-    _announcerController.text = "";
-    _phoneController.text = "";
-    _addressController.text = "";
-    _weekdayPriceController.text = "";
-    _weekendPriceController.text = "";
-    _currentCurrencyId = 0;
-    _currentRegion = "";
-    _currentDistrict = "";
-    _facilities = [];
-    _longtitude = 0.0;
-    _latitute = 0.0;
-    _locationName = "";
+    setState(() {
+      _mainImage = null;
+      _extraImages = List.generate(8, (_) => null);
+      _currentSection = "";
+      _titleController.text = "";
+      _descriptionController.text = "";
+      _announcerController.text = "";
+      _phoneController.text = "";
+      _addressController.text = "";
+      _weekdayPriceController.text = "";
+      _weekendPriceController.text = "";
+      _currentCurrencyId = 0;
+      _currentRegion = "";
+      _currentDistrict = "";
+      _currentPopularPlace = "";
+      _facilities = [];
+      _longtitude = 0.0;
+      _latitute = 0.0;
+      _locationName = "";
+    });
   }
 
   List<String> get _bookedDays {
@@ -147,15 +149,20 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     Map<String, dynamic> data = {};
     data["photo"] = _mainImageId;
     data["photos"] = _extraImagesId;
-    data["estate_type"] = _categories
+    data["estate_type"] = Provider.of<EstateTypesProvider>(context,
+            listen: false)
+        .categories
         .firstWhere((element) => element.title == _currentSection.toString())
         .id;
     data["title"] = _titleController.text;
-    data["region"] = _regions
+    data["region"] = Provider.of<FacilityProvider>(context, listen: false)
+        .regions
         .firstWhere((region) => region.title.toString() == _currentRegion);
     data["district"] = _districts.firstWhere(
         (district) => district.title.toString() == _currentDistrict);
-    data["popular_place_id"] = _popular_places
+    data["popular_place_id"] = Provider.of<FacilityProvider>(context,
+            listen: false)
+        .places
         .firstWhere((place) => place.title.toString() == _currentPopularPlace)
         .id;
     data["address"] = _addressController.text;
@@ -191,7 +198,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
       _isUploading = true;
       _isSubmitted = false;
     });
-    Provider.of<EstateProvider>(context, listen: false)
+    Provider.of<CreateEstateProvider>(context, listen: false)
         .updateEstate(_estateId, data, _estate)
         .then((value) async {
       _resetInputs();
@@ -232,14 +239,14 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
   Future<dynamic> _selectImage() async {
     final ImagePicker _picker = ImagePicker();
     final XFile? imageFile =
-        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 20);
+        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 100);
     return imageFile == null ? null : imageFile.path;
   }
 
   Future<dynamic> _selectMultipleImages() async {
     final ImagePicker _picker = ImagePicker();
     final List<XFile>? imageFiles =
-        await _picker.pickMultiImage(imageQuality: 30);
+        await _picker.pickMultiImage(imageQuality: 100);
     List<String> result = [];
     imageFiles!.forEach((imageFile) {
       result.add(imageFile.path);
@@ -263,9 +270,15 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     var photo = await MultipartFile.fromFile(_mainImage.path,
         filename: "testimage.png");
 
-    Provider.of<EstateProvider>(context, listen: false)
+    setState(() {
+      _mainImageUploading = true;
+    });
+    Provider.of<CreateEstateProvider>(context, listen: false)
         .uploadTempPhoto(photo)
         .then((value) {
+      setState(() {
+        _mainImageUploading = false;
+      });
       _mainImageId = value;
     });
   }
@@ -282,19 +295,25 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
         }
       });
     } else {
+      setState(() {
+        _extraImages[index] = File(image as String);
+        _currentExtraImageIndex = index + 1;
+        _extraImagesLoading[index] = true;
+      });
+
       var photo = await MultipartFile.fromFile(
         File(image as String).path,
         filename: "testimage.png",
       );
 
       if (_extraImages[index] == null) {
-        Provider.of<EstateProvider>(context, listen: false)
+        Provider.of<CreateEstateProvider>(context, listen: false)
             .uploadExtraPhoto(photo)
             .then((value) {
           _extraImagesId[index] = value;
         });
       } else {
-        Provider.of<EstateProvider>(context, listen: false)
+        Provider.of<CreateEstateProvider>(context, listen: false)
             .updateExtraPhoto(_extraImagesId[index], photo)
             .then((value) {
           _extraImagesId[index] = value;
@@ -302,8 +321,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
       }
 
       setState(() {
-        _extraImages[index] = File(image as String);
-        _currentExtraImageIndex = index + 1;
+        _extraImagesLoading[index] = false;
       });
     }
   }
@@ -313,18 +331,22 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     if (images != null) {
       int length = images.length < 8 ? images.length : 8;
       for (int i = index; i < length; i++) {
+        _extraImages[i] = File(images[i]);
+        _extraImagesLoading[i] = true;
+      }
+      setState(() {});
+      for (int i = index; i < length; i++) {
         var photo = await MultipartFile.fromFile(
           File(images[i]).path,
           filename: "testimage.png",
         );
-        await Provider.of<EstateProvider>(context, listen: false)
+        await Provider.of<CreateEstateProvider>(context, listen: false)
             .uploadExtraPhoto(photo)
             .then((value) {
           _extraImagesId[i] = value;
-          _extraImages[i] = File(images[i]);
         });
         setState(() {
-          _currentExtraImageIndex = i + 1;
+          _extraImagesLoading[i] = false;
         });
       }
     }
@@ -342,27 +364,8 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     });
     Future.delayed(Duration.zero).then((_) async {
       Future.wait([
-        Provider.of<FacilityProvider>(context, listen: false)
-            .getAddresses()
-            .then((value) {
-          setState(() {
-            _regions = value;
-          });
-        }),
-        Provider.of<FacilityProvider>(context, listen: false)
-            .getPopularPlaces()
-            .then((value) {
-          setState(() {
-            _popular_places = value;
-          });
-        }),
-        Provider.of<FacilityProvider>(context, listen: false).getFacilities(),
-        Provider.of<CurrencyProvider>(context, listen: false).getCurrencies(),
-        Provider.of<EstateTypesProvider>(context, listen: false)
-            .getCategories()
-            .then((value) => _categories = value),
         Provider.of<AuthProvider>(context, listen: false)
-            .getUserData()
+            .getUserDataWithoutNotifying()
             .then((user) {
           if (user.runtimeType.toString() == "UserModel") {
             _announcerController.text = "${user!.firstName} ${user.lastName}";
@@ -370,8 +373,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
           }
         }),
       ]).then((_) async {
-        Map data = ModalRoute.of(context)?.settings.arguments as Map;
-        String locale = await getCurrentLocale();
+        Map? data = ModalRoute.of(context)?.settings.arguments as Map?;
         if (data == null) return;
         if (data.containsKey("estateId") && _estateId == 0) {
           _estateId = int.parse(data["estateId"]);
@@ -403,34 +405,39 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
             _currentCurrencyId = _currencies
                 .firstWhere((currency) => currency.title == value.priceType)
                 .id;
-            _currentSection = _categories
-                .firstWhere((category) => category.id == value.typeId,
+            _currentSection =
+                Provider.of<EstateTypesProvider>(context, listen: false)
+                    .categories
+                    .firstWhere((category) => category.id == value.typeId,
+                        orElse: () {
+                      return CategoryModel(
+                        id: 0,
+                        title: "",
+                        slug: "",
+                        icon: "",
+                        foregroundColor: "",
+                        backgroundColor: "",
+                      );
+                    })
+                    .title
+                    .toString();
+            _currentRegion =
+                Provider.of<FacilityProvider>(context, listen: false)
+                    .regions
+                    .firstWhere((region) => region.title == value.region,
+                        orElse: () {
+                      return RegionModel(
+                          id: 0, title: "", translations: {}, districts: []);
+                    })
+                    .title
+                    .toString();
+            _districts = Provider.of<FacilityProvider>(context, listen: false)
+                .regions
+                .firstWhere((region) => region.id.toString() == _currentRegion,
                     orElse: () {
-                  return CategoryModel(
-                    id: 0,
-                    title: "",
-                    slug: "",
-                    icon: "",
-                    foregroundColor: "",
-                    backgroundColor: "",
-                  );
-                })
-                .title
-                .toString();
-            _currentRegion = _regions
-                .firstWhere((region) => region.title == value.region,
-                    orElse: () {
-                  return RegionModel(
-                      id: 0, title: "", translations: {}, districts: []);
-                })
-                .title
-                .toString();
-            _districts = _regions.firstWhere(
-                (region) => region.id.toString() == _currentRegion, orElse: () {
               return RegionModel(
                   id: 0, title: "", districts: [], translations: {});
             }).districts;
-            print(_currentRegion);
             _currentDistrict = _districts
                 .firstWhere((district) => district.title == value.district,
                     orElse: () {
@@ -482,404 +489,432 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
         Provider.of<FacilityProvider>(context, listen: false).facilities;
     List<CategoryModel> categories =
         Provider.of<EstateTypesProvider>(context, listen: false).categories;
+
     List<CurrencyModel> currencies =
         Provider.of<CurrencyProvider>(context, listen: false).currencies;
 
-    return SafeArea(
-      child: Scaffold(
-        appBar: _isEditing
-            ? buildNavigationalAppBar(
-                context,
-                Locales.string(context, "estate_editing_title"),
-              )
-            : null,
-        body: _isLoading
-            ? Center(
-                child: CircularProgressIndicator(),
-              )
-            : _isUploading
-                ? Padding(
-                    padding: const EdgeInsets.all(defaultPadding),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          Locales.string(context, "saving"),
-                          style: TextStyle(
-                            color: normalOrange,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
+    return Scaffold(
+      appBar: _isEditing
+          ? buildNavigationalAppBar(
+              context,
+              Locales.string(context, "estate_editing_title"),
+            )
+          : null,
+      body: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : _isUploading
+              ? Padding(
+                  padding: const EdgeInsets.all(defaultPadding),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        Locales.string(context, "saving"),
+                        style: TextStyle(
+                          color: normalOrange,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
                         ),
-                        SizedBox(
-                          width: defaultPadding,
+                      ),
+                      SizedBox(
+                        width: defaultPadding,
+                      ),
+                      Container(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 3,
+                          color: normalOrange,
                         ),
-                        Container(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 3,
-                            color: normalOrange,
+                      )
+                    ],
+                  ),
+                )
+              : Container(
+                  padding: EdgeInsets.fromLTRB(
+                    defaultPadding,
+                    0,
+                    defaultPadding,
+                    0,
+                  ),
+                  child: Form(
+                    key: _form,
+                    child: SingleChildScrollView(
+                      controller: _scrollController,
+                      physics: BouncingScrollPhysics(),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: defaultPadding),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                width: 40.w,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      Locales.string(context, "main_photo"),
+                                      style: TextStyles.display9(),
+                                    ),
+                                    SizedBox(height: 12),
+                                    Text(
+                                      Locales.string(
+                                          context, "this_photo_is_main"),
+                                      style: TextStyles.display10(),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              _buildMainImagePicker(
+                                photo: _mainImage,
+                                callback: _selectMainImage,
+                                disabled: false,
+                                height: 45.w,
+                                uploading: _mainImageUploading,
+                              ),
+                            ],
                           ),
-                        )
-                      ],
-                    ),
-                  )
-                : Container(
-                    padding: EdgeInsets.fromLTRB(
-                      defaultPadding,
-                      0,
-                      defaultPadding,
-                      0,
-                    ),
-                    child: Form(
-                      key: _form,
-                      child: SingleChildScrollView(
-                        controller: _scrollController,
-                        physics: BouncingScrollPhysics(),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(height: defaultPadding),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Container(
-                                  width: 40.w,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        Locales.string(context, "main_photo"),
-                                        style: TextStyles.display9(),
-                                      ),
-                                      SizedBox(height: 12),
-                                      Text(
-                                        Locales.string(
-                                            context, "this_photo_is_main"),
-                                        style: TextStyles.display10(),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                _buildMainImagePicker(
-                                  photo: _mainImage,
-                                  callback: _selectMainImage,
-                                  disabled: false,
-                                  height: 45.w,
-                                ),
-                              ],
-                            ),
-                            ErrorText(
-                              errorText:
-                                  Locales.string(context, "pick_a_photo"),
-                              display: (_isSubmitted && _mainImage == null),
-                            ),
-                            VerticalHorizontalSizedBox(),
-                            Text(
-                              Locales.string(context, "gallary"),
-                              style: TextStyles.display9(),
-                            ),
-                            VerticalHorizontalSizedBox(),
-                            _buildExtraImagesGrid(),
-                            VerticalHorizontalHalfSizedBox(),
-                            Text(
-                              Locales.string(context, "max_photo_count_8"),
-                              style: TextStyles.display10(),
-                            ),
-                            VerticalHorizontalSizedBox(),
-                            Text(
-                              Locales.string(context, "choose_section"),
-                              style: TextStyles.display9(),
-                            ),
-                            Row(
-                              children: [
-                                ...categories.map((category) {
-                                  return SmallButton(category.title,
-                                      enabled: _currentSection ==
-                                          category.title, onPressed: () {
-                                    setState(() {
-                                      _currentSection = category.title;
-                                    });
-                                  });
-                                }).toList()
-                              ],
-                            ),
-                            VerticalHorizontalSizedBox(),
-                            Text(
-                              Locales.string(context, "region"),
-                              style: TextStyles.display9(),
-                            ),
-                            _buildSelectionRow(
-                                _regions.map((region) => region.title).toList(),
-                                _currentRegion,
-                                Locales.string(context, "choose_region"),
-                                onChanged: (value) {
-                              setState(() {
-                                _currentRegion = value as String;
-                                if (_currentRegion == "0") {
+                          ErrorText(
+                            errorText: Locales.string(context, "pick_a_photo"),
+                            display: (_isSubmitted && _mainImage == null),
+                          ),
+                          VerticalHorizontalSizedBox(),
+                          Text(
+                            Locales.string(context, "gallary"),
+                            style: TextStyles.display9(),
+                          ),
+                          VerticalHorizontalSizedBox(),
+                          _buildExtraImagesGrid(),
+                          VerticalHorizontalHalfSizedBox(),
+                          Text(
+                            Locales.string(context, "max_photo_count_8"),
+                            style: TextStyles.display10(),
+                          ),
+                          VerticalHorizontalSizedBox(),
+                          Text(
+                            Locales.string(context, "choose_section"),
+                            style: TextStyles.display9(),
+                          ),
+                          Row(
+                            children: [
+                              ...categories.map((category) {
+                                return SmallButton(category.title,
+                                    enabled: _currentSection == category.title,
+                                    onPressed: () {
                                   setState(() {
-                                    _currentDistrict = "0";
-                                    _districts = [];
+                                    _currentSection = category.title;
                                   });
-                                } else {
-                                  setState(() {
-                                    _districts = _regions
-                                        .firstWhere((region) =>
-                                            region.title.toString() ==
-                                            _currentRegion)
-                                        .districts;
+                                  Provider.of<FacilityProvider>(context,
+                                          listen: false)
+                                      .getFacilities(category.id.toString())
+                                      .then((_) {
+                                    setState(() {});
                                   });
-                                }
-                              });
-                            }),
-                            VerticalHorizontalSizedBox(),
-                            Text(
-                              Locales.string(context, "district"),
-                              style: TextStyles.display9(),
-                            ),
-                            _buildSelectionRow(
-                                _districts
-                                    .map((district) => district.title)
-                                    .toList(),
-                                _currentDistrict,
-                                Locales.string(context, "choose_district"),
-                                onChanged: (value) {
+                                });
+                              }).toList()
+                            ],
+                          ),
+                          VerticalHorizontalSizedBox(),
+                          ElevatedButton(
+                            onPressed: () {
                               setState(() {
-                                _currentDistrict = value as String;
+                                _filtersOpen = !_filtersOpen;
                               });
-                            }),
-                            VerticalHorizontalSizedBox(),
-                            Text(
-                              Locales.string(context, "popular_place"),
+                            },
+                            style: ElevatedButton.styleFrom(
+                              primary: Colors.white,
+                              shadowColor: Colors.transparent,
+                              elevation: 0,
+                              side: BorderSide(
+                                color: disabledGrey,
+                                width: 1,
+                              ),
+                            ),
+                            child: Text(
+                              Locales.string(context, "adding_filters") +
+                                  (_filtersOpen ? " ▼" : " ▲"),
                               style: TextStyles.display9(),
                             ),
-                            _buildSelectionRow(
-                                _popular_places
-                                    .map((place) => place.title)
-                                    .toList(),
-                                _currentPopularPlace,
-                                Locales.string(context, "choose_popular_place"),
-                                onChanged: (value) {
-                              setState(() {
-                                _currentPopularPlace = value as String;
-                              });
-                            }),
-                            VerticalHorizontalSizedBox(),
-                            Text(
-                              Locales.string(context, "choose_title"),
-                              style: TextStyles.display9(),
-                            ),
-                            VerticalHorizontalHalfSizedBox(),
-                            NormalTextInput(
-                              hintText:
-                                  Locales.string(context, "example_title"),
-                              controller: _titleController,
-                              focusNode: _titleFocusNode,
-                              onSubmitted: (value) {
-                                FocusScope.of(context)
-                                    .requestFocus(_addressFocusNode);
-                              },
-                              validator: (value) {
-                                if (value!.length == 0) {
-                                  return Locales.string(
-                                      context, "required_field");
-                                }
-                                return null;
-                              },
-                            ),
-                            VerticalHorizontalSizedBox(),
-                            Text(
-                              Locales.string(context, "choose_location"),
-                              style: TextStyles.display9(),
-                            ),
-                            VerticalHorizontalHalfSizedBox(),
-                            _buildLocationPicker(),
-                            VerticalHorizontalSizedBox(),
-                            Text(
-                              Locales.string(context, "enter_address"),
-                              style: TextStyles.display9(),
-                            ),
-                            VerticalHorizontalHalfSizedBox(),
-                            NormalTextInput(
-                              hintText:
-                                  Locales.string(context, "example_address"),
-                              controller: _addressController,
-                              focusNode: _addressFocusNode,
-                              onSubmitted: (value) {
-                                FocusScope.of(context)
-                                    .requestFocus(_descriptionFocusNode);
-                              },
-                              validator: (value) {
-                                if (value!.length == 0) {
-                                  return Locales.string(
-                                      context, "required_field");
-                                }
-                                return null;
-                              },
-                            ),
-                            VerticalHorizontalSizedBox(),
-                            Text(
-                              Locales.string(context, "about_estate"),
-                              style: TextStyles.display9(),
-                            ),
-                            VerticalHorizontalHalfSizedBox(),
-                            NormalTextInput(
-                              hintText: Locales.string(context, "about_estate"),
-                              maxLines: 8,
-                              maxLength: _descriptionMaxLength,
-                              controller: _descriptionController,
-                              focusNode: _descriptionFocusNode,
-                              onSubmitted: (value) {
-                                FocusScope.of(context)
-                                    .requestFocus(_announcerFocusNode);
-                              },
-                              validator: (value) {
-                                if (value!.length == 0) {
-                                  return Locales.string(
-                                      context, "required_field");
-                                }
-                                return null;
-                              },
-                            ),
-                            VerticalHorizontalHalfSizedBox(),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(Locales.string(
-                                    context, "at_least_50_chars")),
-                                Text(
-                                    "${_descriptionController.text.length}/${_descriptionMaxLength}"),
-                              ],
-                            ),
-                            VerticalHorizontalSizedBox(),
-                            Text(
-                              Locales.string(context, "booked_days_if_any"),
-                              style: TextStyles.display9(),
-                            ),
-                            _buildCalendar(),
-                            VerticalHorizontalHalfSizedBox(),
-                            BookedDaysHint(),
-                            VerticalHorizontalSizedBox(),
-                            Text(
-                              Locales.string(context, "adding_filters"),
-                              style: TextStyles.display9(),
-                            ),
-                            VerticalHorizontalHalfSizedBox(),
-                            _buildFacilitiesGrid(facilities),
-                            VerticalHorizontalSizedBox(),
-                            Text(
-                              Locales.string(context, "contact"),
-                              style: TextStyles.display9(),
-                            ),
-                            VerticalHorizontalHalfSizedBox(),
-                            NormalTextInput(
-                              hintText: Locales.string(context, "fullname"),
-                              controller: _announcerController,
-                              focusNode: _announcerFocusNode,
-                              validation: false,
-                              onSubmitted: (value) {
-                                FocusScope.of(context)
-                                    .requestFocus(_phoneFocusNode);
-                              },
-                            ),
-                            VerticalHorizontalHalfSizedBox(),
-                            NormalTextInput(
-                              hintText: Locales.string(context, "phone"),
-                              controller: _phoneController,
-                              focusNode: _phoneFocusNode,
-                              isPhone: true,
-                              onSubmitted: (value) {
-                                FocusScope.of(context)
-                                    .requestFocus(_weekdayPriceFocusNode);
-                              },
-                            ),
-                            VerticalHorizontalSizedBox(),
-                            Text(
-                              Locales.string(context, "price"),
-                              style: TextStyles.display9(),
-                            ),
-                            VerticalHorizontalHalfSizedBox(),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Container(
-                                  width: 43.w,
-                                  child: NormalTextInput(
-                                    hintText: Locales.string(
-                                        context, "weekday_price"),
-                                    controller: _weekdayPriceController,
-                                    focusNode: _weekdayPriceFocusNode,
-                                    isPrice: true,
-                                    onSubmitted: (value) {
-                                      FocusScope.of(context)
-                                          .requestFocus(_weekendPriceFocusNode);
-                                    },
-                                    validator: (value) {
-                                      if (value!.length == 0) {
-                                        return Locales.string(
-                                            context, "required_field");
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                ),
-                                Container(
-                                  width: 43.w,
-                                  child: NormalTextInput(
-                                    hintText: Locales.string(
-                                        context, "weekend_price"),
-                                    controller: _weekendPriceController,
-                                    focusNode: _weekendPriceFocusNode,
-                                    isPrice: true,
-                                    onSubmitted: (value) {},
-                                    validator: (value) {
-                                      if (value!.length == 0) {
-                                        return Locales.string(
-                                            context, "required_field");
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                            _buildPriceTypeRow(currencies),
-                            ErrorText(
-                              errorText:
-                                  Locales.string(context, "choose_currency"),
-                              display:
-                                  (_isSubmitted && _currentCurrencyId == 0),
-                            ),
-                            VerticalHorizontalSizedBox(),
-                            FluidBigButton(
-                              onPress: () async {
-                                if (_isEditing) {
-                                  await updateData(context);
-                                } else {
-                                  dynamic data = await sendData(context);
-                                  if (data != null) {
+                          ),
+                          VerticalHorizontalHalfSizedBox(),
+                          _buildFacilitiesGrid(facilities),
+                          VerticalHorizontalSizedBox(),
+                          Text(
+                            Locales.string(context, "region"),
+                            style: TextStyles.display9(),
+                          ),
+                          _buildSelectionRow(
+                              Provider.of<FacilityProvider>(context,
+                                      listen: false)
+                                  .regions
+                                  .map((region) => region.title)
+                                  .toList(),
+                              _currentRegion,
+                              Locales.string(context, "choose_region"),
+                              onChanged: (value) {
+                            setState(() {
+                              _currentRegion = value as String;
+                              if (_currentRegion == "0") {
+                                setState(() {
+                                  _currentDistrict = "0";
+                                  _districts = [];
+                                });
+                              } else {
+                                setState(() {
+                                  _districts = Provider.of<FacilityProvider>(
+                                          context,
+                                          listen: false)
+                                      .regions
+                                      .firstWhere((region) =>
+                                          region.title.toString() ==
+                                          _currentRegion)
+                                      .districts;
+                                });
+                              }
+                            });
+                          }),
+                          VerticalHorizontalSizedBox(),
+                          Text(
+                            Locales.string(context, "district"),
+                            style: TextStyles.display9(),
+                          ),
+                          _buildSelectionRow(
+                              _districts
+                                  .map((district) => district.title)
+                                  .toList(),
+                              _currentDistrict,
+                              Locales.string(context, "choose_district"),
+                              onChanged: (value) {
+                            setState(() {
+                              _currentDistrict = value as String;
+                            });
+                          }),
+                          VerticalHorizontalSizedBox(),
+                          Text(
+                            Locales.string(context, "popular_place"),
+                            style: TextStyles.display9(),
+                          ),
+                          _buildSelectionRow(
+                              Provider.of<FacilityProvider>(context,
+                                      listen: false)
+                                  .places
+                                  .map((place) => place.title)
+                                  .toList(),
+                              _currentPopularPlace,
+                              Locales.string(context, "choose_popular_place"),
+                              onChanged: (value) {
+                            setState(() {
+                              _currentPopularPlace = value as String;
+                            });
+                          }),
+                          VerticalHorizontalSizedBox(),
+                          Text(
+                            Locales.string(context, "choose_title"),
+                            style: TextStyles.display9(),
+                          ),
+                          VerticalHorizontalHalfSizedBox(),
+                          NormalTextInput(
+                            hintText: Locales.string(context, "example_title"),
+                            controller: _titleController,
+                            focusNode: _titleFocusNode,
+                            onSubmitted: (value) {
+                              FocusScope.of(context)
+                                  .requestFocus(_addressFocusNode);
+                            },
+                            validator: (value) {
+                              if (value!.length == 0) {
+                                return Locales.string(
+                                    context, "required_field");
+                              }
+                              return null;
+                            },
+                          ),
+                          VerticalHorizontalSizedBox(),
+                          Text(
+                            Locales.string(context, "choose_location"),
+                            style: TextStyles.display9(),
+                          ),
+                          VerticalHorizontalHalfSizedBox(),
+                          _buildLocationPicker(),
+                          VerticalHorizontalSizedBox(),
+                          Text(
+                            Locales.string(context, "enter_address"),
+                            style: TextStyles.display9(),
+                          ),
+                          VerticalHorizontalHalfSizedBox(),
+                          NormalTextInput(
+                            hintText:
+                                Locales.string(context, "example_address"),
+                            controller: _addressController,
+                            focusNode: _addressFocusNode,
+                            onSubmitted: (value) {
+                              FocusScope.of(context)
+                                  .requestFocus(_descriptionFocusNode);
+                            },
+                            validator: (value) {
+                              if (value!.length == 0) {
+                                return Locales.string(
+                                    context, "required_field");
+                              }
+                              return null;
+                            },
+                          ),
+                          VerticalHorizontalSizedBox(),
+                          Text(
+                            Locales.string(context, "about_estate"),
+                            style: TextStyles.display9(),
+                          ),
+                          VerticalHorizontalHalfSizedBox(),
+                          NormalTextInput(
+                            hintText: Locales.string(context, "about_estate"),
+                            maxLines: 8,
+                            maxLength: _descriptionMaxLength,
+                            controller: _descriptionController,
+                            focusNode: _descriptionFocusNode,
+                            onSubmitted: (value) {
+                              FocusScope.of(context)
+                                  .requestFocus(_announcerFocusNode);
+                            },
+                            validator: (value) {
+                              if (value!.length == 0) {
+                                return Locales.string(
+                                    context, "required_field");
+                              }
+                              return null;
+                            },
+                          ),
+                          VerticalHorizontalHalfSizedBox(),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                  Locales.string(context, "at_least_50_chars")),
+                              Text(
+                                  "${_descriptionController.text.length}/${_descriptionMaxLength}"),
+                            ],
+                          ),
+                          VerticalHorizontalSizedBox(),
+                          Text(
+                            Locales.string(context, "booked_days_if_any"),
+                            style: TextStyles.display9(),
+                          ),
+                          _buildCalendar(),
+                          VerticalHorizontalHalfSizedBox(),
+                          BookedDaysHint(),
+                          VerticalHorizontalSizedBox(),
+                          Text(
+                            Locales.string(context, "contact"),
+                            style: TextStyles.display9(),
+                          ),
+                          VerticalHorizontalHalfSizedBox(),
+                          NormalTextInput(
+                            hintText: Locales.string(context, "fullname"),
+                            controller: _announcerController,
+                            focusNode: _announcerFocusNode,
+                            validation: false,
+                            onSubmitted: (value) {
+                              FocusScope.of(context)
+                                  .requestFocus(_phoneFocusNode);
+                            },
+                          ),
+                          VerticalHorizontalHalfSizedBox(),
+                          NormalTextInput(
+                            hintText: Locales.string(context, "phone"),
+                            controller: _phoneController,
+                            focusNode: _phoneFocusNode,
+                            isPhone: true,
+                            onSubmitted: (value) {
+                              FocusScope.of(context)
+                                  .requestFocus(_weekdayPriceFocusNode);
+                            },
+                          ),
+                          VerticalHorizontalSizedBox(),
+                          Text(
+                            Locales.string(context, "price"),
+                            style: TextStyles.display9(),
+                          ),
+                          VerticalHorizontalHalfSizedBox(),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                width: 43.w,
+                                child: NormalTextInput(
+                                  hintText:
+                                      Locales.string(context, "weekday_price"),
+                                  controller: _weekdayPriceController,
+                                  focusNode: _weekdayPriceFocusNode,
+                                  isPrice: true,
+                                  onSubmitted: (value) {
                                     FocusScope.of(context)
-                                        .requestFocus(FocusNode());
-                                    Navigator.of(context).pushNamed(
-                                        PlansScreen.routeName,
-                                        arguments: {"data": data});
-                                  }
+                                        .requestFocus(_weekendPriceFocusNode);
+                                  },
+                                  validator: (value) {
+                                    if (value!.length == 0) {
+                                      return Locales.string(
+                                          context, "required_field");
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ),
+                              Container(
+                                width: 43.w,
+                                child: NormalTextInput(
+                                  hintText:
+                                      Locales.string(context, "weekend_price"),
+                                  controller: _weekendPriceController,
+                                  focusNode: _weekendPriceFocusNode,
+                                  isPrice: true,
+                                  onSubmitted: (value) {},
+                                  validator: (value) {
+                                    if (value!.length == 0) {
+                                      return Locales.string(
+                                          context, "required_field");
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                          _buildPriceTypeRow(currencies),
+                          ErrorText(
+                            errorText:
+                                Locales.string(context, "choose_currency"),
+                            display: (_isSubmitted && _currentCurrencyId == 0),
+                          ),
+                          VerticalHorizontalSizedBox(),
+                          FluidBigButton(
+                            onPress: () async {
+                              if (_isEditing) {
+                                await updateData(context);
+                              } else {
+                                dynamic data = await sendData(context);
+                                if (data != null) {
+                                  FocusScope.of(context)
+                                      .requestFocus(FocusNode());
+                                  Navigator.of(context).pushNamed(
+                                      PlansScreen.routeName,
+                                      arguments: {"data": data});
                                 }
-                              },
-                              text: _isEditing
-                                  ? Locales.string(context, "edit_estate")
-                                  : Locales.string(context, "save_estate"),
-                            ),
-                            VerticalHorizontalSizedBox(),
-                          ],
-                        ),
+                              }
+                            },
+                            text: _isEditing
+                                ? Locales.string(context, "edit_estate")
+                                : Locales.string(context, "save_estate"),
+                          ),
+                          VerticalHorizontalSizedBox(),
+                        ],
                       ),
                     ),
                   ),
-      ),
+                ),
     );
   }
 
@@ -888,6 +923,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     Function? callback,
     double? width,
     double? height,
+    bool uploading = false,
     bool disabled = true,
     double iconScale = 1,
   }) {
@@ -924,10 +960,15 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                         fixMediaUrl(photo),
                         fit: BoxFit.cover,
                       )
-                    : Image.file(
-                        photo as File,
-                        fit: BoxFit.cover,
-                      ),
+                    : (uploading
+                        ? Transform.scale(
+                            scale: 0.5,
+                            child: CircularProgressIndicator(),
+                          )
+                        : Image.file(
+                            photo as File,
+                            fit: BoxFit.cover,
+                          )),
           ),
         ),
       ),
@@ -948,6 +989,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
             callback: () => _selectExtraImages(index),
             disabled: index > _currentExtraImageIndex,
             iconScale: 1.5,
+            uploading: _extraImagesLoading[index],
           ),
         ),
       ],
@@ -966,10 +1008,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
           label: Locales.string(context, "choose_one"),
           labelVisible: false,
           selectedItem: value,
-          onChanged: onChanged ??
-              (value) {
-                print(value);
-              },
+          onChanged: onChanged ?? (value) {},
           validate: (String? item) {
             if (item == null)
               return Locales.string(context, "required_field");
@@ -1074,26 +1113,29 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
   }
 
   Widget _buildFacilitiesGrid(List<FacilityModel> facilities) {
-    return Wrap(
-      alignment: WrapAlignment.spaceBetween,
-      children: [
-        ...facilities.map((facility) {
-          int index = facilities.indexOf(facility);
-          return CustomCheckbox(
-            value: _facilities.contains(facility.id),
-            title: facilities[index].title,
-            onTap: () {
-              setState(() {
-                if (_facilities.contains(facility.id)) {
-                  _facilities.remove(facility.id);
-                } else {
-                  _facilities.add(facility.id);
-                }
-              });
-            },
-          );
-        }).toList()
-      ],
+    return Visibility(
+      visible: _filtersOpen,
+      child: Wrap(
+        alignment: WrapAlignment.spaceBetween,
+        children: [
+          ...facilities.map((facility) {
+            int index = facilities.indexOf(facility);
+            return CustomCheckbox(
+              value: _facilities.contains(facility.id),
+              title: facilities[index].title,
+              onTap: () {
+                setState(() {
+                  if (_facilities.contains(facility.id)) {
+                    _facilities.remove(facility.id);
+                  } else {
+                    _facilities.add(facility.id);
+                  }
+                });
+              },
+            );
+          }).toList()
+        ],
+      ),
     );
   }
 
@@ -1133,7 +1175,6 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
               ),
             ),
             selectedDayPredicate: (day) {
-              print(_selectedDays);
               return _selectedDays.contains(BookingDay.toObj(day));
             },
             startingDayOfWeek: StartingDayOfWeek.monday,

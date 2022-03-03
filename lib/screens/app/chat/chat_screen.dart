@@ -126,53 +126,49 @@ class _ChatScreenState extends State<ChatScreen> {
             .changePageIndex(3);
         return true;
       },
-      child: SafeArea(
-        child: Scaffold(
-          appBar: buildNavigationalAppBar(context, sender!.fullname, () {
-            Navigator.of(context).pop();
-          }, [
-            sender!.photo == ""
-                ? IconButton(
-                    onPressed: () {},
-                    icon: Container(
-                      width: 30,
-                      height: 30,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(30),
-                        child: Image.asset(
-                          "assets/images/user.png",
-                          fit: BoxFit.cover,
-                        ),
+      child: Scaffold(
+        appBar: buildNavigationalAppBar(context, sender!.fullname, () {}, [
+          sender!.photo == ""
+              ? IconButton(
+                  onPressed: () {},
+                  icon: Container(
+                    width: 30,
+                    height: 30,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(30),
+                      child: Image.asset(
+                        "assets/images/user.png",
+                        fit: BoxFit.cover,
                       ),
                     ),
-                  )
-                : IconButton(
-                    onPressed: () {},
-                    icon: Container(
-                      width: 30,
-                      height: 30,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(30),
-                        child: Image.network(
-                          fixMediaUrl(sender!.photo),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                  )
-          ]),
-          body: _isLoading
-              ? Center(
-                  child: CircularProgressIndicator(),
+                  ),
                 )
-              : Column(
-                  children: [
-                    _buildEstateBox(),
-                    _buildMessagesList(),
-                    _buildInputBox()
-                  ],
-                ),
-        ),
+              : IconButton(
+                  onPressed: () {},
+                  icon: Container(
+                    width: 30,
+                    height: 30,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(30),
+                      child: Image.network(
+                        fixMediaUrl(sender!.photo),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                )
+        ]),
+        body: _isLoading
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : Column(
+                children: [
+                  _buildEstateBox(),
+                  _buildMessagesList(),
+                  _buildInputBox()
+                ],
+              ),
       ),
     );
   }

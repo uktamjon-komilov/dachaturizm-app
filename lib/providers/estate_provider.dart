@@ -1,7 +1,4 @@
-import 'dart:convert';
-
 import 'package:dachaturizm/constants.dart';
-import 'package:dachaturizm/helpers/locale_helper.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/models/category_model.dart';
 import 'package:dachaturizm/models/estate_rating_model.dart';
@@ -43,8 +40,8 @@ class EstateProvider with ChangeNotifier {
     return response;
   }
 
-  Future<Map<int, List<EstateModel>>> _setTopEstates(dynamic data,
-      CategoryModel category, Map<int, List<EstateModel>> result) async {
+  Future<Map<int, List<EstateModel>>> _setTopEstates(
+      data, CategoryModel category, Map<int, List<EstateModel>> result) async {
     await data["results"].forEach((item) async {
       EstateModel estate = await EstateModel.fromJson(item);
       result[category.id]!.add(estate);
@@ -67,8 +64,9 @@ class EstateProvider with ChangeNotifier {
         data = response.data;
         estates = await _setTopEstates(data, categories[i], estates);
         while (data["links"]["next"] != null) {
-          data = await _fetch(data["links"]["next"]);
-          estates = await _setTopEstates(data, categories[i], estates);
+          response = await _fetch(data["links"]["next"]);
+          estates = await _setTopEstates(response.data, categories[i], estates);
+          data = response.data;
         }
       }
     }
@@ -113,18 +111,6 @@ class EstateProvider with ChangeNotifier {
     } catch (e) {}
     data["estates"] = estates;
     return data;
-  }
-
-  // Get static pages
-  Future<List<StaticPageModel>> getStaticPages() async {
-    List<StaticPageModel> pages = [];
-    const url = "${baseUrl}api/staticpages/";
-    final response = await dio.get(url);
-    await response.data.forEach((item) async {
-      StaticPageModel page = await StaticPageModel.fromJson(item);
-      pages.add(page);
-    });
-    return pages;
   }
 
   // Begin
@@ -339,266 +325,8 @@ class EstateProvider with ChangeNotifier {
     if (categoryId != null) {
       data["category"] = categoryId;
     }
-    print(url);
-    print(data);
     final response = await dio.post(url, data: data);
-    print(response.data);
     return response.data;
-  }
-
-  // Prepare data for creation/updating
-  prepareData(data, [estate]) async {
-    final locale = await getCurrentLocale();
-    Map<String, dynamic> tempData = {};
-
-    // if (data.containsKey("photos")) {
-    //   int i = 0;
-
-    //   while (data["photos"].length > 0) {
-    //     if (data["photos"].length == i) break;
-    //     var photo;
-    //     if (data["photos"][i].runtimeType.toString() == "String") {
-    //       photo = data["photos"][i];
-    //     } else {
-    //       photo = await MultipartFile.fromFile(data["photos"][i].path,
-    //           filename: "testimage.png");
-    //     }
-    //     tempData["photo${i + 1}"] = photo;
-    //     i += 1;
-    //   }
-    // }
-    tempData["photos"] = "[${data['photos'].join(',')}]";
-
-    // if (data.containsKey("photo")) {
-    //   if (data["photo"].runtimeType.toString() == "String") {
-    //     tempData["photo"] = data["photo"];
-    //   } else {
-    //     tempData["photo"] = await MultipartFile.fromFile(data["photo"].path,
-    //         filename: "testimage.png");
-    //   }
-    // }
-    tempData["photo"] = data["photo"];
-
-    Map<String, dynamic> translations = {
-      "en": {
-        "title": "",
-        "description": "",
-        "region": data["region"].translations["en"]["title"],
-        "district": data["region"].translations["en"]["title"],
-      },
-      "uz": {
-        "title": "",
-        "description": "",
-        "region": data["region"].translations["uz"]["title"],
-        "district": data["region"].translations["uz"]["title"],
-      },
-      "ru": {
-        "title": "",
-        "description": "",
-        "region": data["region"].translations["ru"]["title"],
-        "district": data["region"].translations["ru"]["title"],
-      }
-    };
-
-    print(translations);
-
-    if (data.containsKey("title")) {
-      translations[locale.toString()]["title"] = data["title"];
-    } else {
-      translations[locale.toString()]["title"] = estate.title;
-    }
-
-    if (data.containsKey("description")) {
-      translations[locale.toString()]["description"] = data["description"];
-    } else {
-      translations[locale.toString()]["description"] = estate.description;
-    }
-
-    tempData["translations"] = json.encode(translations);
-
-    if (data.containsKey("estate_type")) {
-      tempData["estate_type"] = data["estate_type"];
-    }
-
-    if (data.containsKey("price_type")) {
-      tempData["price_type"] = data["price_type"];
-    }
-
-    if (data.containsKey("popular_place_id")) {
-      tempData["popular_place_id"] = data["popular_place_id"];
-    }
-
-    if (data.containsKey("beds")) {
-      tempData["beds"] = 5;
-    }
-
-    if (data.containsKey("pool")) {
-      tempData["pool"] = 1;
-    }
-
-    if (data.containsKey("people")) {
-      tempData["people"] = 5;
-    }
-
-    if (data.containsKey("weekday_price")) {
-      tempData["weekday_price"] = data["weekday_price"];
-    }
-
-    if (data.containsKey("weekend_price")) {
-      tempData["weekend_price"] = data["weekend_price"];
-    }
-
-    if (data.containsKey("address")) {
-      tempData["address"] = data["address"];
-    }
-
-    if (data.containsKey("longtitute")) {
-      tempData["longtitute"] = data["longtitute"];
-    }
-
-    if (data.containsKey("latitute")) {
-      tempData["latitute"] = data["latitute"];
-    }
-
-    if (data.containsKey("announcer")) {
-      tempData["announcer"] = data["announcer"];
-    }
-
-    if (data.containsKey("phone")) {
-      tempData["phone"] = data["phone"].toString().replaceAll("+", "");
-    }
-
-    if (data.containsKey("is_published")) {
-      tempData["is_published"] = data["is_published"];
-    }
-
-    if (data.containsKey("facilities")) {
-      tempData["facilities"] = "[${data['facilities'].join(',')}]";
-    }
-
-    if (data.containsKey("booked_days")) {
-      tempData["booked_days"] = "[${data['booked_days'].join(',')}]";
-    }
-
-    print(tempData);
-
-    return tempData;
-  }
-
-  // Estate creation future
-  Future<Map<String, dynamic>> createEstate(Map<String, dynamic> data) async {
-    const url = "${baseUrl}api/estate/";
-    String refresh = await auth.getRefreshToken();
-    print("refresh");
-    if (refresh == null || refresh == "") {
-      return {"statusCode": 400};
-    }
-    String access = await auth.getAccessToken();
-    print("access");
-    Options options = Options(
-      headers: {
-        "Content-type": "multipart/form-data",
-        "Authorization": "Bearer ${access}",
-      },
-    );
-
-    Map<String, dynamic> tempData = await prepareData(data);
-
-    try {
-      FormData formData = FormData.fromMap(tempData);
-      final response = await dio.post(url, data: formData, options: options);
-      print("uploaded");
-      return {"statusCode": response.statusCode};
-    } catch (e) {
-      print(e);
-    }
-    return {"statusCode": 400};
-  }
-
-  // Estate updating future
-  Future updateEstate(estateId, data, estate) async {
-    final url = "${baseUrl}api/estate/${estateId}/";
-    String refresh = await auth.getRefreshToken();
-    if (refresh == null || refresh == "") {
-      return {"statusCode": 400};
-    }
-    String access = await auth.getAccessToken();
-    Options options = Options(headers: {
-      "Content-type": "multipart/form-data",
-      "Authorization": "Bearer ${access}",
-    });
-
-    Map<String, dynamic> tempData = await prepareData(data, estate);
-
-    try {
-      FormData formData = FormData.fromMap(tempData);
-      var response = await dio.patch(url, data: formData, options: options);
-      print(response);
-      return {"statusCode": response.statusCode};
-    } catch (e) {
-      print(e);
-    }
-    return {"statusCode": 400};
-  }
-
-  Future<int> uploadTempPhoto(photo) async {
-    try {
-      const url = "${baseUrl}api/tempphoto/";
-      String access = await auth.getAccessToken();
-      Options options = Options(headers: {
-        "Content-type": "multipart/form-data",
-        "Authorization": "Bearer ${access}",
-      });
-      FormData formData = FormData.fromMap({"photo": photo});
-      final response = await dio.post(url, options: options, data: formData);
-      if (response.statusCode as int >= 200 &&
-          response.statusCode as int < 300) {
-        return response.data["id"];
-      }
-    } catch (e) {
-      print(e);
-    }
-    return 0;
-  }
-
-  Future<int> uploadExtraPhoto(photo) async {
-    try {
-      const url = "${baseUrl}api/estatephotos/";
-      String access = await auth.getAccessToken();
-      Options options = Options(headers: {
-        "Content-type": "multipart/form-data",
-        "Authorization": "Bearer ${access}",
-      });
-      FormData formData = FormData.fromMap({"photo": photo});
-      final response = await dio.post(url, options: options, data: formData);
-      if (response.statusCode as int >= 200 &&
-          response.statusCode as int < 300) {
-        return response.data["id"];
-      }
-    } catch (e) {
-      print(e);
-    }
-    return 0;
-  }
-
-  Future<int> updateExtraPhoto(id, photo) async {
-    try {
-      final url = "${baseUrl}api/estatephotos/${id}/";
-      String access = await auth.getAccessToken();
-      Options options = Options(headers: {
-        "Content-type": "multipart/form-data",
-        "Authorization": "Bearer ${access}",
-      });
-      FormData formData = FormData.fromMap({"photo": photo});
-      final response = await dio.patch(url, options: options, data: formData);
-      if (response.statusCode as int >= 200 &&
-          response.statusCode as int < 300) {
-        return response.data["id"];
-      }
-    } catch (e) {
-      print(e);
-    }
-    return 0;
   }
 
   // Getting my estates
@@ -609,7 +337,6 @@ class EstateProvider with ChangeNotifier {
     } else {
       url = "${baseUrl}api/estate/myestates/?term=${term}";
     }
-    print(url);
     final access = await auth.getAccessToken();
     try {
       final response = await dio.get(
@@ -639,9 +366,7 @@ class EstateProvider with ChangeNotifier {
   Future<EstateModel?> getMyLastEstate() async {
     const url = "${baseUrl}api/estate/last/";
     final access = await auth.getAccessToken();
-    print(url);
     try {
-      print(url);
       final response = await dio.get(
         url,
         options: Options(headers: {
@@ -649,7 +374,6 @@ class EstateProvider with ChangeNotifier {
           "Authorization": "Bearer ${access}",
         }),
       );
-      print(response);
       if (response.statusCode as int >= 200 ||
           response.statusCode as int < 300) {
         EstateModel estate = await EstateModel.fromJson(response.data);
@@ -658,24 +382,19 @@ class EstateProvider with ChangeNotifier {
     } catch (e) {
       print(e);
     }
-    print("no");
     return null;
   }
 
   // Advertise estate
   Future<bool> advertise(String slug, int estateId) async {
     final url = "${baseUrl}api/advertise/${slug}/${estateId}/";
-    print(url);
     final access = await auth.getAccessToken();
     try {
-      print("try");
       final response = await dio.post(url,
           options: Options(headers: {
             "Content-type": "application/json",
             "Authorization": "Bearer ${access}"
           }));
-      print(response);
-      print(response.data);
       if (response.statusCode as int >= 200 ||
           response.statusCode as int < 300) {
         return true;
@@ -684,7 +403,6 @@ class EstateProvider with ChangeNotifier {
     } catch (e) {
       print(e);
     }
-    print(false);
     return false;
   }
 

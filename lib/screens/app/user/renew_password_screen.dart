@@ -41,7 +41,6 @@ class _RenewPasswordScreenState extends State<RenewPasswordScreen> {
         if (data["status"]) {
           snackBarMessage = Locales.string(context, "your_password_renewed");
         } else {
-          print(data);
           switch (data["detail"]) {
             case "OLD_PASSWORD_WRONG":
               snackBarMessage = Locales.string(context, "old_password_wrong");
@@ -74,116 +73,113 @@ class _RenewPasswordScreenState extends State<RenewPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: buildNavigationalAppBar(
-          context,
-          Locales.string(context, "change_password"),
-        ),
-        floatingActionButton: Visibility(
-          visible: !_isLoading,
-          child: Container(
-            width: 100.w - 1.8 * defaultPadding,
-            child: FluidBigButton(
-              text: Locales.string(context, "save"),
-              onPress: _changePassword,
-            ),
+    return Scaffold(
+      appBar: buildNavigationalAppBar(
+        context,
+        Locales.string(context, "change_password"),
+      ),
+      floatingActionButton: Visibility(
+        visible: !_isLoading,
+        child: Container(
+          width: 100.w - 1.8 * defaultPadding,
+          child: FluidBigButton(
+            text: Locales.string(context, "save"),
+            onPress: _changePassword,
           ),
         ),
-        body: _isLoading
-            ? Center(
-                child: CircularProgressIndicator(),
-              )
-            : Container(
-                height: 100.h,
-                width: 100.w,
-                padding: EdgeInsets.all(defaultPadding),
-                child: SingleChildScrollView(
-                  child: Form(
-                    key: _form,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          Locales.string(context, "current_password"),
-                          style:
-                              TextStyles.display6().copyWith(color: darkPurple),
-                        ),
-                        SizedBox(height: defaultPadding * 3 / 4),
-                        PasswordInputField(
-                          controller: _currentPasswordController,
-                          hintText: Locales.string(context, "current_password"),
-                          validator: (value) {
-                            if (value!.length == 0) {
-                              return Locales.string(
-                                context,
-                                "fill_in_the_fields",
-                              );
-                            }
-                            return null;
-                          },
-                        ),
-                        SizedBox(height: 1.5 * defaultPadding),
-                        Text(
-                          Locales.string(context, "enter_new_password"),
-                          style:
-                              TextStyles.display6().copyWith(color: darkPurple),
-                        ),
-                        SizedBox(height: defaultPadding * 3 / 4),
-                        PasswordInputField(
-                          controller: _newPasswordController,
-                          hintText:
-                              Locales.string(context, "enter_new_password"),
-                          validator: (value) {
-                            if (value!.length == 0) {
-                              return Locales.string(
-                                context,
-                                "fill_in_the_fields",
-                              );
-                            } else if (_newPasswordController.text !=
-                                _confirmPasswordController.text) {
-                              return Locales.string(
-                                context,
-                                "passwords_must_match",
-                              );
-                            }
-                            return null;
-                          },
-                        ),
-                        SizedBox(height: 1.5 * defaultPadding),
-                        Text(
-                          Locales.string(context, "repeat_new_password"),
-                          style:
-                              TextStyles.display6().copyWith(color: darkPurple),
-                        ),
-                        SizedBox(height: defaultPadding * 3 / 4),
-                        PasswordInputField(
-                          controller: _confirmPasswordController,
-                          hintText:
-                              Locales.string(context, "repeat_new_password"),
-                          validator: (value) {
-                            if (value!.length == 0) {
-                              return Locales.string(
-                                context,
-                                "fill_in_the_fields",
-                              );
-                            } else if (_newPasswordController.text !=
-                                _confirmPasswordController.text) {
-                              return Locales.string(
-                                context,
-                                "passwords_must_match",
-                              );
-                            }
-                            return null;
-                          },
-                        ),
-                        SizedBox(height: 1.5 * defaultPadding),
-                      ],
-                    ),
+      ),
+      body: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : Container(
+              height: 100.h,
+              width: 100.w,
+              padding: EdgeInsets.all(defaultPadding),
+              child: SingleChildScrollView(
+                child: Form(
+                  key: _form,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        Locales.string(context, "current_password"),
+                        style:
+                            TextStyles.display6().copyWith(color: darkPurple),
+                      ),
+                      SizedBox(height: defaultPadding * 3 / 4),
+                      PasswordInputField(
+                        controller: _currentPasswordController,
+                        hintText: Locales.string(context, "current_password"),
+                        validator: (value) {
+                          if (value!.length == 0) {
+                            return Locales.string(
+                              context,
+                              "fill_in_the_fields",
+                            );
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 1.5 * defaultPadding),
+                      Text(
+                        Locales.string(context, "enter_new_password"),
+                        style:
+                            TextStyles.display6().copyWith(color: darkPurple),
+                      ),
+                      SizedBox(height: defaultPadding * 3 / 4),
+                      PasswordInputField(
+                        controller: _newPasswordController,
+                        hintText: Locales.string(context, "enter_new_password"),
+                        validator: (value) {
+                          if (value!.length == 0) {
+                            return Locales.string(
+                              context,
+                              "fill_in_the_fields",
+                            );
+                          } else if (_newPasswordController.text !=
+                              _confirmPasswordController.text) {
+                            return Locales.string(
+                              context,
+                              "passwords_must_match",
+                            );
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 1.5 * defaultPadding),
+                      Text(
+                        Locales.string(context, "repeat_new_password"),
+                        style:
+                            TextStyles.display6().copyWith(color: darkPurple),
+                      ),
+                      SizedBox(height: defaultPadding * 3 / 4),
+                      PasswordInputField(
+                        controller: _confirmPasswordController,
+                        hintText:
+                            Locales.string(context, "repeat_new_password"),
+                        validator: (value) {
+                          if (value!.length == 0) {
+                            return Locales.string(
+                              context,
+                              "fill_in_the_fields",
+                            );
+                          } else if (_newPasswordController.text !=
+                              _confirmPasswordController.text) {
+                            return Locales.string(
+                              context,
+                              "passwords_must_match",
+                            );
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 1.5 * defaultPadding),
+                    ],
                   ),
                 ),
               ),
-      ),
+            ),
     );
   }
 }

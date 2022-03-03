@@ -196,5 +196,6 @@
     "last_charges": "Last charges",
     "renewed": "Renewed",
     "you_dont_have_transactions": "You don't have transactions",
-    "other_settings": "Other settings"
+    "other_settings": "Other settings",
+    "refresh_to_get_new_results": "Please, refresh to get new results"
 }
