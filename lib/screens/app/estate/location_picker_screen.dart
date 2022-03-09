@@ -74,7 +74,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
           Locales.string(context, "choose_location"),
           () {
             _data["position"] = _markers.firstWhere((element) => true).position;
-            Navigator.pop(context, _data);
+            return _data;
           },
           [
             IconButton(

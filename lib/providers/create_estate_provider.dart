@@ -207,6 +207,7 @@ class CreateEstateProvider extends ChangeNotifier {
       final response = await dio.post(url, options: options, data: formData);
       if (response.statusCode as int >= 200 &&
           response.statusCode as int < 300) {
+        print(response.data);
         return response.data["id"];
       }
     } catch (e) {

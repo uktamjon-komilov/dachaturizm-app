@@ -8,9 +8,11 @@ AppBar buildNavigationalAppBar(BuildContext context, String title,
     leading: IconButton(
       onPressed: () {
         if (refreshNavigationCallback != null) {
-          refreshNavigationCallback();
+          final data = refreshNavigationCallback();
+          Navigator.pop(context, data);
+        } else {
+          Navigator.of(context).pop();
         }
-        Navigator.of(context).pop();
       },
       icon: Icon(
         Icons.chevron_left_rounded,
