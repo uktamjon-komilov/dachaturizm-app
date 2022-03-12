@@ -246,6 +246,7 @@ class EstateProvider with ChangeNotifier {
     });
     data["estates"] = estates;
     data["next"] = response.data["links"]["next"];
+    data["count"] = response.data["count"];
     return data;
   }
 

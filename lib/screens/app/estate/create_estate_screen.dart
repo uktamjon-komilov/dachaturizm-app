@@ -14,6 +14,7 @@ import 'package:dachaturizm/models/currency_model.dart';
 import 'package:dachaturizm/models/district_model.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/models/facility_model.dart';
+import 'package:dachaturizm/models/popular_place_model.dart';
 import 'package:dachaturizm/models/region_model.dart';
 import 'package:dachaturizm/models/category_model.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
@@ -164,11 +165,12 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
         .firstWhere((region) => region.title.toString() == _currentRegion);
     data["district"] = _districts.firstWhere(
         (district) => district.title.toString() == _currentDistrict);
-    data["popular_place_id"] = Provider.of<FacilityProvider>(context,
-            listen: false)
-        .places
-        .firstWhere((place) => place.title.toString() == _currentPopularPlace)
-        .id;
+    data["popular_place_id"] =
+        Provider.of<FacilityProvider>(context, listen: false).places.firstWhere(
+            (place) => place.title.toString() == _currentPopularPlace,
+            orElse: () {
+      return PopularPlaceModel(id: 0, title: "");
+    }).id;
     data["address"] = _addressController.text;
     data["longtitute"] = _longtitude;
     data["latitute"] = _latitute;
@@ -631,26 +633,24 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                               _currentRegion,
                               Locales.string(context, "choose_region"),
                               onChanged: (value) {
-                            setState(() {
-                              _currentRegion = value as String;
-                              if (_currentRegion == "0") {
-                                setState(() {
-                                  _currentDistrict = "0";
-                                  _districts = [];
-                                });
-                              } else {
-                                setState(() {
-                                  _districts = Provider.of<FacilityProvider>(
-                                          context,
-                                          listen: false)
-                                      .regions
-                                      .firstWhere((region) =>
-                                          region.title.toString() ==
-                                          _currentRegion)
-                                      .districts;
-                                });
-                              }
-                            });
+                            _currentRegion = value as String;
+                            if (_currentRegion == "0") {
+                              setState(() {
+                                _districts = [];
+                                _currentDistrict = "0";
+                              });
+                            } else {
+                              setState(() {
+                                _districts = Provider.of<FacilityProvider>(
+                                        context,
+                                        listen: false)
+                                    .regions
+                                    .firstWhere((region) =>
+                                        region.title.toString() ==
+                                        _currentRegion)
+                                    .districts;
+                              });
+                            }
                           }),
                           VerticalHorizontalSizedBox(),
                           Text(

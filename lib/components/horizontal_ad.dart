@@ -40,6 +40,7 @@ class HorizontalAd extends StatelessWidget {
               fit: StackFit.expand,
               children: [
                 CachedNetworkImage(
+                  cacheKey: estate.photo,
                   imageUrl: estate.photo,
                   fit: BoxFit.cover,
                   height: 145,

@@ -18,6 +18,7 @@ class EstateModel {
   final int userAdsCount;
   final String userPhoto;
   final String photo;
+  final String thumbnail;
   final List<EstatePhotos> photos;
   final int beds;
   final int pool;
@@ -63,6 +64,7 @@ class EstateModel {
     this.userAdsCount = 0,
     this.userPhoto = "",
     this.photo = "",
+    this.thumbnail = "",
     this.userId = 0,
     this.typeId = 0,
     this.longtitute = 0.0,
@@ -87,7 +89,7 @@ class EstateModel {
 
   static Future<EstateModel> fromJson(data) async {
     String locale = await getCurrentLocale();
-    
+
     final localData = data["translations"][locale];
 
     return EstateModel(
@@ -118,6 +120,9 @@ class EstateModel {
       userAdsCount: data["user_ads_count"],
       userPhoto: data["user_photo"] ?? "",
       photo: fixMediaUrl(data["photo"]),
+      thumbnail: data["thumbnail"] == null
+          ? fixMediaUrl(data["photo"])
+          : fixMediaUrl(data["thumbnail"]),
       photos: data.keys.contains("photos")
           ? data["photos"]
               .map<EstatePhotos>((item) => EstatePhotos(

@@ -299,12 +299,18 @@ class AdPlanItem extends StatelessWidget {
                       Icon(Icons.notifications_active_rounded,
                           color: textColor),
                       SizedBox(width: 10),
-                      Text(
-                        description ??
-                            Locales.string(
-                                context, "you_can_activate_this_plan"),
-                        style: TextStyles.display6().copyWith(
-                          color: textColor,
+                      Flexible(
+                        child: Text(
+                          description ??
+                              Locales.string(
+                                  context, "you_can_activate_this_plan"),
+                          maxLines: 2,
+                          style: TextStyles.display6().copyWith(
+                            color: textColor,
+                            fontSize: 10,
+                            height: 0.9,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       )
                     ],

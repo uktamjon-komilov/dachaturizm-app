@@ -45,7 +45,7 @@ class CategoryItem extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 12),
+          SizedBox(height: 6),
           Text(
             title,
             style: TextStyles.display4(),
