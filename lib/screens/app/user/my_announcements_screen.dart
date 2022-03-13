@@ -448,11 +448,30 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
                       title: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            plan.title,
-                            style: plan.available
-                                ? null
-                                : TextStyle(color: Colors.grey[500]),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                plan.title,
+                                style: plan.available
+                                    ? null
+                                    : TextStyle(color: Colors.grey[500]),
+                              ),
+                              SizedBox(
+                                width: 50.w,
+                                child: Flexible(
+                                  child: Text(
+                                    plan.description,
+                                    maxLines: 2,
+                                    style: TextStyle(
+                                      color: Colors.grey[500],
+                                      fontSize: 10,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                           Text(
                             "${plan.price.toString()} " +

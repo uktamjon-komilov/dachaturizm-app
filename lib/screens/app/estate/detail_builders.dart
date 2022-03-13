@@ -87,7 +87,7 @@ class DetailBuilder {
               child: GestureDetector(
                 onTap: () {
                   UrlLauncher.launch(
-                      "https://www.google.com/maps/search/?api=1&query=${detail.longtitute},${detail.latitute}");
+                      "https://www.google.com/maps/search/?api=1&query=${detail.latitute},${detail.longtitute}");
                 },
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),

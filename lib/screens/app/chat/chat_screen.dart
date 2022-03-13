@@ -180,7 +180,7 @@ class _ChatScreenState extends State<ChatScreen> {
         width: 80,
         height: 80,
         child: Image.network(
-          estate.photo,
+          estate.thumbnail,
           fit: BoxFit.cover,
         ),
       ),
