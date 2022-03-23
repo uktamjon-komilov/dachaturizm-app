@@ -3,9 +3,10 @@ import 'package:dachaturizm/screens/app/estate/create_estate_screen.dart';
 import 'package:dachaturizm/screens/app/home/home_screen.dart';
 import 'package:dachaturizm/screens/app/search/search_screen.dart';
 import 'package:dachaturizm/screens/app/user/user_screen.dart';
+import 'package:flutter/cupertino.dart';
 
 class NavigationalExtraState {
-  final screens = [
+  List<Widget> screens = [
     HomePageScreen(),
     SearchPageScreen(),
     EstateCreationPageScreen(),

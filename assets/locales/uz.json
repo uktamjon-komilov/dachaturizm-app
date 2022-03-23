@@ -67,8 +67,8 @@
     "first_name": "Ism",
     "last_name": "Familiya",
     "phone": "Telefon raqam",
-    "action_success_completed": "Muvaffaqiyatli amalga oshirildi!",
-    "something_wrong_not_enough_money": "Nimadir xato ketdi yoki balansingizda pul yetarli emas! Iltimos, yana bir bor urinib ko'ring.",
+    "action_success_completed": " muvaffaqiyatli faollashtirildi!",
+    "something_wrong_not_enough_money": " не активирован :-( Возможно у вас недостаточно денег на счету!",
     "confirmation": "Tasdiqlash",
     "are_you_sure": "Ishonchingiz komilmi?",
     "yes": "Ha",
@@ -197,5 +197,9 @@
     "renewed": "Yangilandi",
     "you_dont_have_transactions": "Sizda tranzaksiyalar mavjuda emas",
     "other_settings": "Boshqa sozlamalar",
-    "refresh_to_get_new_results": "Iltimos, yangi natijalarni olish uchun yangilang"
+    "refresh_to_get_new_results": "Iltimos, yangi natijalarni olish uchun yangilang",
+    "all_photos": "Barcha fotosuratlar",
+    "ad_your_balance": "Balansingiz: ",
+    "charging_amount": "Yechiladigan summa: ",
+    "target_address": "Mo'ljal: "
 }

@@ -27,9 +27,7 @@ class MessageModel {
     late EstateModel estate;
     try {
       estate = await EstateModel.fromJson(data["estate_detail"]);
-    } catch (e) {
-      print(e);
-    }
+    } catch (e) {}
     return MessageModel(
       id: data["id"],
       sender: UserModel.fromJson(data["sender"]),

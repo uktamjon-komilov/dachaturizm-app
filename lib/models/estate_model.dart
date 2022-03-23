@@ -1,10 +1,8 @@
 import 'package:dachaturizm/helpers/locale_helper.dart';
 import 'package:dachaturizm/helpers/url_helper.dart';
 import 'package:dachaturizm/models/booking_day.dart';
-import 'package:dachaturizm/models/district_model.dart';
 import 'package:dachaturizm/models/facility_model.dart';
 import 'package:dachaturizm/models/photo_model.dart';
-import 'package:dachaturizm/models/region_model.dart';
 
 class EstateModel {
   final int id;
@@ -26,6 +24,7 @@ class EstateModel {
   final double weekdayPrice;
   final double weekendPrice;
   final String address;
+  final String? popularPlaceTitle;
   final String region;
   final String district;
   final double longtitute;
@@ -57,6 +56,7 @@ class EstateModel {
     this.weekdayPrice = 0.0,
     this.weekendPrice = 0.0,
     this.address = "",
+    this.popularPlaceTitle,
     this.region = "",
     this.district = "",
     this.announcer = "",
@@ -87,7 +87,7 @@ class EstateModel {
         "isTop": this.isTop,
       }[key];
 
-  static Future<EstateModel> fromJson(data) async {
+  static Future<EstateModel> fromJson(Map<String, dynamic> data) async {
     String locale = await getCurrentLocale();
 
     final localData = data["translations"][locale];
@@ -115,6 +115,9 @@ class EstateModel {
       longtitute: data["longtitute"],
       latitute: data["latitute"],
       address: data["address"],
+      popularPlaceTitle: data.containsKey("popular_place_title")
+          ? data["popular_place_title"]
+          : null,
       announcer: data["announcer"],
       phone: data["phone"],
       userAdsCount: data["user_ads_count"],

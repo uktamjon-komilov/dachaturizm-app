@@ -3,6 +3,7 @@ import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/helpers/call_with_auth.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
+import 'package:dachaturizm/screens/app/estate/create_estate_screen.dart';
 import 'package:dachaturizm/screens/app/navigational_app_extra_state.dart';
 import 'package:dachaturizm/screens/app/user/wishlist_screen.dart';
 import 'package:dachaturizm/components/bottom_navbar.dart';
@@ -26,6 +27,11 @@ class _NavigationalAppScreenState extends State<NavigationalAppScreen>
     Future.delayed(Duration.zero).then((_) {
       Provider.of<AuthProvider>(context, listen: false).getAccessToken();
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
   }
 
   @override

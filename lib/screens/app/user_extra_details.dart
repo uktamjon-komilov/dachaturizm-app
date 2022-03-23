@@ -7,8 +7,6 @@ import 'package:flutter_locales/flutter_locales.dart';
 
 Widget buildUserDetails(BuildContext context, UserModel? user,
     [bool showBalance = false]) {
-  print(user!.photo.toString());
-
   return Visibility(
     visible: user != null,
     child: Container(
@@ -22,7 +20,7 @@ Widget buildUserDetails(BuildContext context, UserModel? user,
               width: 75,
               height: 75,
               child: CachedNetworkImage(
-                imageUrl: user.photo,
+                imageUrl: user!.photo,
                 errorWidget: (context, _, __) {
                   return Image.asset(
                     "assets/images/user.png",

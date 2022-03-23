@@ -137,11 +137,13 @@ class _MyAppState extends State<MyApp> {
     super.didChangeDependencies();
     if (_isInit) {
       _isInit = false;
-      Provider.of<RegionProvider>(context, listen: false).getAndSetRegions();
-      Provider.of<StaticPagesProvider>(context, listen: false).getStaticPages();
-      Provider.of<FacilityProvider>(context, listen: false).fetchAll();
-      Provider.of<CurrencyProvider>(context, listen: false).getCurrencies();
-      Provider.of<AuthProvider>(context, listen: false).getUserData();
+      Provider.of<AuthProvider>(context, listen: false).getUserData().then((_) {
+        Provider.of<RegionProvider>(context, listen: false).getAndSetRegions();
+        Provider.of<StaticPagesProvider>(context, listen: false)
+            .getStaticPages();
+        Provider.of<FacilityProvider>(context, listen: false).fetchAll();
+        Provider.of<CurrencyProvider>(context, listen: false).getCurrencies();
+      });
     }
   }
 

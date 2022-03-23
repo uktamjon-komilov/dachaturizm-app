@@ -356,9 +356,7 @@ class EstateProvider with ChangeNotifier {
         });
         return estates;
       }
-    } catch (e) {
-      print(e);
-    }
+    } catch (e) {}
 
     return [];
   }
@@ -380,9 +378,7 @@ class EstateProvider with ChangeNotifier {
         EstateModel estate = await EstateModel.fromJson(response.data);
         return estate;
       }
-    } catch (e) {
-      print(e);
-    }
+    } catch (e) {}
     return null;
   }
 
@@ -401,9 +397,7 @@ class EstateProvider with ChangeNotifier {
         return true;
       }
       return false;
-    } catch (e) {
-      print(e);
-    }
+    } catch (e) {}
     return false;
   }
 
@@ -450,9 +444,7 @@ class EstateProvider with ChangeNotifier {
         });
         return estates;
       }
-    } catch (e) {
-      print(e);
-    }
+    } catch (e) {}
     return estates;
   }
 

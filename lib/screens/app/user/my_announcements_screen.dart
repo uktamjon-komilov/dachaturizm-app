@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:ui';
 
 import 'package:dachaturizm/components/app_bar.dart';
@@ -12,6 +13,7 @@ import 'package:dachaturizm/helpers/call_with_auth.dart';
 import 'package:dachaturizm/helpers/parse_datetime.dart';
 import 'package:dachaturizm/models/ads_plan.dart';
 import 'package:dachaturizm/models/estate_model.dart';
+import 'package:dachaturizm/models/user_model.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/providers/currency_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
@@ -35,6 +37,7 @@ class MyAnnouncements extends StatefulWidget {
 }
 
 class _MyAnnouncementsState extends State<MyAnnouncements> {
+  bool _isInit = true;
   List<EstateModel> _allEstates = [];
   List<EstateModel> _simpleEstates = [];
   List<EstateModel> _topEstates = [];
@@ -53,10 +56,9 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
 
   List<AdPlan> _plans = [];
   bool _isLoading = false;
-  bool _adPlanNotAvailable = false;
   List<Map<String, dynamic>> _actions = [];
-  String _adPlan = "";
-  TextEditingController _searchController = TextEditingController();
+  List<String> _adPlans = [];
+  double _adsTotal = 0.0;
 
   void _chooseAction(EstateModel estate, String action) async {
     final chosenAction =
@@ -160,25 +162,28 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
 
   @override
   void didChangeDependencies() {
-    _actions = [
-      {
-        "key": "edit",
-        "value": Locales.string(context, "edit"),
-        "callback": ([String? id]) {
-          _navigateToEditScreen(id);
-        },
-        "hot": false,
-      },
-      {
-        "key": "advertise",
-        "value": Locales.string(context, "advertise"),
-        "callback": ([String? id]) {
-          _openAdsPriceList(id);
-        },
-        "hot": true,
-      },
-    ];
     super.didChangeDependencies();
+    if (_isInit) {
+      _isInit = false;
+      _actions = [
+        {
+          "key": "edit",
+          "value": Locales.string(context, "edit"),
+          "callback": ([String? id]) {
+            _navigateToEditScreen(id);
+          },
+          "hot": false,
+        },
+        {
+          "key": "advertise",
+          "value": Locales.string(context, "advertise"),
+          "callback": ([String? id]) {
+            _openAdsPriceList(context, id);
+          },
+          "hot": true,
+        },
+      ];
+    }
   }
 
   @override
@@ -330,21 +335,24 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
     }
   }
 
-  _showStatusSnackBar(bool value) {
+  _showStatusSnackBar(bool value, {String hint = ""}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
+        backgroundColor: value ? Colors.green : Colors.red,
         content: value
             ? Text(
-                Locales.string(
-                  context,
-                  "action_success_completed",
-                ),
+                hint +
+                    Locales.string(
+                      context,
+                      "action_success_completed",
+                    ),
               )
             : Text(
-                Locales.string(
-                  context,
-                  "something_wrong_not_enough_money",
-                ),
+                hint +
+                    Locales.string(
+                      context,
+                      "something_wrong_not_enough_money",
+                    ),
               ),
       ),
     );
@@ -434,90 +442,147 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
         arguments: {"estateId": id});
   }
 
-  void _openAdsPriceList([String? id]) {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => StatefulBuilder(builder: (context, setState) {
-        return Container(
-          height: 350,
-          child: Column(
-            children: [
-              ..._plans
-                  .map(
-                    (plan) => RadioListTile(
-                      title: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  void _openAdsPriceList(BuildContext context, [String? id]) {
+    Provider.of<AuthProvider>(context, listen: false)
+        .getUserDataWithoutNotifying()
+        .then((user) {
+      showModalBottomSheet(
+        context: context,
+        builder: (context) => StatefulBuilder(builder: (context, setState) {
+          return Container(
+            child: Column(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(defaultPadding),
+                  child: Column(
+                    children: [
+                      Row(
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                plan.title,
-                                style: plan.available
-                                    ? null
-                                    : TextStyle(color: Colors.grey[500]),
-                              ),
-                              SizedBox(
-                                width: 50.w,
-                                child: Flexible(
-                                  child: Text(
-                                    plan.description,
-                                    maxLines: 2,
-                                    style: TextStyle(
-                                      color: Colors.grey[500],
-                                      fontSize: 10,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
+                          Text(
+                            Locales.string(context, "ad_your_balance"),
+                            style: TextStyle(fontSize: 15),
                           ),
                           Text(
-                            "${plan.price.toString()} " +
-                                Locales.string(
-                                  context,
-                                  "sum",
-                                ),
-                            style: plan.available
-                                ? null
-                                : TextStyle(color: Colors.grey[500]),
+                            user!.balance.toString() +
+                                " " +
+                                Locales.string(context, "sum"),
+                            style: TextStyle(fontSize: 15),
                           ),
                         ],
                       ),
-                      value: plan.slug,
-                      groupValue: _adPlan,
-                      activeColor: normalOrange,
-                      onChanged: (value) {
-                        if (plan.available) {
-                          setState(() {
-                            _adPlan = value as String;
-                          });
-                        } else {
-                          Navigator.of(context).pop();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                Locales.string(context,
-                                    "this_plan_is_not_available_currently_try_soon"),
-                              ),
-                            ),
-                          );
-                        }
-                      },
-                    ),
-                  )
-                  .toList(),
-              SizedBox(height: 10),
-              _buildButtonsBox(context, estateId: id)
-            ],
+                      Row(
+                        children: [
+                          Text(
+                            Locales.string(context, "charging_amount"),
+                            style: TextStyle(fontSize: 15),
+                          ),
+                          Text(
+                            _adsTotal.toString() +
+                                " " +
+                                Locales.string(context, "sum"),
+                            style: TextStyle(fontSize: 15),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                Spacer(),
+                ..._plans
+                    .map(
+                      (plan) => CheckboxListTile(
+                        title: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _planText(plan),
+                            _planPrice(plan, context),
+                          ],
+                        ),
+                        value: _adPlans.contains(plan.slug),
+                        controlAffinity: ListTileControlAffinity.leading,
+                        activeColor: normalOrange,
+                        onChanged: (value) {
+                          if (value == true && !_adPlans.contains(plan.slug)) {
+                            _adPlans.add(plan.slug);
+                            _adsTotal += plan.price;
+                          } else {
+                            _adPlans.remove(plan.slug);
+                            _adsTotal -= plan.price;
+                          }
+                          setState(() {});
+                        },
+                      ),
+                    )
+                    .toList(),
+                SizedBox(height: 10),
+                _buildButtonsBox(context, estateId: id),
+                SizedBox(height: 25),
+              ],
+            ),
+          );
+        }),
+      );
+    });
+  }
+
+  Text _planPrice(AdPlan plan, BuildContext context) {
+    return Text(
+      "${plan.price.toString()} " +
+          Locales.string(
+            context,
+            "sum",
           ),
-        );
-      }),
+      style: plan.available
+          ? TextStyle(fontSize: 12)
+          : TextStyle(
+              color: Colors.grey[500],
+              fontSize: 12,
+            ),
+    );
+  }
+
+  Column _planText(AdPlan plan) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _planTitle(plan),
+        _planDescription(plan),
+      ],
+    );
+  }
+
+  Widget _planDescription(AdPlan plan) {
+    return SizedBox(
+      width: 40.w,
+      child: Flex(
+        direction: Axis.horizontal,
+        children: [
+          Flexible(
+            child: Text(
+              plan.description,
+              maxLines: 2,
+              style: TextStyle(
+                color: Colors.grey[500],
+                fontSize: 10,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Text _planTitle(AdPlan plan) {
+    return Text(
+      plan.title,
+      style: plan.available ? null : TextStyle(color: Colors.grey[500]),
     );
   }
 
   Padding _buildButtonsBox(BuildContext context, {estateId}) {
+    UserModel? user = Provider.of<AuthProvider>(context, listen: false).user;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
       child: Row(
@@ -534,6 +599,10 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
               side: BorderSide(color: normalOrange, width: 1),
             ),
             onPressed: () {
+              setState(() {
+                _adPlans = [];
+                _adsTotal = 0.0;
+              });
               Navigator.of(context).pop();
             },
             child: Text(
@@ -542,32 +611,52 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-                primary: normalOrange,
-                onPrimary: Colors.white,
-                elevation: 0,
-                shadowColor: Colors.transparent,
-                padding: EdgeInsets.symmetric(vertical: 10),
-                minimumSize: Size(42.w, 50)),
+              primary: normalOrange,
+              onPrimary: Colors.white,
+              elevation: 0,
+              shadowColor: Colors.transparent,
+              padding: EdgeInsets.symmetric(vertical: 10),
+              minimumSize: Size(42.w, 50),
+            ),
             child: Text(
               Locales.string(context, "advertise"),
             ),
-            onPressed: () {
-              if (_adPlan == "") return;
-              _showConfirmAlert(() async {
-                setState(() {
-                  _isLoading = true;
-                });
-                Provider.of<EstateProvider>(context, listen: false)
-                    .advertise(_adPlan, int.parse(estateId))
-                    .then((value) {
-                  _refresh();
-                  _showStatusSnackBar(value);
-                  setState(() {
-                    _isLoading = false;
-                  });
-                });
-              });
-            },
+            onPressed: (user!.balance < _adsTotal || _adPlans.length == 0)
+                ? null
+                : () {
+                    if (_adPlans.length == 0) return;
+                    _showConfirmAlert(() async {
+                      setState(() {
+                        _isLoading = true;
+                      });
+                      _adPlans.forEach((planSlug) async {
+                        bool value = await Provider.of<EstateProvider>(context,
+                                listen: false)
+                            .advertise(planSlug, int.parse(estateId));
+                        String planTitle = _plans.firstWhere(
+                            (plan) => plan.slug == planSlug, orElse: () {
+                          return AdPlan(
+                            id: 0,
+                            title: "",
+                            description: "",
+                            slug: "",
+                            days: 0,
+                            price: 0,
+                            available: false,
+                          );
+                        }).title;
+                        if (value) {
+                          _showStatusSnackBar(value, hint: planTitle);
+                        } else {
+                          _showStatusSnackBar(value, hint: planTitle);
+                        }
+                      });
+                      _refresh();
+                      setState(() {
+                        _isLoading = false;
+                      });
+                    });
+                  },
           ),
         ],
       ),
@@ -702,7 +791,7 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
               width: 80,
               height: 80,
               child: Image.network(
-                estate.photo,
+                estate.thumbnail,
                 fit: BoxFit.cover,
               ),
             ),

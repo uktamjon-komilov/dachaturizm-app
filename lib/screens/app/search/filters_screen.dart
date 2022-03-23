@@ -58,9 +58,7 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
       if (data.containsKey("category")) {
         _categoryId = data["category"];
       }
-    } catch (e) {
-      print(e);
-    }
+    } catch (e) {}
 
     _sortingTypes = Provider.of<EstateProvider>(context, listen: false).sorting;
     _currentSort =

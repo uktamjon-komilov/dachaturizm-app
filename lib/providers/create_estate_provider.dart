@@ -144,9 +144,7 @@ class CreateEstateProvider extends ChangeNotifier {
       FormData formData = FormData.fromMap(tempData);
       final response = await dio.post(url, data: formData, options: options);
       return {"statusCode": response.statusCode};
-    } catch (e) {
-      print(e);
-    }
+    } catch (e) {}
     return {"statusCode": 400};
   }
 
@@ -169,9 +167,7 @@ class CreateEstateProvider extends ChangeNotifier {
       FormData formData = FormData.fromMap(tempData);
       var response = await dio.patch(url, data: formData, options: options);
       return {"statusCode": response.statusCode};
-    } catch (e) {
-      print(e);
-    }
+    } catch (e) {}
     return {"statusCode": 400};
   }
 
@@ -189,9 +185,7 @@ class CreateEstateProvider extends ChangeNotifier {
           response.statusCode as int < 300) {
         return response.data["id"];
       }
-    } catch (e) {
-      print(e);
-    }
+    } catch (e) {}
     return 0;
   }
 
@@ -207,12 +201,9 @@ class CreateEstateProvider extends ChangeNotifier {
       final response = await dio.post(url, options: options, data: formData);
       if (response.statusCode as int >= 200 &&
           response.statusCode as int < 300) {
-        print(response.data);
         return response.data["id"];
       }
-    } catch (e) {
-      print(e);
-    }
+    } catch (e) {}
     return 0;
   }
 
@@ -230,9 +221,26 @@ class CreateEstateProvider extends ChangeNotifier {
           response.statusCode as int < 300) {
         return response.data["id"];
       }
+    } catch (e) {}
+    return 0;
+  }
+
+  Future<Map<String, bool>> removePhoto(int _id) async {
+    try {
+      final url = "${baseUrl}api/estatephotos/${_id}/";
+      String access = await auth.getAccessToken();
+      Options options = Options(headers: {
+        "Content-type": "multipart/form-data",
+        "Authorization": "Bearer ${access}",
+      });
+      final response = await dio.delete(url, options: options);
+      if (response.statusCode as int >= 200 &&
+          response.statusCode as int < 300) {
+        return {"status": true};
+      }
     } catch (e) {
       print(e);
     }
-    return 0;
+    return {"status": false};
   }
 }

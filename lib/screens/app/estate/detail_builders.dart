@@ -40,6 +40,28 @@ class DetailBuilder {
     );
   }
 
+  Widget buildPopularPlaceBox(context) {
+    return Visibility(
+      visible: detail.popularPlaceTitle != null,
+      child: Container(
+        margin: EdgeInsets.only(top: 10),
+        padding: EdgeInsets.symmetric(
+          horizontal: 7,
+          vertical: 5,
+        ),
+        decoration: BoxDecoration(
+          color: normalOrange,
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Text(
+          Locales.string(context, "target_address") +
+              detail.popularPlaceTitle.toString(),
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
+    );
+  }
+
   Widget buildAddressBox(context) {
     return Visibility(
       visible: (detail.longtitute != 0.0 && detail.latitute != 0.0),

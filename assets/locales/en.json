@@ -67,8 +67,8 @@
     "first_name": "Firstname",
     "last_name": "Lastname",
     "phone": "Phone",
-    "action_success_completed": "Action completed successfully!",
-    "something_wrong_not_enough_money": "Something went wrong or you may not have enough money in your balance! Please, try again.",
+    "action_success_completed": " successfully activated!",
+    "something_wrong_not_enough_money": " не активирован :-( Возможно у вас недостаточно денег на счету!",
     "confirmation": "Confirmation",
     "are_you_sure": "Are you sure?",
     "yes": "Yes",
@@ -197,5 +197,9 @@
     "renewed": "Renewed",
     "you_dont_have_transactions": "You don't have transactions",
     "other_settings": "Other settings",
-    "refresh_to_get_new_results": "Please, refresh to get new results"
+    "refresh_to_get_new_results": "Please, refresh to get new results",
+    "all_photos": "All photos",
+    "ad_your_balance": "Your balance: ",
+    "charging_amount": "Withdrawals from your account: ",
+    "target_address": "Target address: "
 }

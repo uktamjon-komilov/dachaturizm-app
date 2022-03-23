@@ -307,16 +307,24 @@ class _HomePageScreenState extends State<HomePageScreen> {
           banners != null &&
           (topEstates.length > 0 || banners.length > 0)),
       child: Container(
+        margin: EdgeInsets.only(top: 10),
         child: Column(
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               textBaseline: TextBaseline.alphabetic,
               children: [
-                Text(
-                  Locales.string(context, "top") +
-                      " ${category.title.toLowerCase()}",
-                  style: TextStyles.display2(),
+                Container(
+                  decoration: BoxDecoration(
+                    color: normalOrange,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  padding: EdgeInsets.fromLTRB(7, 0, 7, 3),
+                  child: Text(
+                    Locales.string(context, "top") +
+                        " ${category.title.toLowerCase()}",
+                    style: TextStyles.display2().copyWith(color: Colors.white),
+                  ),
                 ),
                 TextLinkButton(Locales.string(context, "all"), () {
                   _navigateToCategory(context, category);

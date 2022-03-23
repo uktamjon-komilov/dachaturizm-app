@@ -58,9 +58,7 @@ class _PlansScreenState extends State<PlansScreen> {
           if (data != null && data.containsKey("data")) {
             _data = data["data"];
           }
-        } catch (e) {
-          print(e);
-        }
+        } catch (e) {}
         setState(() {
           _isLoading = false;
         });

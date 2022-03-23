@@ -34,7 +34,11 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
 
   @override
   void didChangeDependencies() {
+    super.didChangeDependencies();
     if (_isInit) {
+      setState(() {
+        _isInit = false;
+      });
       Map? data = ModalRoute.of(context)!.settings.arguments as Map?;
       if (data != null) {
         if (data["latitute"] != 0.0 && data["longtitude"] != 0.0) {
@@ -53,11 +57,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
           ),
         );
       }
-      setState(() {
-        _isInit = false;
-      });
     }
-    super.didChangeDependencies();
   }
 
   @override

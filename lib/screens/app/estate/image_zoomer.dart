@@ -72,8 +72,8 @@ class _ImageZoomerState extends State<ImageZoomer> {
               onPageChanged: (int number) {},
             ),
             Positioned(
-              top: 10,
-              left: 10,
+              top: 40,
+              left: 25,
               child: IconButton(
                 icon: Icon(
                   Icons.arrow_back,

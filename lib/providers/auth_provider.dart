@@ -171,9 +171,7 @@ class AuthProvider with ChangeNotifier {
           return data;
         }
       }
-    } catch (e) {
-      print(e);
-    }
+    } catch (e) {}
     return {"status": false};
   }
 
@@ -241,9 +239,7 @@ class AuthProvider with ChangeNotifier {
           response.statusCode as int < 300) {
         return response.data;
       }
-    } catch (e) {
-      print(e);
-    }
+    } catch (e) {}
     return {"status": false};
   }
 
@@ -327,9 +323,7 @@ class AuthProvider with ChangeNotifier {
           data["messages"].add(message);
         });
       }
-    } catch (e) {
-      print(e);
-    }
+    } catch (e) {}
     return data;
   }
 
@@ -355,9 +349,7 @@ class AuthProvider with ChangeNotifier {
           data["messages"].add(message);
         });
       }
-    } catch (e) {
-      print(e);
-    }
+    } catch (e) {}
     return data;
   }
 
@@ -421,9 +413,7 @@ class AuthProvider with ChangeNotifier {
         options: Options(headers: headers),
       );
       return response.data;
-    } catch (e) {
-      print(e);
-    }
+    } catch (e) {}
     return {"status": false, "detail": "BASE_ERROR"};
   }
 

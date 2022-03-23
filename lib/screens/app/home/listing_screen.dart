@@ -28,12 +28,11 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
   bool _isLoading = true;
   bool _paginationLoading = false;
   bool _isInit = true;
-  bool _showTop = true;
+  bool _showTop = false;
   CategoryModel? _category;
 
   List<EstateModel> _allEstates = [];
   List<EstateModel> _topEstates = [];
-  List<EstateModel> _simpleEstates = [];
   List<EstateModel> _currentEstates = [];
 
   String? _topNextLink;
@@ -68,6 +67,7 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
               .then((value) {
             setState(() {
               _topEstates.addAll(value["estates"]);
+              _allEstates.addAll(value["estates"]);
               _paginationLoading = false;
               _topNextLink = value["next"];
             });
@@ -80,7 +80,7 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
               .getNextPage(_simpleNextLink as String)
               .then((value) {
             setState(() {
-              _simpleEstates.addAll(value["estates"]);
+              _allEstates.addAll(value["estates"]);
               _paginationLoading = false;
               _simpleNextLink = value["next"];
             });
@@ -91,6 +91,7 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
   }
 
   _search() async {
+    _allEstates = [];
     await Future.wait([
       Provider.of<EstateProvider>(context, listen: false).getSearchedResults(
           term: _searchController.text,
@@ -101,6 +102,7 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
           }).then((data) {
         setState(() {
           _topEstates = data["estates"];
+          _allEstates.addAll(data["estates"]);
           _topNextLink = data["next"];
         });
       }),
@@ -112,19 +114,18 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
             "simple": true,
           }).then((data) {
         setState(() {
-          _simpleEstates = data["estates"];
+          _allEstates.addAll(data["estates"]);
           _simpleNextLink = data["next"];
         });
       }),
     ]).then((_) {
-      _allEstates = [..._topEstates, ..._simpleEstates];
       if (_showTop) {
         setState(() {
           _currentEstates = _topEstates;
         });
       } else {
         setState(() {
-          _currentEstates = _simpleEstates;
+          _currentEstates = _allEstates;
         });
       }
     });
@@ -132,12 +133,14 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
 
   Future<void> _refreshAction() async {
     _searchController.text = "";
+    _allEstates = [];
     await Future.wait([
       Provider.of<EstateProvider>(context, listen: false)
           .getEstatesByType(_category, "top")
           .then((value) {
         setState(() {
           _topEstates = value["estates"];
+          _allEstates.addAll(value["estates"]);
           _topNextLink = value["next"];
         });
       }),
@@ -145,18 +148,17 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
           .getEstatesByType(_category, "simple")
           .then((value) {
         setState(() {
-          _simpleEstates = value["estates"];
+          _allEstates.addAll(value["estates"]);
           _simpleNextLink = value["next"];
         });
       }),
     ]);
     setState(() {
-      _allEstates = [..._topEstates, ..._simpleEstates];
       _isLoading = false;
       if (_showTop) {
         _currentEstates = _topEstates;
       } else {
-        _currentEstates = _simpleEstates;
+        _currentEstates = _allEstates;
       }
     });
   }
@@ -221,20 +223,18 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
                                 horizontal: defaultPadding),
                             child: Row(
                               children: [
+                                SmallButton(Locales.string(context, "all"),
+                                    enabled: !_showTop, onPressed: () {
+                                  setState(() {
+                                    _showTop = false;
+                                    _currentEstates = _allEstates;
+                                  });
+                                }),
                                 SmallButton(Locales.string(context, "top"),
-                                    // + "(${_topEstates.length})",
                                     enabled: _showTop, onPressed: () {
                                   setState(() {
                                     _showTop = true;
                                     _currentEstates = _topEstates;
-                                  });
-                                }),
-                                SmallButton(Locales.string(context, "simple"),
-                                    // + "(${_simpleEstates.length})",
-                                    enabled: !_showTop, onPressed: () {
-                                  setState(() {
-                                    _showTop = false;
-                                    _currentEstates = _simpleEstates;
                                   });
                                 }),
                               ],

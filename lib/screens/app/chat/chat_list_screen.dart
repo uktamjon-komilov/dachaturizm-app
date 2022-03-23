@@ -85,11 +85,6 @@ class _ChatListScreenState extends State<ChatListScreen> {
                       itemCount: _chats.length,
                       padding: EdgeInsets.zero,
                       itemBuilder: (context, index) {
-                        // UserModel user = _chats[index].sender.id == _userId
-                        //     ? _chats[index].receiver
-                        //     : _chats[index].sender;
-                        print(_chats[index].sender.id);
-                        print(_userId);
                         UserModel user = _chats[index].sender.id == _userId
                             ? _chats[index].receiver
                             : _chats[index].sender;

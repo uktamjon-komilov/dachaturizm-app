@@ -171,6 +171,7 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
                               _detailBuilder.drawDivider(),
                               SizedBox(height: defaultPadding),
                               _detailBuilder.buildDescription(context),
+                              _detailBuilder.buildPopularPlaceBox(context),
                               _detailBuilder.buildAddressBox(context),
                               _detailBuilder.buildChips(),
                               _detailBuilder.buildAnnouncerBox(context),
