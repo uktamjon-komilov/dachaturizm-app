@@ -67,7 +67,8 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
               .then((value) {
             setState(() {
               _topEstates.addAll(value["estates"]);
-              _allEstates.addAll(value["estates"]);
+              // _allEstates.addAll(value["estates"]);
+              _allEstates.insertAll(0, value["estates"]);
               _paginationLoading = false;
               _topNextLink = value["next"];
             });
@@ -80,7 +81,8 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
               .getNextPage(_simpleNextLink as String)
               .then((value) {
             setState(() {
-              _allEstates.addAll(value["estates"]);
+              // _allEstates.addAll(value["estates"]);
+              _allEstates.insertAll(0, value["estates"]);
               _paginationLoading = false;
               _simpleNextLink = value["next"];
             });
@@ -102,7 +104,8 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
           }).then((data) {
         setState(() {
           _topEstates = data["estates"];
-          _allEstates.addAll(data["estates"]);
+          // _allEstates.addAll(data["estates"]);
+          _allEstates.insertAll(0, data["estates"]);
           _topNextLink = data["next"];
         });
       }),
@@ -114,7 +117,8 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
             "simple": true,
           }).then((data) {
         setState(() {
-          _allEstates.addAll(data["estates"]);
+          // _allEstates.addAll(data["estates"]);
+          _allEstates.insertAll(0, data["estates"]);
           _simpleNextLink = data["next"];
         });
       }),
@@ -140,7 +144,8 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
           .then((value) {
         setState(() {
           _topEstates = value["estates"];
-          _allEstates.addAll(value["estates"]);
+          // _allEstates.addAll(value["estates"]);
+          _allEstates.insertAll(0, value["estates"]);
           _topNextLink = value["next"];
         });
       }),
