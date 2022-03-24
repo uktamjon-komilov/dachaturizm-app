@@ -83,7 +83,12 @@ class EstateProvider with ChangeNotifier {
     String type,
   ) async {
     Map<String, dynamic> data = {};
-    final url = "${baseUrl}api/estate/${category!.slug}/${type}/";
+    String url = "";
+    if (type == "all") {
+      url = "${baseUrl}api/estate/${category!.slug}/";
+    } else {
+      url = "${baseUrl}api/estate/${category!.slug}/${type}/";
+    }
     List<EstateModel> estates = [];
     try {
       Response response = await _fetch(url);
@@ -105,8 +110,10 @@ class EstateProvider with ChangeNotifier {
       Response response = await _fetch(url);
       data["next"] = response.data["links"]["next"];
       await response.data["results"].forEach((item) async {
-        EstateModel estate = await EstateModel.fromJson(item);
-        estates.add(estate);
+        try {
+          EstateModel estate = await EstateModel.fromJson(item);
+          estates.add(estate);
+        } catch (e) {}
       });
     } catch (e) {}
     data["estates"] = estates;
@@ -158,6 +165,9 @@ class EstateProvider with ChangeNotifier {
             : "false",
         "is_simple": extraArgs.containsKey("simple")
             ? extraArgs["simple"].toString()
+            : "false",
+        "is_all": extraArgs.containsKey("all")
+            ? extraArgs["all"].toString()
             : "false",
       },
     ).query;

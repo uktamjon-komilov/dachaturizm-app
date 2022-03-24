@@ -87,14 +87,30 @@ class EstateModel {
         "isTop": this.isTop,
       }[key];
 
+  static String getFromOtherLang(Map<String, dynamic> data, key, currLang) {
+    List<String> langs = ["uz", "ru", "en"];
+    langs.remove(currLang);
+    String value = "";
+    langs.forEach((lang) {
+      if (value != "" && data.containsKey(lang)) {
+        if (data[lang].containsKey(key)) {
+          value = data[lang][key];
+        }
+      }
+    });
+    return value;
+  }
+
   static Future<EstateModel> fromJson(Map<String, dynamic> data) async {
     String locale = await getCurrentLocale();
 
-    final localData = data["translations"][locale];
+    Map<String, dynamic> localData = data["translations"][locale];
 
     return EstateModel(
       id: data.containsKey("id") ? data["id"] : 0,
-      title: localData["title"],
+      title: localData.containsKey("title")
+          ? localData["title"]
+          : getFromOtherLang(data["translations"], "title", "uz"),
       description: localData["description"],
       region: localData.containsKey("region") ? localData["region"] : "",
       district: localData.containsKey("district") ? localData["district"] : "",

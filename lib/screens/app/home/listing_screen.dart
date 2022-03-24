@@ -58,7 +58,7 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
       ScrollPosition position = _scrollController.position;
       if (position.pixels > position.maxScrollExtent - 80 &&
           !_paginationLoading) {
-        if (_showTop && _topNextLink != null) {
+        if (!_paginationLoading && _showTop && _topNextLink != null) {
           setState(() {
             _paginationLoading = true;
           });
@@ -67,24 +67,32 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
               .then((value) {
             setState(() {
               _topEstates.addAll(value["estates"]);
-              // _allEstates.addAll(value["estates"]);
-              _allEstates.insertAll(0, value["estates"]);
               _paginationLoading = false;
               _topNextLink = value["next"];
             });
           });
-        } else if (!_showTop && _simpleNextLink != null) {
+        } else if (!_paginationLoading &&
+            !_showTop &&
+            _simpleNextLink != null) {
           setState(() {
             _paginationLoading = true;
+            _simpleNextLink = null;
           });
           Provider.of<EstateProvider>(context, listen: false)
               .getNextPage(_simpleNextLink as String)
               .then((value) {
+            _allEstates.addAll(value["estates"]);
+            Set<int> _indexes = {};
+            List<EstateModel> _items = [];
+            for (int i = 0; i < _allEstates.length; i++) {
+              if (!_indexes.contains(_allEstates[i].id)) {
+                _items.add(_allEstates[i]);
+              }
+            }
+            _allEstates = _items;
             setState(() {
-              // _allEstates.addAll(value["estates"]);
-              _allEstates.insertAll(0, value["estates"]);
-              _paginationLoading = false;
               _simpleNextLink = value["next"];
+              _paginationLoading = false;
             });
           });
         }
@@ -104,8 +112,6 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
           }).then((data) {
         setState(() {
           _topEstates = data["estates"];
-          // _allEstates.addAll(data["estates"]);
-          _allEstates.insertAll(0, data["estates"]);
           _topNextLink = data["next"];
         });
       }),
@@ -113,12 +119,10 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
           term: _searchController.text,
           category: _category,
           extraArgs: {
-            "top": false,
-            "simple": true,
+            "all": true,
           }).then((data) {
         setState(() {
-          // _allEstates.addAll(data["estates"]);
-          _allEstates.insertAll(0, data["estates"]);
+          _allEstates = data["estates"];
           _simpleNextLink = data["next"];
         });
       }),
@@ -144,16 +148,14 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
           .then((value) {
         setState(() {
           _topEstates = value["estates"];
-          // _allEstates.addAll(value["estates"]);
-          _allEstates.insertAll(0, value["estates"]);
           _topNextLink = value["next"];
         });
       }),
       Provider.of<EstateProvider>(context, listen: false)
-          .getEstatesByType(_category, "simple")
+          .getEstatesByType(_category, "all")
           .then((value) {
         setState(() {
-          _allEstates.addAll(value["estates"]);
+          _allEstates = value["estates"];
           _simpleNextLink = value["next"];
         });
       }),
