@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/models/user_model.dart';
 import 'package:dachaturizm/styles/text_styles.dart';
@@ -6,9 +7,8 @@ import 'package:flutter_locales/flutter_locales.dart';
 
 Widget buildUserDetails(BuildContext context, UserModel? user,
     [bool showBalance = false]) {
-
   return Visibility(
-    visible: user != null, 
+    visible: user != null,
     child: Container(
       height: 150,
       padding: EdgeInsets.symmetric(horizontal: defaultPadding),
@@ -19,15 +19,15 @@ Widget buildUserDetails(BuildContext context, UserModel? user,
             child: Container(
               width: 75,
               height: 75,
-              child: (user!.photo.toString() == "String")
-                  ? Image.network(
-                      user.photo,
-                      fit: BoxFit.cover,
-                    )
-                  : Image.asset(
-                      "assets/images/user.png",
-                      fit: BoxFit.cover,
-                    ),
+              child: CachedNetworkImage(
+                imageUrl: user!.photo,
+                errorWidget: (context, _, __) {
+                  return Image.asset(
+                    "assets/images/user.png",
+                    fit: BoxFit.cover,
+                  );
+                },
+              ),
             ),
           ),
           SizedBox(width: defaultPadding),

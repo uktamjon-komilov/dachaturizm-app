@@ -41,6 +41,7 @@ import 'package:dachaturizm/screens/auth/reset_password_step2_screen.dart';
 import 'package:dachaturizm/screens/auth/reset_password_step3_screen.dart';
 import 'package:dachaturizm/screens/loading/choose_language_screen.dart';
 import 'package:dachaturizm/screens/splash_screen.dart';
+import 'package:dachaturizm/screens/temp.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:flutter/material.dart';
@@ -136,10 +137,13 @@ class _MyAppState extends State<MyApp> {
     super.didChangeDependencies();
     if (_isInit) {
       _isInit = false;
-      Provider.of<RegionProvider>(context, listen: false).getAndSetRegions();
-      Provider.of<StaticPagesProvider>(context, listen: false).getStaticPages();
-      Provider.of<FacilityProvider>(context, listen: false).fetchAll();
-      Provider.of<CurrencyProvider>(context, listen: false).getCurrencies();
+      Provider.of<AuthProvider>(context, listen: false).getUserData().then((_) {
+        Provider.of<RegionProvider>(context, listen: false).getAndSetRegions();
+        Provider.of<StaticPagesProvider>(context, listen: false)
+            .getStaticPages();
+        Provider.of<FacilityProvider>(context, listen: false).fetchAll();
+        Provider.of<CurrencyProvider>(context, listen: false).getCurrencies();
+      });
     }
   }
 

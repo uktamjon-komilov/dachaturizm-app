@@ -28,12 +28,11 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
   bool _isLoading = true;
   bool _paginationLoading = false;
   bool _isInit = true;
-  bool _showTop = true;
+  bool _showTop = false;
   CategoryModel? _category;
 
   List<EstateModel> _allEstates = [];
   List<EstateModel> _topEstates = [];
-  List<EstateModel> _simpleEstates = [];
   List<EstateModel> _currentEstates = [];
 
   String? _topNextLink;
@@ -59,7 +58,7 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
       ScrollPosition position = _scrollController.position;
       if (position.pixels > position.maxScrollExtent - 80 &&
           !_paginationLoading) {
-        if (_showTop && _topNextLink != null) {
+        if (!_paginationLoading && _showTop && _topNextLink != null) {
           setState(() {
             _paginationLoading = true;
           });
@@ -72,17 +71,28 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
               _topNextLink = value["next"];
             });
           });
-        } else if (!_showTop && _simpleNextLink != null) {
+        } else if (!_paginationLoading &&
+            !_showTop &&
+            _simpleNextLink != null) {
           setState(() {
             _paginationLoading = true;
+            _simpleNextLink = null;
           });
           Provider.of<EstateProvider>(context, listen: false)
               .getNextPage(_simpleNextLink as String)
               .then((value) {
+            _allEstates.addAll(value["estates"]);
+            Set<int> _indexes = {};
+            List<EstateModel> _items = [];
+            for (int i = 0; i < _allEstates.length; i++) {
+              if (!_indexes.contains(_allEstates[i].id)) {
+                _items.add(_allEstates[i]);
+              }
+            }
+            _allEstates = _items;
             setState(() {
-              _simpleEstates.addAll(value["estates"]);
-              _paginationLoading = false;
               _simpleNextLink = value["next"];
+              _paginationLoading = false;
             });
           });
         }
@@ -91,6 +101,7 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
   }
 
   _search() async {
+    _allEstates = [];
     await Future.wait([
       Provider.of<EstateProvider>(context, listen: false).getSearchedResults(
           term: _searchController.text,
@@ -108,23 +119,21 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
           term: _searchController.text,
           category: _category,
           extraArgs: {
-            "top": false,
-            "simple": true,
+            "all": true,
           }).then((data) {
         setState(() {
-          _simpleEstates = data["estates"];
+          _allEstates = data["estates"];
           _simpleNextLink = data["next"];
         });
       }),
     ]).then((_) {
-      _allEstates = [..._topEstates, ..._simpleEstates];
       if (_showTop) {
         setState(() {
           _currentEstates = _topEstates;
         });
       } else {
         setState(() {
-          _currentEstates = _simpleEstates;
+          _currentEstates = _allEstates;
         });
       }
     });
@@ -132,6 +141,7 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
 
   Future<void> _refreshAction() async {
     _searchController.text = "";
+    _allEstates = [];
     await Future.wait([
       Provider.of<EstateProvider>(context, listen: false)
           .getEstatesByType(_category, "top")
@@ -142,21 +152,20 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
         });
       }),
       Provider.of<EstateProvider>(context, listen: false)
-          .getEstatesByType(_category, "simple")
+          .getEstatesByType(_category, "all")
           .then((value) {
         setState(() {
-          _simpleEstates = value["estates"];
+          _allEstates = value["estates"];
           _simpleNextLink = value["next"];
         });
       }),
     ]);
     setState(() {
-      _allEstates = [..._topEstates, ..._simpleEstates];
       _isLoading = false;
       if (_showTop) {
         _currentEstates = _topEstates;
       } else {
-        _currentEstates = _simpleEstates;
+        _currentEstates = _allEstates;
       }
     });
   }
@@ -221,20 +230,18 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
                                 horizontal: defaultPadding),
                             child: Row(
                               children: [
+                                SmallButton(Locales.string(context, "all"),
+                                    enabled: !_showTop, onPressed: () {
+                                  setState(() {
+                                    _showTop = false;
+                                    _currentEstates = _allEstates;
+                                  });
+                                }),
                                 SmallButton(Locales.string(context, "top"),
-                                    // + "(${_topEstates.length})",
                                     enabled: _showTop, onPressed: () {
                                   setState(() {
                                     _showTop = true;
                                     _currentEstates = _topEstates;
-                                  });
-                                }),
-                                SmallButton(Locales.string(context, "simple"),
-                                    // + "(${_simpleEstates.length})",
-                                    enabled: !_showTop, onPressed: () {
-                                  setState(() {
-                                    _showTop = false;
-                                    _currentEstates = _simpleEstates;
                                   });
                                 }),
                               ],

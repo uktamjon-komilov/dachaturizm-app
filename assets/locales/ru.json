@@ -67,8 +67,8 @@
     "first_name": "Имя",
     "last_name": "Фамилия",
     "phone": "Телефон",
-    "action_success_completed": "Действие выполнено успешно!",
-    "something_wrong_not_enough_money": "Что-то пошло не так или у вас недостаточно денег на балансе! Пожалуйста, попробуйте еще раз.",
+    "action_success_completed": " успешно активирован!",
+    "something_wrong_not_enough_money": " не активирован :-( Возможно у вас недостаточно денег на счету!",
     "confirmation": "Подтверждение",
     "are_you_sure": "Вы уверены?",
     "yes": "Да",
@@ -197,5 +197,9 @@
     "renewed": "Обновлено",
     "you_dont_have_transactions": "У вас нет транзакций",
     "other_settings": "Другие настройки",
-    "refresh_to_get_new_results": "Пожалуйста, обновите страницу, чтобы получить новые результаты"
+    "refresh_to_get_new_results": "Пожалуйста, обновите страницу, чтобы получить новые результаты",
+    "all_photos": "Все фотографии",
+    "ad_your_balance": "Ваш баланс: ",
+    "charging_amount": "Снятие с вашего счета: ",
+    "target_address": "Пункт назначения: "
 }

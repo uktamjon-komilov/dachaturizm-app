@@ -35,3 +35,24 @@ class Service {
     );
   }
 }
+
+class ServiceItem {
+  final int id;
+  final String title;
+  final String phone;
+
+  ServiceItem({
+    required this.id,
+    required this.title,
+    required this.phone,
+  });
+
+  static Future<ServiceItem> fromJson(data) async {
+    String locale = await getCurrentLocale();
+    return ServiceItem(
+      id: data["id"],
+      title: data["translations"][locale]["title"],
+      phone: data["phone"],
+    );
+  }
+}

@@ -44,6 +44,11 @@ class _ChatListScreenState extends State<ChatListScreen> {
           _chats = value;
         });
       });
+      Provider.of<AuthProvider>(context, listen: false)
+          .getUserId()
+          .then((value) {
+        _userId = value;
+      });
     });
   }
 
@@ -57,14 +62,6 @@ class _ChatListScreenState extends State<ChatListScreen> {
           .refreshChatsScreen = false;
       await _refreshMyChats(context);
     }
-    // if (_isInit) {
-    //   _isInit = false;
-    //   _userId =
-    //       await Provider.of<AuthProvider>(context, listen: false).getUserId();
-    //   Timer.periodic(Duration(seconds: 30), (timer) async {
-    //     await _refreshMyChats(context);
-    //   });
-    // }
   }
 
   @override

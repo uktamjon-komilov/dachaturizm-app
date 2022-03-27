@@ -3,10 +3,15 @@ import 'package:dachaturizm/components/bottom_navbar.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/helpers/url_helper.dart';
 import 'package:dachaturizm/models/service_model.dart';
+import 'package:dachaturizm/providers/auth_provider.dart';
+import 'package:dachaturizm/repository/services_repository.dart';
 import 'package:dachaturizm/styles/text_styles.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
+import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 
 class ServiceScreen extends StatefulWidget {
   const ServiceScreen({Key? key}) : super(key: key);
@@ -21,15 +26,21 @@ class _ServiceScreenState extends State<ServiceScreen> {
   bool _isInit = true;
   bool _isLoading = true;
   Service? _service;
+  List<ServiceItem> _items = [];
 
   @override
-  void didChangeDependencies() {
+  void didChangeDependencies() async {
     super.didChangeDependencies();
     if (_isInit) {
       _isInit = false;
       Service data = ModalRoute.of(context)?.settings.arguments as Service;
+      Dio dio = Provider.of<AuthProvider>(context, listen: false).dio;
+      ServicesRepository servicesRepository = ServicesRepository(dio: dio);
+      List<ServiceItem> items =
+          await servicesRepository.getServiceItems(data.id);
       setState(() {
         _service = data;
+        _items = items;
         _isLoading = false;
       });
     }
@@ -38,7 +49,8 @@ class _ServiceScreenState extends State<ServiceScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: buildNavigationalAppBar(context, _service!.title),
+      appBar: buildNavigationalAppBar(
+          context, _service == null ? "" : _service!.title),
       bottomNavigationBar: buildBottomNavigation(context, () {
         Navigator.of(context)
           ..pop()
@@ -72,10 +84,7 @@ class _ServiceScreenState extends State<ServiceScreen> {
                     ),
                     SizedBox(height: 24),
                     Text(
-                      _service!.content +
-                          _service!.content +
-                          _service!.content +
-                          _service!.content,
+                      _service!.content,
                       style: TextStyle(
                         fontSize: 13,
                         height: 1.92,
@@ -102,6 +111,57 @@ class _ServiceScreenState extends State<ServiceScreen> {
                       ),
                     ),
                     SizedBox(height: 24),
+                    Column(
+                      children: [
+                        ..._items
+                            .map(
+                              (item) => Container(
+                                width: 100.w,
+                                height: 80,
+                                padding: EdgeInsets.symmetric(vertical: 10),
+                                decoration: BoxDecoration(),
+                                child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Flexible(
+                                              child: Text(
+                                                item.title,
+                                                maxLines: 2,
+                                                style: TextStyles.display2()
+                                                    .copyWith(
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                            ),
+                                            Text(item.phone)
+                                          ],
+                                        ),
+                                      ),
+                                      IconButton(
+                                        onPressed: () {
+                                          String phone = item.phone;
+                                          if (!phone.startsWith("+")) {
+                                            phone = "+" + phone;
+                                          }
+                                          UrlLauncher.launch("tel://${phone}");
+                                        },
+                                        icon: Icon(Icons.phone),
+                                      )
+                                    ]),
+                              ),
+                            )
+                            .toList()
+                      ],
+                    )
                   ],
                 ),
               ),

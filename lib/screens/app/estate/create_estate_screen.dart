@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:dachaturizm/components/app_bar.dart';
 import 'package:dachaturizm/components/booked_days_hint.dart';
@@ -13,6 +14,7 @@ import 'package:dachaturizm/models/currency_model.dart';
 import 'package:dachaturizm/models/district_model.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/models/facility_model.dart';
+import 'package:dachaturizm/models/popular_place_model.dart';
 import 'package:dachaturizm/models/region_model.dart';
 import 'package:dachaturizm/models/category_model.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
@@ -34,10 +36,13 @@ import "package:flutter/material.dart";
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:multi_image_picker2/multi_image_picker2.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:find_dropdown/find_dropdown.dart';
+import 'package:http_parser/src/media_type.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 
 class EstateCreationPageScreen extends StatefulWidget {
   const EstateCreationPageScreen({Key? key}) : super(key: key);
@@ -79,6 +84,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
   int _mainImageId = 0;
   List _extraImages = List.generate(8, (_) => null);
   List _extraImagesId = List.generate(8, (_) => 0);
+  List<Asset> images = <Asset>[];
   String _currentSection = "";
   TextEditingController _titleController = TextEditingController();
   TextEditingController _descriptionController = TextEditingController();
@@ -88,8 +94,8 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
   TextEditingController _weekdayPriceController = TextEditingController();
   TextEditingController _weekendPriceController = TextEditingController();
   int _currentCurrencyId = 0;
-  String _currentRegion = "";
-  String _currentDistrict = "";
+  String? _currentRegion;
+  String? _currentDistrict;
   String _currentPopularPlace = "";
   List<int> _facilities = [];
   double _longtitude = 0.0;
@@ -109,8 +115,8 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
       _weekdayPriceController.text = "";
       _weekendPriceController.text = "";
       _currentCurrencyId = 0;
-      _currentRegion = "";
-      _currentDistrict = "";
+      _currentRegion = null;
+      _currentDistrict = null;
       _currentPopularPlace = "";
       _facilities = [];
       _longtitude = 0.0;
@@ -128,8 +134,8 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
         _mainImage == null ||
         _currentSection == "0" ||
         _currentCurrencyId == 0 ||
-        _currentRegion == "0" ||
-        _currentDistrict == "0") {
+        _currentRegion == null ||
+        _currentDistrict == null) {
       _scrollController.animateTo(
         0,
         duration: Duration(milliseconds: 500),
@@ -160,11 +166,12 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
         .firstWhere((region) => region.title.toString() == _currentRegion);
     data["district"] = _districts.firstWhere(
         (district) => district.title.toString() == _currentDistrict);
-    data["popular_place_id"] = Provider.of<FacilityProvider>(context,
-            listen: false)
-        .places
-        .firstWhere((place) => place.title.toString() == _currentPopularPlace)
-        .id;
+    data["popular_place_id"] =
+        Provider.of<FacilityProvider>(context, listen: false).places.firstWhere(
+            (place) => place.title.toString() == _currentPopularPlace,
+            orElse: () {
+      return PopularPlaceModel(id: 0, title: "");
+    }).id;
     data["address"] = _addressController.text;
     data["longtitute"] = _longtitude;
     data["latitute"] = _latitute;
@@ -243,17 +250,6 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     return imageFile == null ? null : imageFile.path;
   }
 
-  Future<dynamic> _selectMultipleImages() async {
-    final ImagePicker _picker = ImagePicker();
-    final List<XFile>? imageFiles =
-        await _picker.pickMultiImage(imageQuality: 100);
-    List<String> result = [];
-    imageFiles!.forEach((imageFile) {
-      result.add(imageFile.path);
-    });
-    return result.length == 0 ? null : result;
-  }
-
   Future<void> _selectMainImage() async {
     final image = await _selectImage();
     if (image == null) {
@@ -283,79 +279,55 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     });
   }
 
-  Future<void> _selectExtraImage(index) async {
-    final image = await _selectImage();
-    if (image == null) {
-      setState(() {
-        _extraImages[index] = null;
-        if (_isEditing) {
-          _currentExtraImageIndex = 8;
-        } else if (index > 0 && _extraImages[index + 1] != null) {
-          _currentExtraImageIndex = index - 1;
-        }
-      });
-    } else {
-      setState(() {
-        _extraImages[index] = File(image as String);
-        _currentExtraImageIndex = index + 1;
-        _extraImagesLoading[index] = true;
-      });
+  Future<void> loadAssets() async {
+    List<Asset> resultList = <Asset>[];
 
-      var photo = await MultipartFile.fromFile(
-        File(image as String).path,
-        filename: "testimage.png",
+    try {
+      resultList = await MultiImagePicker.pickImages(
+        maxImages: 8,
+        enableCamera: true,
+        selectedAssets: images,
+        cupertinoOptions: CupertinoOptions(
+          takePhotoIcon: "chat",
+          doneButtonTitle: "OK",
+        ),
+        materialOptions: MaterialOptions(
+          statusBarColor: "#F17C31",
+          actionBarColor: "#F17C31",
+          actionBarTitle: "DachaTurizm",
+          allViewTitle: Locales.string(context, "all_photos"),
+          useDetailsView: false,
+          selectCircleStrokeColor: "#000000",
+        ),
       );
+    } on Exception catch (e) {}
 
-      if (_extraImages[index] == null) {
-        Provider.of<CreateEstateProvider>(context, listen: false)
-            .uploadExtraPhoto(photo)
-            .then((value) {
-          _extraImagesId[index] = value;
-        });
-      } else {
-        Provider.of<CreateEstateProvider>(context, listen: false)
-            .updateExtraPhoto(_extraImagesId[index], photo)
-            .then((value) {
-          _extraImagesId[index] = value;
-        });
-      }
+    if (!mounted) return;
 
-      setState(() {
-        _extraImagesLoading[index] = false;
+    setState(() {
+      images = resultList;
+    });
+
+    images.forEach((image) async {
+      ByteData byteData = await image.getByteData();
+      List<int> imageData = byteData.buffer.asUint8List();
+      MultipartFile photo = MultipartFile.fromBytes(
+        imageData,
+        filename: "image.jpg",
+        contentType: MediaType("image", "jpg"),
+      );
+      int index = images.indexOf(image);
+      Provider.of<CreateEstateProvider>(context, listen: false)
+          .uploadExtraPhoto(photo)
+          .then((value) {
+        _extraImagesId[index] = value;
       });
-    }
-  }
-
-  Future<dynamic> _selectExtraImages(index) async {
-    final List<String>? images = await _selectMultipleImages();
-    if (images != null) {
-      int length = images.length < 8 ? images.length : 8;
-      for (int i = index; i < length; i++) {
-        _extraImages[i] = File(images[i]);
-        _extraImagesLoading[i] = true;
-      }
-      setState(() {});
-      for (int i = index; i < length; i++) {
-        var photo = await MultipartFile.fromFile(
-          File(images[i]).path,
-          filename: "testimage.png",
-        );
-        await Provider.of<CreateEstateProvider>(context, listen: false)
-            .uploadExtraPhoto(photo)
-            .then((value) {
-          _extraImagesId[i] = value;
-        });
-        setState(() {
-          _extraImagesLoading[i] = false;
-        });
-      }
-    }
-
-    return null;
+    });
   }
 
   @override
   void didChangeDependencies() {
+    super.didChangeDependencies();
     _descriptionController.addListener(() {
       setState(() {});
     });
@@ -363,16 +335,13 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
       _isLoading = true;
     });
     Future.delayed(Duration.zero).then((_) async {
-      Future.wait([
-        Provider.of<AuthProvider>(context, listen: false)
-            .getUserDataWithoutNotifying()
-            .then((user) {
-          if (user.runtimeType.toString() == "UserModel") {
-            _announcerController.text = "${user!.firstName} ${user.lastName}";
-            _phoneController.text = "+${user.phone}";
-          }
-        }),
-      ]).then((_) async {
+      Provider.of<AuthProvider>(context, listen: false)
+          .getUserDataWithoutNotifying()
+          .then((user) {
+        if (user.runtimeType.toString() == "UserModel") {
+          _announcerController.text = "${user!.firstName} ${user.lastName}";
+          _phoneController.text = "+${user.phone}";
+        }
         Map? data = ModalRoute.of(context)?.settings.arguments as Map?;
         if (data == null) return;
         if (data.containsKey("estateId") && _estateId == 0) {
@@ -461,7 +430,6 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     setState(() {
       _isLoading = false;
     });
-    super.didChangeDependencies();
   }
 
   @override
@@ -657,26 +625,24 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                               _currentRegion,
                               Locales.string(context, "choose_region"),
                               onChanged: (value) {
-                            setState(() {
-                              _currentRegion = value as String;
-                              if (_currentRegion == "0") {
-                                setState(() {
-                                  _currentDistrict = "0";
-                                  _districts = [];
-                                });
-                              } else {
-                                setState(() {
-                                  _districts = Provider.of<FacilityProvider>(
-                                          context,
-                                          listen: false)
-                                      .regions
-                                      .firstWhere((region) =>
-                                          region.title.toString() ==
-                                          _currentRegion)
-                                      .districts;
-                                });
-                              }
-                            });
+                            _currentRegion = value as String;
+                            if (_currentRegion == null) {
+                              setState(() {
+                                _districts = [];
+                                _currentDistrict = null;
+                              });
+                            } else {
+                              _districts = Provider.of<FacilityProvider>(
+                                      context,
+                                      listen: false)
+                                  .regions
+                                  .firstWhere((region) =>
+                                      region.title.toString() == _currentRegion)
+                                  .districts;
+                              setState(() {
+                                _currentDistrict = null;
+                              });
+                            }
                           }),
                           VerticalHorizontalSizedBox(),
                           Text(
@@ -982,15 +948,28 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
       children: [
         ...List.generate(
           8,
-          (index) => _buildMainImagePicker(
-            width: (100.w - 3.5 * defaultPadding) / 4,
-            height: (100.w - 3.5 * defaultPadding) / 4,
-            photo: _extraImages[index],
-            callback: () => _selectExtraImages(index),
-            disabled: index > _currentExtraImageIndex,
-            iconScale: 1.5,
-            uploading: _extraImagesLoading[index],
-          ),
+          (index) {
+            Asset? asset = (images.length > index) ? images[index] : null;
+            return ImageBox(
+              onTap: loadAssets,
+              photo: asset,
+              size: (100.w - 3.5 * defaultPadding) / 4,
+              onDelete: () {
+                setState(() {
+                  _extraImagesLoading[index] = true;
+                });
+                Provider.of<CreateEstateProvider>(context, listen: false)
+                    .removePhoto(_extraImagesId[index])
+                    .then((value) {
+                  setState(() {
+                    _extraImagesId[index] = 0;
+                    _extraImagesLoading[index] = false;
+                    images.removeAt(index);
+                  });
+                });
+              },
+            );
+          },
         ),
       ],
     );
@@ -1001,23 +980,12 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     return Container(
       height: 45,
       margin: EdgeInsets.only(top: 10),
-      child: SingleChildScrollView(
-        physics: NeverScrollableScrollPhysics(),
-        child: FindDropdown<String>(
-          items: values,
-          label: Locales.string(context, "choose_one"),
-          labelVisible: false,
-          selectedItem: value,
-          onChanged: onChanged ?? (value) {},
-          validate: (String? item) {
-            if (item == null)
-              return Locales.string(context, "required_field");
-            else if (!value.contains(item))
-              return Locales.string(context, "invalid_item");
-            else
-              return null;
-          },
-        ),
+      child: DropdownSearch<String>(
+        mode: Mode.BOTTOM_SHEET,
+        showSelectedItems: true,
+        items: values,
+        onChanged: onChanged,
+        selectedItem: value,
       ),
     );
   }
@@ -1028,7 +996,8 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
       MaterialPageRoute(
         builder: (context) => LocationPickerScreen(),
         settings: RouteSettings(
-            arguments: {"longtitude": _longtitude, "latitute": _latitute}),
+          arguments: {"longtitude": _longtitude, "latitute": _latitute},
+        ),
       ),
     );
     setState(() {
@@ -1258,5 +1227,87 @@ class VerticalHorizontalSizedBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(height: defaultPadding);
+  }
+}
+
+class ImageBox extends StatefulWidget {
+  final void Function()? onTap;
+  final Asset? photo;
+  final double size;
+  final bool isUpdating;
+  final void Function()? onDelete;
+
+  const ImageBox({
+    Key? key,
+    this.onTap,
+    this.photo,
+    required this.size,
+    this.isUpdating = false,
+    this.onDelete,
+  }) : super(key: key);
+
+  @override
+  State<ImageBox> createState() => _ImageBoxState();
+}
+
+class _ImageBoxState extends State<ImageBox> {
+  getContent(Asset? photo) {
+    if (photo == null) {
+      return Center(
+        child: Image.asset(
+          "assets/images/fi-rr-camera.png",
+          scale: 1.5,
+        ),
+      );
+    }
+    return Stack(
+      children: [
+        AssetThumb(
+          asset: photo,
+          width: widget.size.toInt(),
+          height: widget.size.toInt(),
+        ),
+        Positioned(
+          right: 8,
+          top: 8,
+          child: GestureDetector(
+            onTap: widget.onDelete,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.red,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Icon(
+                Icons.close_rounded,
+                color: Colors.white,
+                size: 20,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: widget.onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: lessNormalGrey,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: ClipRRect(
+          clipBehavior: Clip.antiAlias,
+          borderRadius: BorderRadius.circular(20),
+          child: Container(
+            width: widget.size,
+            height: widget.size,
+            child: getContent(widget.photo),
+          ),
+        ),
+      ),
+    );
   }
 }

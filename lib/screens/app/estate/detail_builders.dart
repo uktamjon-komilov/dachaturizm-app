@@ -8,6 +8,7 @@ import 'package:dachaturizm/helpers/call_with_auth.dart';
 import 'package:dachaturizm/helpers/url_helper.dart';
 import 'package:dachaturizm/models/booking_day.dart';
 import 'package:dachaturizm/models/estate_model.dart';
+import 'package:dachaturizm/models/photo_model.dart';
 import 'package:dachaturizm/models/user_model.dart';
 import 'package:dachaturizm/screens/app/chat/chat_screen.dart';
 import 'package:dachaturizm/screens/app/estate/image_zoomer.dart';
@@ -35,6 +36,28 @@ class DetailBuilder {
         children: [
           ...detail.facilities.map((item) => Chips(item.title)).toList(),
         ],
+      ),
+    );
+  }
+
+  Widget buildPopularPlaceBox(context) {
+    return Visibility(
+      visible: detail.popularPlaceTitle != null,
+      child: Container(
+        margin: EdgeInsets.only(top: 10),
+        padding: EdgeInsets.symmetric(
+          horizontal: 7,
+          vertical: 5,
+        ),
+        decoration: BoxDecoration(
+          color: normalOrange,
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Text(
+          Locales.string(context, "target_address") +
+              detail.popularPlaceTitle.toString(),
+          style: TextStyle(color: Colors.white),
+        ),
       ),
     );
   }
@@ -86,7 +109,7 @@ class DetailBuilder {
               child: GestureDetector(
                 onTap: () {
                   UrlLauncher.launch(
-                      "https://www.google.com/maps/search/?api=1&query=${detail.longtitute},${detail.latitute}");
+                      "https://www.google.com/maps/search/?api=1&query=${detail.latitute},${detail.longtitute}");
                 },
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),
@@ -146,7 +169,7 @@ class DetailBuilder {
     DateTime _focusedDay = DateTime.now();
 
     return Visibility(
-      visible: (show && _selectedDays.length != 0),
+      visible: show,
       child: Column(
         children: [
           drawDivider(),
@@ -281,7 +304,7 @@ class DetailBuilder {
           indicatorColor: normalOrange,
           indicatorBackgroundColor: lightGrey,
           children: [
-            ...detail.photos
+            ...[EstatePhotos(id: 0, photo: detail.photo), ...detail.photos]
                 .map(
                   (item) => GestureDetector(
                     onTap: () {
@@ -293,9 +316,10 @@ class DetailBuilder {
                           },
                           settings: RouteSettings(
                             arguments: {
-                              "photos": detail.photos
-                                  .map((item) => item.photo)
-                                  .toList(),
+                              "photos": [
+                                EstatePhotos(id: 0, photo: detail.photo),
+                                ...detail.photos
+                              ].map((item) => item.photo).toList(),
                               "current": item.photo,
                             },
                           ),
@@ -454,7 +478,7 @@ class DetailBuilder {
               child: FluidBigButton(
                 onPress: () {
                   String phone = detail.phone;
-                  if(!detail.phone.startsWith("+")){
+                  if (!detail.phone.startsWith("+")) {
                     phone = "+" + phone;
                   }
                   UrlLauncher.launch("tel://${phone}");

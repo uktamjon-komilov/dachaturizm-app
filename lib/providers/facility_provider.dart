@@ -30,7 +30,9 @@ class FacilityProvider with ChangeNotifier {
       this.getFacilities(),
       this.getAddresses(),
       this.getPopularPlaces(),
-    ]);
+    ]).then((value) {
+      notifyListeners();
+    });
   }
 
   Future getFacilities([String categoryId = ""]) async {

@@ -23,4 +23,20 @@ class ServicesRepository extends BaseRepository {
 
     return services;
   }
+
+  Future<List<ServiceItem>> getServiceItems(int id) async {
+    List<ServiceItem> items = [];
+    final url = "${baseUrl}api/services/${id}/items/";
+    try {
+      final respose = await dio.get(url);
+      if (isSuccessStatus(respose)) {
+        await respose.data.forEach((elem) async {
+          ServiceItem item = await ServiceItem.fromJson(elem);
+          items.add(item);
+        });
+      }
+    } catch (e) {}
+
+    return items;
+  }
 }

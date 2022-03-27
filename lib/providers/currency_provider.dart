@@ -56,9 +56,7 @@ class CurrencyProvider with ChangeNotifier {
           response.statusCode as int < 300) {
         return response.data["link"];
       }
-    } catch (e) {
-      print(e);
-    }
+    } catch (e) {}
 
     return "";
   }

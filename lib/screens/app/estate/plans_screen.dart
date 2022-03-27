@@ -58,9 +58,7 @@ class _PlansScreenState extends State<PlansScreen> {
           if (data != null && data.containsKey("data")) {
             _data = data["data"];
           }
-        } catch (e) {
-          print(e);
-        }
+        } catch (e) {}
         setState(() {
           _isLoading = false;
         });
@@ -283,32 +281,25 @@ class AdPlanItem extends StatelessWidget {
                 ),
               ],
             ),
-            (disabled != null && disabled!)
-                ? Row(
-                    children: [
-                      Text(
-                        Locales.string(context, "you_dont_have_enough_money"),
-                        style: TextStyles.display6().copyWith(
-                          color: textColor,
-                        ),
-                      )
-                    ],
-                  )
-                : Row(
-                    children: [
-                      Icon(Icons.notifications_active_rounded,
-                          color: textColor),
-                      SizedBox(width: 10),
-                      Text(
-                        description ??
-                            Locales.string(
-                                context, "you_can_activate_this_plan"),
-                        style: TextStyles.display6().copyWith(
-                          color: textColor,
-                        ),
-                      )
-                    ],
+            Row(
+              children: [
+                Icon(Icons.notifications_active_rounded, color: textColor),
+                SizedBox(width: 10),
+                Flexible(
+                  child: Text(
+                    description ??
+                        Locales.string(context, "you_can_activate_this_plan"),
+                    maxLines: 2,
+                    style: TextStyles.display6().copyWith(
+                      color: textColor,
+                      fontSize: 10,
+                      height: 0.9,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
+                )
+              ],
+            ),
           ],
         ),
       ),

@@ -116,13 +116,13 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                 ),
                 SizedBox(height: 1.5 * defaultPadding),
                 Text(
-                  "Ism",
+                  Locales.string(context, "first_name"),
                   style: TextStyles.display2().copyWith(letterSpacing: 0.3),
                 ),
                 SizedBox(height: defaultPadding * 3 / 4),
                 CustomInput(
                   controller: _nameController,
-                  hintText: "Ism",
+                  hintText: Locales.string(context, "first_name"),
                   validator: (value) {
                     if (value?.length == 0) {
                       return Locales.string(context, "name_must_be_provided");

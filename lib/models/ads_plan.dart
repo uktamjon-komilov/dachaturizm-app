@@ -27,7 +27,7 @@ class AdPlan {
           ? data["translations"][locale]["title"]
           : "-",
       description: data["translations"].containsKey(locale)
-          ? data["translations"][locale]["description"]
+          ? data["translations"][locale]["content"]
           : "-",
       slug: data["slug"],
       days: data["days"],

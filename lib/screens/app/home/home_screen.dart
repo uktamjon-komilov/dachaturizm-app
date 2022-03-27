@@ -130,7 +130,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
                           children: [
                             _buidlCategoryRow(context, categories),
                             SizedBox(height: defaultPadding * 0.5),
-                            // _buildSearchBar(context),
                             _buildBannerBlock(
                                 context, topBanners, _topBannerIndex),
                             SizedBox(height: defaultPadding * 0.5),
@@ -240,7 +239,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
         visible: estates != null,
         child: Container(
           width: 100.w,
-          padding: EdgeInsets.only(top: defaultPadding),
+          padding: EdgeInsets.only(top: defaultPadding / 2),
           child: Wrap(
             alignment: WrapAlignment.spaceBetween,
             runSpacing: 6,
@@ -251,7 +250,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
         ),
       );
     } catch (e) {
-      print(e);
       return Visibility(visible: false, child: Container());
     }
   }
@@ -309,16 +307,24 @@ class _HomePageScreenState extends State<HomePageScreen> {
           banners != null &&
           (topEstates.length > 0 || banners.length > 0)),
       child: Container(
+        margin: EdgeInsets.only(top: 10),
         child: Column(
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               textBaseline: TextBaseline.alphabetic,
               children: [
-                Text(
-                  Locales.string(context, "top") +
-                      " ${category.title.toLowerCase()}",
-                  style: TextStyles.display2(),
+                Container(
+                  decoration: BoxDecoration(
+                    color: normalOrange,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  padding: EdgeInsets.fromLTRB(7, 0, 7, 3),
+                  child: Text(
+                    Locales.string(context, "top") +
+                        " ${category.title.toLowerCase()}",
+                    style: TextStyles.display2().copyWith(color: Colors.white),
+                  ),
                 ),
                 TextLinkButton(Locales.string(context, "all"), () {
                   _navigateToCategory(context, category);
@@ -335,7 +341,8 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
   Widget _buidlCategoryRow(BuildContext context, List categories) {
     return Container(
-      height: 133,
+      height: 100,
+      width: 100.w,
       padding: EdgeInsets.symmetric(horizontal: defaultPadding),
       decoration: BoxDecoration(
         color: Colors.grey[100],
@@ -353,7 +360,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
               children: [
                 ...categories.map((item) {
                   return Container(
-                    margin: EdgeInsets.only(right: 34),
+                    margin: EdgeInsets.only(right: 30),
                     child: CategoryItem(
                       title: item.title,
                       icon: item.icon,
@@ -364,7 +371,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                   );
                 }).toList(),
                 Container(
-                  margin: EdgeInsets.only(right: 34),
+                  margin: EdgeInsets.only(right: 30),
                   child: CategoryItem(
                     title: Locales.string(context, "services"),
                     onTap: () {

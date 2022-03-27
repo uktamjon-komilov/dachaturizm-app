@@ -146,7 +146,7 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
                     child: Column(
                       children: [
                         Visibility(
-                          visible: _banner != null,
+                          visible: _banner != null && _banner!.id != detail.id,
                           child: Padding(
                             padding: const EdgeInsets.only(top: defaultPadding),
                             child: HorizontalAd(_banner as EstateModel),
@@ -171,6 +171,7 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
                               _detailBuilder.drawDivider(),
                               SizedBox(height: defaultPadding),
                               _detailBuilder.buildDescription(context),
+                              _detailBuilder.buildPopularPlaceBox(context),
                               _detailBuilder.buildAddressBox(context),
                               _detailBuilder.buildChips(),
                               _detailBuilder.buildAnnouncerBox(context),

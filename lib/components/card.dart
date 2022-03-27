@@ -95,7 +95,8 @@ class _EstateCardState extends State<EstateCard> {
                         );
                       },
                       child: CachedNetworkImage(
-                        imageUrl: widget.estate.photo,
+                        cacheKey: widget.estate.thumbnail,
+                        imageUrl: widget.estate.thumbnail,
                         fit: BoxFit.cover,
                         height: 145,
                         placeholder: (context, _) => Image.asset(

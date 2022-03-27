@@ -12,6 +12,7 @@ class NavigationScreenProvider with ChangeNotifier {
   bool _refreshHomePage = false;
   bool _refreshChatsScreen = false;
   bool _refreshUserScreen = false;
+  bool _recreateCreateEstateScreen = false;
   int _unreadMessagesCount = 0;
   Map<String, dynamic> extraPageData = {"home": {}};
 
@@ -20,6 +21,10 @@ class NavigationScreenProvider with ChangeNotifier {
   int get currentIndex {
     final currentIndex = _currentIndex;
     return currentIndex;
+  }
+
+  bool get recreateCreateEstateScreen {
+    return _recreateCreateEstateScreen;
   }
 
   bool get refreshHomePage {
@@ -37,6 +42,13 @@ class NavigationScreenProvider with ChangeNotifier {
   set refreshHomePage(bool value) {
     _refreshHomePage = value;
     if (_refreshHomePage) {
+      notifyListeners();
+    }
+  }
+
+  dispatchRecreateCreateEstateScreen(bool value) {
+    _recreateCreateEstateScreen = value;
+    if (value) {
       notifyListeners();
     }
   }

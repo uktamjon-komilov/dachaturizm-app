@@ -45,7 +45,6 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
   dynamic Function()? onFilterCallback;
   int? _categoryId;
 
-  // TextEditingController _addressController = TextEditingController();
   TextEditingController _minPriceController = TextEditingController();
   TextEditingController _maxPriceController = TextEditingController();
 
@@ -59,15 +58,11 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
       if (data.containsKey("category")) {
         _categoryId = data["category"];
       }
-    } catch (e) {
-      print(e);
-    }
+    } catch (e) {}
 
     _sortingTypes = Provider.of<EstateProvider>(context, listen: false).sorting;
     _currentSort =
         Provider.of<EstateProvider>(context, listen: false).filters["sorting"];
-    // _addressController.text =
-    //     Provider.of<EstateProvider>(context, listen: false).filters["address"];
 
     _regions = Provider.of<RegionProvider>(context, listen: false).regions;
 
@@ -107,9 +102,6 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
   }
 
   _setAllFilters() {
-    // Provider.of<EstateProvider>(context, listen: false)
-    //     .filtersAddress(_addressController.text);
-
     int regionId = _regions
         .firstWhere((region) => region.title == _currentRegion, orElse: () {
       return RegionModel(
@@ -142,18 +134,20 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
           .filtersPlace(_currentPlaceId);
     }
 
-    double maxPrice = double.parse(_maxPriceController.text);
-    double minPrice = double.parse(_minPriceController.text);
+    try {
+      double maxPrice = double.parse(_maxPriceController.text);
+      double minPrice = double.parse(_minPriceController.text);
 
-    if (minPrice < maxPrice) {
-      Provider.of<EstateProvider>(context, listen: false)
-          .filtersMinPrice(double.parse(_minPriceController.text));
-    }
+      if (minPrice < maxPrice) {
+        Provider.of<EstateProvider>(context, listen: false)
+            .filtersMinPrice(double.parse(_minPriceController.text));
+      }
 
-    if (maxPrice != 0.0 && maxPrice > minPrice) {
-      Provider.of<EstateProvider>(context, listen: false)
-          .filtersMaxPrice(double.parse(_maxPriceController.text));
-    }
+      if (maxPrice != 0.0 && maxPrice > minPrice) {
+        Provider.of<EstateProvider>(context, listen: false)
+            .filtersMaxPrice(double.parse(_maxPriceController.text));
+      }
+    } catch (e) {}
 
     Provider.of<EstateProvider>(context, listen: false)
         .filtersSorting(_currentSort as String);
@@ -195,7 +189,7 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
           .getSearchedResults(category: category)
           .then((value) {
         setState(() {
-          _resultCount = value["estates"].length;
+          _resultCount = value["count"];
         });
       });
     } else {
@@ -203,7 +197,7 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
           .getSearchedResults()
           .then((value) {
         setState(() {
-          _resultCount = value["estates"].length;
+          _resultCount = value["count"];
         });
       });
     }
@@ -215,7 +209,6 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
     if (_isInit) {
       _isInit = false;
       await _fetchData();
-      // _listenControllers();
       Map<String, dynamic> modalData =
           ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
       if (modalData.containsKey("onFilterCallback")) {
@@ -226,7 +219,6 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
 
   @override
   void dispose() {
-    // _addressController.dispose();
     _minPriceController.dispose();
     _maxPriceController.dispose();
     super.dispose();
@@ -260,8 +252,7 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
       },
       child: Scaffold(
         appBar: buildNavigationalAppBar(
-            context, Locales.string(context, "filters") + " (${_resultCount})",
-            () {
+            context, Locales.string(context, "filters"), () {
           _clearFilters();
         }, [
           IconButton(
@@ -297,16 +288,6 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
                           _currentSort as String),
                       SizedBox(height: defaultPadding / 2),
                       Divider(height: 0),
-                      // SizedBox(height: defaultPadding),
-                      // Text(
-                      //   Locales.string(context, "enter_address"),
-                      //   style: TextStyles.display5(),
-                      // ),
-                      // SizedBox(height: 12),
-                      // TextInput(
-                      //   hintText: Locales.string(context, "address"),
-                      //   controller: _addressController,
-                      // ),
                       SizedBox(height: defaultPadding),
                       Text(
                         Locales.string(context, "choose_region"),

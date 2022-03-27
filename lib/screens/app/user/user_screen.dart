@@ -37,11 +37,6 @@ class _UserPageScreenState extends State<UserPageScreen> {
         builder: (context) => page,
       ),
     ) as Map;
-    // if (result != null && result.containsKey("change")) {
-    //   setState(() {
-    //     _someChange = true;
-    //   });
-    // }
   }
 
   @override
