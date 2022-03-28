@@ -102,18 +102,32 @@ class EstateModel {
   }
 
   static Future<EstateModel> fromJson(Map<String, dynamic> data) async {
-    String locale = await getCurrentLocale();
+    List<String> langs = ["uz", "en", "ru"];
+    String? locale = await getCurrentLocale();
 
-    Map<String, dynamic> localData = data["translations"][locale];
+  Map<String, dynamic> localData = {};
+
+  int counter = 0;
+
+  while(counter < langs.length && !data["translations"].containsKey(locale)){
+    locale = langs[counter];
+    counter += 1;
+  }
+
+    try{
+    localData = data["translations"][locale];
+    }catch(e){
+      locale = null;
+    }
 
     return EstateModel(
       id: data.containsKey("id") ? data["id"] : 0,
-      title: localData.containsKey("title")
+      title: locale == null ? "-" : (localData.containsKey("title")
           ? localData["title"]
-          : getFromOtherLang(data["translations"], "title", "uz"),
-      description: localData["description"],
-      region: localData.containsKey("region") ? localData["region"] : "",
-      district: localData.containsKey("district") ? localData["district"] : "",
+          : getFromOtherLang(data["translations"], "title", "uz")),
+      description: locale == null ? "-" : (localData["description"]),
+      region: locale == null ? "-" :(localData.containsKey("region") ? localData["region"] : ""),
+      district: locale == null ? "-" : (localData.containsKey("district") ? localData["district"] : ""),
       priceType: data["price_type"]["translations"][locale]["title"],
       rating: data["rating"],
       views: data["views"],
