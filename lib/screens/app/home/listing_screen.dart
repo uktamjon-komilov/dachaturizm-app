@@ -4,6 +4,7 @@ import 'package:dachaturizm/components/no_result.dart';
 import 'package:dachaturizm/components/search_bar_with_filter.dart';
 import 'package:dachaturizm/components/small_button.dart';
 import 'package:dachaturizm/constants.dart';
+import 'package:dachaturizm/helpers/remove_doubles.dart';
 import 'package:dachaturizm/models/category_model.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
@@ -58,40 +59,39 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
       ScrollPosition position = _scrollController.position;
       if (position.pixels > position.maxScrollExtent - 80 &&
           !_paginationLoading) {
-        if (!_paginationLoading && _showTop && _topNextLink != null) {
+        if (_showTop && _topNextLink != null) {
           setState(() {
             _paginationLoading = true;
           });
           Provider.of<EstateProvider>(context, listen: false)
               .getNextPage(_topNextLink as String)
               .then((value) {
+            List<EstateModel> _estates = value["estates"];
+            _estates.shuffle();
+            _topEstates.addAll(_estates);
+            _topEstates = removeDoubleEstates(_topEstates);
+            _topNextLink = value["next"];
             setState(() {
-              _topEstates.addAll(value["estates"]);
+              _currentEstates = _topEstates;
               _paginationLoading = false;
-              _topNextLink = value["next"];
             });
           });
-        } else if (!_paginationLoading &&
+        } else if (
             !_showTop &&
             _simpleNextLink != null) {
           setState(() {
             _paginationLoading = true;
-            _simpleNextLink = null;
           });
           Provider.of<EstateProvider>(context, listen: false)
               .getNextPage(_simpleNextLink as String)
               .then((value) {
-            _allEstates.addAll(value["estates"]);
-            Set<int> _indexes = {};
-            List<EstateModel> _items = [];
-            for (int i = 0; i < _allEstates.length; i++) {
-              if (!_indexes.contains(_allEstates[i].id)) {
-                _items.add(_allEstates[i]);
-              }
-            }
-            _allEstates = _items;
+            List<EstateModel> _estates = value["estates"];
+            _estates.shuffle();
+            _allEstates.addAll(_estates);
+            _allEstates = removeDoubleEstates(_allEstates);
+            _simpleNextLink = value["next"];
             setState(() {
-              _simpleNextLink = value["next"];
+              _currentEstates = _allEstates;
               _paginationLoading = false;
             });
           });
@@ -110,8 +110,10 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
             "top": true,
             "simple": false,
           }).then((data) {
+        List<EstateModel> _estates = data["estates"];
+        _estates.shuffle();
+        _topEstates = removeDoubleEstates(_estates);
         setState(() {
-          _topEstates = data["estates"];
           _topNextLink = data["next"];
         });
       }),
@@ -121,8 +123,10 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
           extraArgs: {
             "all": true,
           }).then((data) {
+        List<EstateModel> _estates = data["estates"];
+        _estates.shuffle();
+        _allEstates = removeDoubleEstates(_estates);
         setState(() {
-          _allEstates = data["estates"];
           _simpleNextLink = data["next"];
         });
       }),
@@ -146,16 +150,22 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
       Provider.of<EstateProvider>(context, listen: false)
           .getEstatesByType(_category, "top")
           .then((value) {
+        List<EstateModel> _estates = value["estates"];
+        _estates.shuffle();
+        _estates = removeDoubleEstates(_estates);
+          _topEstates = _estates;
         setState(() {
-          _topEstates = value["estates"];
           _topNextLink = value["next"];
         });
       }),
       Provider.of<EstateProvider>(context, listen: false)
           .getEstatesByType(_category, "all")
           .then((value) {
+        List<EstateModel> _estates = value["estates"];
+        _estates.shuffle();
+        _estates = removeDoubleEstates(_estates);
+          _allEstates = _estates;
         setState(() {
-          _allEstates = value["estates"];
           _simpleNextLink = value["next"];
         });
       }),
@@ -197,9 +207,7 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
             : RefreshIndicator(
                 onRefresh: _refreshAction,
                 child: Container(
-                  height: _allEstates.length == 0
-                      ? 100.h - 4 * defaultPadding
-                      : null,
+                  height: 100.h,
                   child: SingleChildScrollView(
                     controller: _scrollController,
                     physics: AlwaysScrollableScrollPhysics(),
