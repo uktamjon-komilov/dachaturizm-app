@@ -1,5 +1,4 @@
 import 'package:dachaturizm/constants.dart';
-import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/screens/auth/login_screen.dart';
 import 'package:dachaturizm/styles/text_styles.dart';

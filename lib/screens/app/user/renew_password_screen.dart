@@ -89,13 +89,13 @@ class _RenewPasswordScreenState extends State<RenewPasswordScreen> {
         ),
       ),
       body: _isLoading
-          ? Center(
+          ? const Center(
               child: CircularProgressIndicator(),
             )
           : Container(
               height: 100.h,
               width: 100.w,
-              padding: EdgeInsets.all(defaultPadding),
+              padding: const EdgeInsets.all(defaultPadding),
               child: SingleChildScrollView(
                 child: Form(
                   key: _form,
@@ -107,7 +107,7 @@ class _RenewPasswordScreenState extends State<RenewPasswordScreen> {
                         style:
                             TextStyles.display6().copyWith(color: darkPurple),
                       ),
-                      SizedBox(height: defaultPadding * 3 / 4),
+                      const SizedBox(height: defaultPadding * 3 / 4),
                       PasswordInputField(
                         controller: _currentPasswordController,
                         hintText: Locales.string(context, "current_password"),
@@ -121,13 +121,13 @@ class _RenewPasswordScreenState extends State<RenewPasswordScreen> {
                           return null;
                         },
                       ),
-                      SizedBox(height: 1.5 * defaultPadding),
+                      const SizedBox(height: 1.5 * defaultPadding),
                       Text(
                         Locales.string(context, "enter_new_password"),
                         style:
                             TextStyles.display6().copyWith(color: darkPurple),
                       ),
-                      SizedBox(height: defaultPadding * 3 / 4),
+                      const SizedBox(height: defaultPadding * 3 / 4),
                       PasswordInputField(
                         controller: _newPasswordController,
                         hintText: Locales.string(context, "enter_new_password"),
@@ -147,13 +147,13 @@ class _RenewPasswordScreenState extends State<RenewPasswordScreen> {
                           return null;
                         },
                       ),
-                      SizedBox(height: 1.5 * defaultPadding),
+                      const SizedBox(height: 1.5 * defaultPadding),
                       Text(
                         Locales.string(context, "repeat_new_password"),
                         style:
                             TextStyles.display6().copyWith(color: darkPurple),
                       ),
-                      SizedBox(height: defaultPadding * 3 / 4),
+                      const SizedBox(height: defaultPadding * 3 / 4),
                       PasswordInputField(
                         controller: _confirmPasswordController,
                         hintText:
@@ -174,7 +174,7 @@ class _RenewPasswordScreenState extends State<RenewPasswordScreen> {
                           return null;
                         },
                       ),
-                      SizedBox(height: 1.5 * defaultPadding),
+                      const SizedBox(height: 1.5 * defaultPadding),
                     ],
                   ),
                 ),

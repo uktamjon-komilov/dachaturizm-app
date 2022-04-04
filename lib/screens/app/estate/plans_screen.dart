@@ -48,7 +48,7 @@ class _PlansScreenState extends State<PlansScreen> {
             .fetchAdPlans()
             .then((value) => _plans = value),
         Provider.of<AuthProvider>(context, listen: false)
-            .getUserData()
+            .getUserDataWithoutNotifying()
             .then((user) => _user = user),
       ]).then((_) {
         try {
@@ -150,7 +150,7 @@ class _PlansScreenState extends State<PlansScreen> {
             ? Container(
                 width: 100.w,
                 height: 90.h,
-                child: Center(
+                child: const Center(
                   child: CircularProgressIndicator(),
                 ),
               )
@@ -174,7 +174,7 @@ class _PlansScreenState extends State<PlansScreen> {
                         ),
                       ],
                     ),
-                    SizedBox(height: defaultPadding * 3 / 4),
+                    const SizedBox(height: defaultPadding * 3 / 4),
                     Text(
                       Locales.string(context, "you_can_change_plans_later_on"),
                       style: TextStyles.display8(),
@@ -249,8 +249,8 @@ class AdPlanItem extends StatelessWidget {
       child: Container(
         width: 100.w,
         height: 100,
-        padding: EdgeInsets.all(20),
-        margin: EdgeInsets.only(bottom: defaultPadding / 2),
+        padding: const EdgeInsets.all(20),
+        margin: const EdgeInsets.only(bottom: defaultPadding / 2),
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: BorderRadius.circular(20),
@@ -284,7 +284,7 @@ class AdPlanItem extends StatelessWidget {
             Row(
               children: [
                 Icon(Icons.notifications_active_rounded, color: textColor),
-                SizedBox(width: 10),
+                const SizedBox(width: 10),
                 Flexible(
                   child: Text(
                     description ??

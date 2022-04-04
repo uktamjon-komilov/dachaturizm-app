@@ -162,18 +162,6 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
     Provider.of<EstateProvider>(context, listen: false).filtersClear();
   }
 
-  _listenControllers() {
-    _minPriceController.addListener(() {
-      double? minValue = double.tryParse(_minPriceController.text);
-      double? maxValue = double.tryParse(_maxPriceController.text);
-      if (minValue != null && maxValue != null && minValue < maxValue) {
-        setState(() {
-          _selectedRange = RangeValues(minValue, _selectedRange.end);
-        });
-      }
-    });
-  }
-
   _getSearchResultsCount() async {
     _setAllFilters();
     if (_categoryId != null) {
@@ -261,12 +249,12 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
               onFilterCallback!();
               Navigator.of(context).pop();
             },
-            icon: Icon(Icons.refresh_rounded),
+            icon: const Icon(Icons.refresh_rounded),
             color: greyishLight,
           ),
         ]),
         body: _isLoading
-            ? Center(
+            ? const Center(
                 child: CircularProgressIndicator(),
               )
             : SingleChildScrollView(
@@ -286,14 +274,14 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
                       ),
                       _buildOrderFilers(_sortingTypes as List<String>,
                           _currentSort as String),
-                      SizedBox(height: defaultPadding / 2),
+                      const SizedBox(height: defaultPadding / 2),
                       Divider(height: 0),
-                      SizedBox(height: defaultPadding),
+                      const SizedBox(height: defaultPadding),
                       Text(
                         Locales.string(context, "choose_region"),
                         style: TextStyles.display5(),
                       ),
-                      SizedBox(height: 12),
+                      const SizedBox(height: 12),
                       Container(
                         height: 45,
                         margin: EdgeInsets.only(top: 10),
@@ -324,12 +312,12 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
                           ),
                         ),
                       ),
-                      SizedBox(height: defaultPadding),
+                      const SizedBox(height: defaultPadding),
                       Text(
                         Locales.string(context, "choose_district"),
                         style: TextStyles.display5(),
                       ),
-                      SizedBox(height: 12),
+                      const SizedBox(height: 12),
                       Container(
                         height: 45,
                         margin: EdgeInsets.only(top: 10),
@@ -349,12 +337,12 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
                           ),
                         ),
                       ),
-                      SizedBox(height: defaultPadding),
+                      const SizedBox(height: defaultPadding),
                       Text(
                         Locales.string(context, "choose_popular_place"),
                         style: TextStyles.display5(),
                       ),
-                      SizedBox(height: 12),
+                      const SizedBox(height: 12),
                       Container(
                         height: 45,
                         margin: EdgeInsets.only(top: 10),
@@ -376,12 +364,12 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
                           ),
                         ),
                       ),
-                      SizedBox(height: defaultPadding),
+                      const SizedBox(height: defaultPadding),
                       Text(
                         Locales.string(context, "set_price"),
                         style: TextStyles.display5(),
                       ),
-                      SizedBox(height: 12),
+                      const SizedBox(height: 12),
                       Container(
                         width: 100.w,
                         child: Row(
@@ -454,14 +442,14 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
                           }).toList(),
                         ],
                       ),
-                      SizedBox(height: defaultPadding / 2),
-                      Divider(height: 0),
-                      SizedBox(height: defaultPadding),
+                      const SizedBox(height: defaultPadding / 2),
+                      const Divider(height: 0),
+                      const SizedBox(height: defaultPadding),
                       Text(
                         Locales.string(context, "extra_filters"),
                         style: TextStyles.display5(),
                       ),
-                      SizedBox(height: 12),
+                      const SizedBox(height: 12),
                       Wrap(
                         children: [
                           ...facilities
@@ -482,7 +470,7 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
                               .toList(),
                         ],
                       ),
-                      SizedBox(height: 5 * defaultPadding),
+                      const SizedBox(height: 5 * defaultPadding),
                     ],
                   ),
                 ),

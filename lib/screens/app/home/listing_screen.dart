@@ -76,9 +76,7 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
               _paginationLoading = false;
             });
           });
-        } else if (
-            !_showTop &&
-            _simpleNextLink != null) {
+        } else if (!_showTop && _simpleNextLink != null) {
           setState(() {
             _paginationLoading = true;
           });
@@ -153,7 +151,7 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
         List<EstateModel> _estates = value["estates"];
         _estates.shuffle();
         _estates = removeDoubleEstates(_estates);
-          _topEstates = _estates;
+        _topEstates = _estates;
         setState(() {
           _topNextLink = value["next"];
         });
@@ -164,7 +162,7 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
         List<EstateModel> _estates = value["estates"];
         _estates.shuffle();
         _estates = removeDoubleEstates(_estates);
-          _allEstates = _estates;
+        _allEstates = _estates;
         setState(() {
           _simpleNextLink = value["next"];
         });
@@ -196,7 +194,7 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
         }, [
           IconButton(
             onPressed: () => _refreshAction(),
-            icon: Icon(Icons.refresh_rounded),
+            icon: const Icon(Icons.refresh_rounded),
             color: greyishLight,
           ),
         ]),
@@ -214,9 +212,7 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(
-                          height: 24,
-                        ),
+                        const SizedBox(height: 24),
                         Padding(
                           padding: const EdgeInsets.symmetric(
                               horizontal: defaultPadding),
@@ -267,11 +263,11 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
                                 ),
                                 child: NoResult(),
                               ),
-                        SizedBox(height: defaultPadding),
+                        const SizedBox(height: defaultPadding),
                         Visibility(
                           visible: _paginationLoading,
                           child: Container(
-                            padding: EdgeInsets.only(bottom: 20),
+                            padding: const EdgeInsets.only(bottom: 20),
                             height: 60,
                             child: Center(
                               child: SpinKitFadingCircle(

@@ -57,7 +57,7 @@ class _ServicesListScreenState extends State<ServicesListScreen> {
         Navigator.of(context).pop();
       }),
       body: _isLoading
-          ? Center(
+          ? const Center(
               child: CircularProgressIndicator(),
             )
           : SingleChildScrollView(
@@ -107,12 +107,12 @@ class _ServicesListScreenState extends State<ServicesListScreen> {
               ),
             ),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Text(
             service.title,
             style: TextStyles.display1(),
           ),
-          SizedBox(height: defaultPadding),
+          const SizedBox(height: defaultPadding),
         ],
       ),
     );

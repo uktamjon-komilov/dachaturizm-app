@@ -56,7 +56,7 @@ class DetailBuilder {
         child: Text(
           Locales.string(context, "target_address") +
               detail.popularPlaceTitle.toString(),
-          style: TextStyle(color: Colors.white),
+          style: const TextStyle(color: Colors.white),
         ),
       ),
     );
@@ -66,8 +66,8 @@ class DetailBuilder {
     return Visibility(
       visible: (detail.longtitute != 0.0 && detail.latitute != 0.0),
       child: Container(
-        padding: EdgeInsets.all(10),
-        margin: EdgeInsets.symmetric(vertical: 20),
+        padding: const EdgeInsets.all(10),
+        margin: const EdgeInsets.symmetric(vertical: 20),
         height: 100,
         decoration: BoxDecoration(
           color: lightGrey,
@@ -78,7 +78,7 @@ class DetailBuilder {
           children: [
             Visibility(
               visible: detail.address.length > 0,
-              child: Expanded(
+              child: const Expanded(
                 flex: 2,
                 child: Icon(Icons.share_location_rounded, size: 25),
               ),
@@ -93,7 +93,7 @@ class DetailBuilder {
                   children: [
                     Text(
                       detail.address,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 12,
                         height: 1.33,
                         fontWeight: FontWeight.w600,
@@ -142,7 +142,7 @@ class DetailBuilder {
         SizedBox(height: defaultPadding),
         Text(
           detail.description,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w400,
             height: 1.4,
@@ -205,7 +205,6 @@ class DetailBuilder {
             ),
             selectedDayPredicate: (day) {
               return _selectedDays.contains(BookingDay.toObj(day));
-              // return true;
             },
             startingDayOfWeek: StartingDayOfWeek.monday,
           ),
@@ -223,7 +222,7 @@ class DetailBuilder {
       children: [
         Text(
           "${formatter.format(detail.weekdayPrice)} ${detail.priceType}",
-          style: TextStyle(
+          style: const TextStyle(
             color: normalOrange,
             fontSize: 16,
             fontWeight: FontWeight.w600,
@@ -233,7 +232,7 @@ class DetailBuilder {
           onPressed: callback,
           child: Text(
             Locales.string(context, "calendar"),
-            style: TextStyle(color: Colors.white),
+            style: const TextStyle(color: Colors.white),
           ),
           style: ElevatedButton.styleFrom(
             primary: normalOrange,
@@ -263,9 +262,7 @@ class DetailBuilder {
             ),
             onRatingUpdate: (rating) {},
           ),
-          SizedBox(
-            width: 10,
-          ),
+          const SizedBox(width: 10),
           Text(
             "${detail.rating} ${Locales.string(context, 'reviews')}",
             style: TextStyle(
@@ -282,7 +279,7 @@ class DetailBuilder {
   Text buildTitle() {
     return Text(
       detail.title,
-      style: TextStyle(
+      style: const TextStyle(
         color: darkPurple,
         fontSize: 18,
         height: 1.44,
@@ -342,7 +339,7 @@ class DetailBuilder {
                 .toList()
           ],
           onPageChanged: (value) {},
-          // autoPlayInterval: 3000,
+          autoPlayInterval: 7000,
           isLoop: true,
         ),
       ),
@@ -356,8 +353,8 @@ class DetailBuilder {
             arguments: {"userId": detail.userId});
       },
       child: Container(
-        padding: EdgeInsets.all(10),
-        margin: EdgeInsets.symmetric(vertical: 20),
+        padding: const EdgeInsets.all(10),
+        margin: const EdgeInsets.symmetric(vertical: 20),
         height: 70,
         decoration: BoxDecoration(
           color: lightGrey,
@@ -381,27 +378,23 @@ class DetailBuilder {
                     : Image.asset("assets/images/user.png"),
               ),
             ),
-            SizedBox(
-              width: 20,
-            ),
+            const SizedBox(width: 20),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   detail.announcer,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: darkPurple,
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                SizedBox(
-                  height: 3,
-                ),
+                const SizedBox(height: 3),
                 Text(
                   "${detail.userAdsCount} ${Locales.string(context, 'ads_count')}",
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: darkPurple,
                     fontSize: 12,
                     fontWeight: FontWeight.w400,
@@ -409,10 +402,10 @@ class DetailBuilder {
                 ),
               ],
             ),
-            Spacer(),
+            const Spacer(),
             IconButton(
               onPressed: () {},
-              icon: Icon(
+              icon: const Icon(
                 Icons.arrow_forward_ios_rounded,
                 color: normalGrey,
               ),
@@ -439,7 +432,7 @@ class DetailBuilder {
               child: FluidOutlinedButton(
                 child: Text(
                   Locales.string(context, "messaging_with_announcer"),
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 12,
                     color: normalOrange,
                     fontWeight: FontWeight.w500,
@@ -471,9 +464,7 @@ class DetailBuilder {
                 },
               ),
             ),
-            SizedBox(
-              width: 15,
-            ),
+            const SizedBox(width: 15),
             Expanded(
               child: FluidBigButton(
                 onPress: () {
@@ -485,7 +476,7 @@ class DetailBuilder {
                 },
                 child: Text(
                   Locales.string(context, "direct_call"),
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 12,
                     color: Colors.white,
                     fontWeight: FontWeight.w500,

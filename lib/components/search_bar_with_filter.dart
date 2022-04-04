@@ -52,7 +52,7 @@ class SearchBarWithFilter extends StatelessWidget {
               },
               decoration: InputDecoration(
                 hintText: Locales.string(context, "search"),
-                hintStyle: TextStyle(
+                hintStyle: const TextStyle(
                   color: Color(0xFFC4C5C4),
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
@@ -65,7 +65,7 @@ class SearchBarWithFilter extends StatelessWidget {
                   onTap: () {
                     onSubmit(controller.text);
                   },
-                  child: Icon(
+                  child: const Icon(
                     Icons.search_rounded,
                     color: Color(0xFFC4C5C4),
                   ),
@@ -78,7 +78,7 @@ class SearchBarWithFilter extends StatelessWidget {
           visible: showFilters,
           child: Row(
             children: [
-              SizedBox(width: 12),
+              const SizedBox(width: 12),
               Container(
                 decoration: BoxDecoration(
                   boxShadow: [
@@ -98,7 +98,7 @@ class SearchBarWithFilter extends StatelessWidget {
                       onFilterTap!();
                     }
                   },
-                  child: Icon(Icons.tune, color: Colors.white),
+                  child: const Icon(Icons.tune, color: Colors.white),
                   style: TextButton.styleFrom(
                     backgroundColor: normalOrange,
                     minimumSize: Size(45, 45),

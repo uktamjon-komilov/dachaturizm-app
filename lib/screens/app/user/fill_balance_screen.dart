@@ -94,7 +94,7 @@ class _BalanceScreenState extends State<BalanceScreen>
         ),
       ),
       body: Container(
-        padding: EdgeInsets.fromLTRB(
+        padding: const EdgeInsets.fromLTRB(
           defaultPadding,
           defaultPadding,
           defaultPadding,
@@ -104,11 +104,11 @@ class _BalanceScreenState extends State<BalanceScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             CustomText(Locales.string(context, "amount")),
-            SizedBox(height: defaultPadding * 3 / 4),
+            const SizedBox(height: defaultPadding * 3 / 4),
             _buildInputField(),
             Text(
               Locales.string(context, "enter_payment_amount"),
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 10,
                 height: 1.5,
                 letterSpacing: 0.3,
@@ -116,9 +116,9 @@ class _BalanceScreenState extends State<BalanceScreen>
                 color: greyishLight,
               ),
             ),
-            SizedBox(height: 1.5 * defaultPadding),
+            const SizedBox(height: 1.5 * defaultPadding),
             CustomText(Locales.string(context, "payment_method")),
-            SizedBox(height: defaultPadding * 3 / 4),
+            const SizedBox(height: defaultPadding * 3 / 4),
             ...paymentMethods
                 .map((method) => PaymentButton(
                       title: method,
@@ -152,7 +152,7 @@ class _BalanceScreenState extends State<BalanceScreen>
             vertical: 0,
           ),
           hintText: Locales.string(context, "enter_payment_amount"),
-          hintStyle: TextStyle(
+          hintStyle: const TextStyle(
             fontSize: 13,
             letterSpacing: 1.2,
             fontWeight: FontWeight.w500,
@@ -191,8 +191,8 @@ class PaymentButton extends StatelessWidget {
       onTap: onPressed,
       child: Container(
         width: 100.w,
-        margin: EdgeInsets.only(bottom: 8),
-        padding: EdgeInsets.symmetric(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.symmetric(
           vertical: 19,
           horizontal: defaultPadding,
         ),
@@ -211,7 +211,7 @@ class PaymentButton extends StatelessWidget {
                 fit: BoxFit.contain,
               ),
             ),
-            SizedBox(width: defaultPadding),
+            const SizedBox(width: defaultPadding),
             Text(
               title.substring(0, 1).toUpperCase() +
                   title.substring(1, title.length),

@@ -83,8 +83,6 @@ class _ChatScreenState extends State<ChatScreen> {
               _data = value;
               _isLoading = false;
             });
-            // _scrollController
-            //     .jumpTo(_scrollController.position.maxScrollExtent);
           });
         }
       });
@@ -102,7 +100,6 @@ class _ChatScreenState extends State<ChatScreen> {
           setState(() {
             _data = value;
           });
-          // _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
         });
       });
     });
@@ -197,14 +194,14 @@ class _ChatScreenState extends State<ChatScreen> {
         children: [
           Text(
             estate.title,
-            style: TextStyle(
+            style: const TextStyle(
               color: darkPurple,
               fontWeight: FontWeight.bold,
               overflow: TextOverflow.ellipsis,
             ),
             maxLines: 1,
           ),
-          SizedBox(height: 5),
+          const SizedBox(height: 5),
           RatingBar.builder(
             ignoreGestures: true,
             initialRating: estate.rating,
@@ -227,12 +224,12 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget _buildLocation(EstateModel estate) {
     return Row(
       children: [
-        Icon(
+        const Icon(
           Icons.location_on,
           size: 15,
           color: normalGrey,
         ),
-        SizedBox(width: 5),
+        const SizedBox(width: 5),
         SmallGreyText(text: estate.address),
       ],
     );
@@ -261,14 +258,12 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ),
         ),
-        padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        margin: EdgeInsets.only(bottom: 5),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        margin: const EdgeInsets.only(bottom: 5),
         child: Row(
           children: [
             _buildImageBox(estate as EstateModel),
-            SizedBox(
-              width: 10,
-            ),
+            const SizedBox(width: 10),
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -289,7 +284,7 @@ class _ChatScreenState extends State<ChatScreen> {
     return Container(
       width: 100.w,
       decoration: BoxDecoration(color: chatInputBackground),
-      padding: EdgeInsets.fromLTRB(
+      padding: const EdgeInsets.fromLTRB(
         defaultPadding,
         defaultPadding / 2,
         defaultPadding,
@@ -301,7 +296,7 @@ class _ChatScreenState extends State<ChatScreen> {
           Expanded(
             child: TextFormField(
               controller: _textController,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
                 height: 1.29,
@@ -313,7 +308,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 fillColor: Colors.white,
                 isDense: true,
                 hintText: Locales.string(context, "write_a_message"),
-                hintStyle: TextStyle(color: greyishLight),
+                hintStyle: const TextStyle(color: greyishLight),
                 contentPadding:
                     EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 border: OutlineInputBorder(
@@ -406,8 +401,8 @@ class MessageItem extends StatelessWidget {
                 color: isSent ? sentMessageColor : inputGrey,
                 borderRadius: BorderRadius.circular(15),
               ),
-              padding: EdgeInsets.fromLTRB(12, 7, 45, 7),
-              margin: EdgeInsets.symmetric(vertical: 6),
+              padding: const EdgeInsets.fromLTRB(12, 7, 45, 7),
+              margin: const EdgeInsets.symmetric(vertical: 6),
               child: Text(
                 text,
                 style: TextStyle(color: darkPurple, fontSize: 17),
@@ -418,7 +413,7 @@ class MessageItem extends StatelessWidget {
               right: 12,
               child: Text(
                 time,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 9,
                   fontWeight: FontWeight.w400,
                   color: normalOrange,

@@ -31,7 +31,7 @@ class FluidBigButton extends StatelessWidget {
             children: [
               Text(
                 text ?? "",
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 14,
                   color: Colors.white,
                   fontWeight: FontWeight.w500,
@@ -46,8 +46,8 @@ class FluidBigButton extends StatelessWidget {
                 child: Container(
                   width: 15,
                   height: 15,
-                  margin: EdgeInsets.only(left: 10),
-                  child: CircularProgressIndicator(
+                  margin: const EdgeInsets.only(left: 10),
+                  child: const CircularProgressIndicator(
                     color: Colors.white,
                     strokeWidth: 2,
                   ),

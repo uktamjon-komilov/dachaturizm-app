@@ -79,7 +79,7 @@ class _UserEstatesScreenState extends State<UserEstatesScreen> {
                   buildUserDetails(context, _user),
                   Container(
                     width: 100.w,
-                    padding: EdgeInsets.fromLTRB(
+                    padding: const EdgeInsets.fromLTRB(
                       defaultPadding,
                       24,
                       defaultPadding,
@@ -106,7 +106,7 @@ class _UserEstatesScreenState extends State<UserEstatesScreen> {
                           visible: _userEstates.length > 0,
                           child: Container(
                             width: 100.w,
-                            padding: EdgeInsets.only(top: defaultPadding),
+                            padding: const EdgeInsets.only(top: defaultPadding),
                             child: Wrap(
                               alignment: WrapAlignment.spaceBetween,
                               runSpacing: 6,

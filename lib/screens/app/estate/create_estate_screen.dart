@@ -40,7 +40,6 @@ import 'package:multi_image_picker2/multi_image_picker2.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:find_dropdown/find_dropdown.dart';
 import 'package:http_parser/src/media_type.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
@@ -331,10 +330,10 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     _descriptionController.addListener(() {
       setState(() {});
     });
-    setState(() {
-      _isLoading = true;
-    });
     Future.delayed(Duration.zero).then((_) async {
+      setState(() {
+        _isLoading = true;
+      });
       Provider.of<AuthProvider>(context, listen: false)
           .getUserDataWithoutNotifying()
           .then((user) {
@@ -425,10 +424,11 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
             _selectedDays = value.bookedDays.toSet();
           });
         }
+      }).then((_) {
+        setState(() {
+          _isLoading = false;
+        });
       });
-    });
-    setState(() {
-      _isLoading = false;
     });
   }
 
@@ -470,7 +470,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
           : null,
       body: _isLoading
           ? Center(
-              child: CircularProgressIndicator(),
+              child: const CircularProgressIndicator(),
             )
           : _isUploading
               ? Padding(
@@ -480,19 +480,17 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                     children: [
                       Text(
                         Locales.string(context, "saving"),
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: normalOrange,
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      SizedBox(
-                        width: defaultPadding,
-                      ),
+                      const SizedBox(width: defaultPadding),
                       Container(
                         width: 20,
                         height: 20,
-                        child: CircularProgressIndicator(
+                        child: const CircularProgressIndicator(
                           strokeWidth: 3,
                           color: normalOrange,
                         ),
@@ -501,7 +499,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                   ),
                 )
               : Container(
-                  padding: EdgeInsets.fromLTRB(
+                  padding: const EdgeInsets.fromLTRB(
                     defaultPadding,
                     0,
                     defaultPadding,
@@ -515,7 +513,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SizedBox(height: defaultPadding),
+                          const SizedBox(height: defaultPadding),
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -529,7 +527,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                                       Locales.string(context, "main_photo"),
                                       style: TextStyles.display9(),
                                     ),
-                                    SizedBox(height: 12),
+                                    const SizedBox(height: 12),
                                     Text(
                                       Locales.string(
                                           context, "this_photo_is_main"),
@@ -551,19 +549,19 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                             errorText: Locales.string(context, "pick_a_photo"),
                             display: (_isSubmitted && _mainImage == null),
                           ),
-                          VerticalHorizontalSizedBox(),
+                          const VerticalHorizontalSizedBox(),
                           Text(
                             Locales.string(context, "gallary"),
                             style: TextStyles.display9(),
                           ),
-                          VerticalHorizontalSizedBox(),
+                          const VerticalHorizontalSizedBox(),
                           _buildExtraImagesGrid(),
-                          VerticalHorizontalHalfSizedBox(),
+                          const VerticalHorizontalHalfSizedBox(),
                           Text(
                             Locales.string(context, "max_photo_count_8"),
                             style: TextStyles.display10(),
                           ),
-                          VerticalHorizontalSizedBox(),
+                          const VerticalHorizontalSizedBox(),
                           Text(
                             Locales.string(context, "choose_section"),
                             style: TextStyles.display9(),
@@ -587,7 +585,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                               }).toList()
                             ],
                           ),
-                          VerticalHorizontalSizedBox(),
+                          const VerticalHorizontalSizedBox(),
                           ElevatedButton(
                             onPressed: () {
                               setState(() {
@@ -609,9 +607,9 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                               style: TextStyles.display9(),
                             ),
                           ),
-                          VerticalHorizontalHalfSizedBox(),
+                          const VerticalHorizontalHalfSizedBox(),
                           _buildFacilitiesGrid(facilities),
-                          VerticalHorizontalSizedBox(),
+                          const VerticalHorizontalSizedBox(),
                           Text(
                             Locales.string(context, "region"),
                             style: TextStyles.display9(),
@@ -644,7 +642,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                               });
                             }
                           }),
-                          VerticalHorizontalSizedBox(),
+                          const VerticalHorizontalSizedBox(),
                           Text(
                             Locales.string(context, "district"),
                             style: TextStyles.display9(),
@@ -660,7 +658,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                               _currentDistrict = value as String;
                             });
                           }),
-                          VerticalHorizontalSizedBox(),
+                          const VerticalHorizontalSizedBox(),
                           Text(
                             Locales.string(context, "popular_place"),
                             style: TextStyles.display9(),
@@ -678,12 +676,12 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                               _currentPopularPlace = value as String;
                             });
                           }),
-                          VerticalHorizontalSizedBox(),
+                          const VerticalHorizontalSizedBox(),
                           Text(
                             Locales.string(context, "choose_title"),
                             style: TextStyles.display9(),
                           ),
-                          VerticalHorizontalHalfSizedBox(),
+                          const VerticalHorizontalHalfSizedBox(),
                           NormalTextInput(
                             hintText: Locales.string(context, "example_title"),
                             controller: _titleController,
@@ -700,19 +698,19 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                               return null;
                             },
                           ),
-                          VerticalHorizontalSizedBox(),
+                          const VerticalHorizontalSizedBox(),
                           Text(
                             Locales.string(context, "choose_location"),
                             style: TextStyles.display9(),
                           ),
-                          VerticalHorizontalHalfSizedBox(),
+                          const VerticalHorizontalHalfSizedBox(),
                           _buildLocationPicker(),
-                          VerticalHorizontalSizedBox(),
+                          const VerticalHorizontalSizedBox(),
                           Text(
                             Locales.string(context, "enter_address"),
                             style: TextStyles.display9(),
                           ),
-                          VerticalHorizontalHalfSizedBox(),
+                          const VerticalHorizontalHalfSizedBox(),
                           NormalTextInput(
                             hintText:
                                 Locales.string(context, "example_address"),
@@ -735,7 +733,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                             Locales.string(context, "about_estate"),
                             style: TextStyles.display9(),
                           ),
-                          VerticalHorizontalHalfSizedBox(),
+                          const VerticalHorizontalHalfSizedBox(),
                           NormalTextInput(
                             hintText: Locales.string(context, "about_estate"),
                             maxLines: 8,
@@ -754,7 +752,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                               return null;
                             },
                           ),
-                          VerticalHorizontalHalfSizedBox(),
+                          const VerticalHorizontalHalfSizedBox(),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -770,14 +768,14 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                             style: TextStyles.display9(),
                           ),
                           _buildCalendar(),
-                          VerticalHorizontalHalfSizedBox(),
+                          const VerticalHorizontalHalfSizedBox(),
                           BookedDaysHint(),
                           VerticalHorizontalSizedBox(),
                           Text(
                             Locales.string(context, "contact"),
                             style: TextStyles.display9(),
                           ),
-                          VerticalHorizontalHalfSizedBox(),
+                          const VerticalHorizontalHalfSizedBox(),
                           NormalTextInput(
                             hintText: Locales.string(context, "fullname"),
                             controller: _announcerController,
@@ -788,7 +786,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                                   .requestFocus(_phoneFocusNode);
                             },
                           ),
-                          VerticalHorizontalHalfSizedBox(),
+                          const VerticalHorizontalHalfSizedBox(),
                           NormalTextInput(
                             hintText: Locales.string(context, "phone"),
                             controller: _phoneController,
@@ -804,7 +802,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                             Locales.string(context, "price"),
                             style: TextStyles.display9(),
                           ),
-                          VerticalHorizontalHalfSizedBox(),
+                          const VerticalHorizontalHalfSizedBox(),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -1055,7 +1053,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                       Flexible(
                         child: Text(
                           _locationName,
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 20,
                             overflow: TextOverflow.ellipsis,
@@ -1066,7 +1064,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                         _locationName == ""
                             ? Locales.string(context, "tap_to_choose_location")
                             : Locales.string(context, "tap_to_change_location"),
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 14,
                         ),
@@ -1197,14 +1195,15 @@ class ErrorText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return display
-        ? Text(
-            errorText,
-            style: TextStyle(
-              color: Colors.red,
-            ),
-          )
-        : Container();
+    return Visibility(
+      visible: display,
+      child: Text(
+        errorText,
+        style: const TextStyle(
+          color: Colors.red,
+        ),
+      ),
+    );
   }
 }
 
@@ -1226,7 +1225,7 @@ class VerticalHorizontalSizedBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(height: defaultPadding);
+    return const SizedBox(height: defaultPadding);
   }
 }
 
@@ -1277,7 +1276,7 @@ class _ImageBoxState extends State<ImageBox> {
                 color: Colors.red,
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.close_rounded,
                 color: Colors.white,
                 size: 20,

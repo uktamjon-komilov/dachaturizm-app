@@ -20,7 +20,7 @@ class BookedDaysHint extends StatelessWidget {
             borderRadius: BorderRadius.circular(5),
           ),
         ),
-        SizedBox(width: 10),
+        const SizedBox(width: 10),
         Text(
           Locales.string(context, "booked_days"),
           style: TextStyles.display10(),

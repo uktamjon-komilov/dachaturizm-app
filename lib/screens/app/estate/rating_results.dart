@@ -19,19 +19,19 @@ Widget buildRatingResults(
             Locales.string(context, "rating"),
             style: TextStyles.display7(),
           ),
-          SizedBox(height: defaultPadding),
+          const SizedBox(height: defaultPadding),
           Row(
             children: [
               Text(
                 estateRating.averageRating.toString(),
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 21,
                   height: 1.2,
                   letterSpacing: 0.3,
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              SizedBox(width: 10),
+              const SizedBox(width: 10),
               RatingBar.builder(
                 ignoreGestures: true,
                 initialRating: estateRating.averageRating,
@@ -46,12 +46,12 @@ Widget buildRatingResults(
                 ),
                 onRatingUpdate: (rating) {},
               ),
-              SizedBox(width: 10),
+              const SizedBox(width: 10),
               Text(
                   "${estateRating.total} ${Locales.string(context, 'reviews')}"),
             ],
           ),
-          SizedBox(height: defaultPadding / 2),
+          const SizedBox(height: defaultPadding / 2),
           ...estateRating.ratings.keys.map((key) {
             RatingModel rating = estateRating.ratings[key] as RatingModel;
             return RatingItem(

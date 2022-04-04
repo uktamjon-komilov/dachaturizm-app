@@ -36,7 +36,7 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
         [
           chosenLang != ""
               ? IconButton(
-                  icon: Icon(Icons.check),
+                  icon: const Icon(Icons.check),
                   onPressed: () async {
                     changeLocale(context, chosenLang);
                     Provider.of<NavigationScreenProvider>(context,
@@ -50,7 +50,7 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
         ],
       ),
       body: _isLoading
-          ? Center(
+          ? const Center(
               child: CircularProgressIndicator(),
             )
           : ListView.builder(

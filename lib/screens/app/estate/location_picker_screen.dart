@@ -126,6 +126,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                       place.street != "" ? place.street : place.thoroughfare;
 
                   setState(() {});
+                  // see this line
                 },
               ),
       ),

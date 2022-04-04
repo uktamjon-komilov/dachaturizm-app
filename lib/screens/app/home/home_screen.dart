@@ -37,7 +37,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
   final FocusNode _searchFocusNode = FocusNode();
 
   int _topBannerIndex = 0;
-  final CarouselController _topBannerController = CarouselController();
 
   Future<void> _refreshHomePage() async {
     Future.delayed(Duration.zero).then((_) async {
@@ -112,7 +111,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
     return Scaffold(
       body: _isLoading
-          ? Center(
+          ? const Center(
               child: CircularProgressIndicator(),
             )
           : RefreshIndicator(
@@ -131,10 +130,10 @@ class _HomePageScreenState extends State<HomePageScreen> {
                         child: Column(
                           children: [
                             _buidlCategoryRow(context, categories),
-                            SizedBox(height: defaultPadding * 0.5),
+                            const SizedBox(height: defaultPadding * 0.5),
                             _buildBannerBlock(
                                 context, topBanners, _topBannerIndex),
-                            SizedBox(height: defaultPadding * 0.5),
+                            const SizedBox(height: defaultPadding * 0.5),
                             Visibility(
                               visible: categories.length > 0 &&
                                   Provider.of<BannerProvider>(context)
@@ -163,14 +162,15 @@ class _HomePageScreenState extends State<HomePageScreen> {
                                           _refreshHomePage();
                                         },
                                       ),
-                                      SizedBox(height: 20),
+                                      const SizedBox(height: 20),
                                       Text(
                                         Locales.string(context,
                                             "refresh_to_get_new_results"),
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           color: disabledGrey,
                                           fontSize: 12,
                                         ),
+                                        textAlign: TextAlign.center,
                                       ),
                                     ],
                                   ),
@@ -191,7 +191,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
   Widget _showCategoryRelatedItems(List<CategoryModel> categories) {
     return Container(
-      padding: EdgeInsets.fromLTRB(
+      padding: const EdgeInsets.fromLTRB(
         defaultPadding,
         24,
         defaultPadding,
@@ -241,7 +241,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
         visible: estates != null,
         child: Container(
           width: 100.w,
-          padding: EdgeInsets.only(top: defaultPadding / 2),
+          padding: const EdgeInsets.only(top: defaultPadding / 2),
           child: Wrap(
             alignment: WrapAlignment.spaceBetween,
             runSpacing: 6,
@@ -304,15 +304,17 @@ class _HomePageScreenState extends State<HomePageScreen> {
         Provider.of<EstateProvider>(context).topEstates[category.id];
     List banners = Provider.of<BannerProvider>(context).banners[category.id];
 
-    topEstates.shuffle();
-    topEstates = removeDoubleEstates(topEstates);
+    try {
+      topEstates.shuffle();
+      topEstates = removeDoubleEstates(topEstates);
+    } catch (e) {}
 
     return Visibility(
       visible: (topEstates != null &&
           banners != null &&
           (topEstates.length > 0 || banners.length > 0)),
       child: Container(
-        margin: EdgeInsets.only(top: 10),
+        margin: const EdgeInsets.only(top: 10),
         child: Column(
           children: [
             Row(
@@ -324,7 +326,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                     color: normalOrange,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  padding: EdgeInsets.fromLTRB(7, 0, 7, 3),
+                  padding: const EdgeInsets.fromLTRB(7, 0, 7, 3),
                   child: Text(
                     Locales.string(context, "top") +
                         " ${category.title.toLowerCase()}",
@@ -348,7 +350,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
     return Container(
       height: 100,
       width: 100.w,
-      padding: EdgeInsets.symmetric(horizontal: defaultPadding),
+      padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
       decoration: BoxDecoration(
         color: Colors.grey[100],
         borderRadius: BorderRadius.only(
@@ -376,7 +378,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                   );
                 }).toList(),
                 Container(
-                  margin: EdgeInsets.only(right: 30),
+                  margin: const EdgeInsets.only(right: 30),
                   child: CategoryItem(
                     title: Locales.string(context, "services"),
                     onTap: () {

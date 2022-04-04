@@ -1,11 +1,9 @@
-import 'dart:ffi';
 import 'dart:ui';
 
 import 'package:dachaturizm/components/app_bar.dart';
 import 'package:dachaturizm/components/bottom_navbar.dart';
 import 'package:dachaturizm/components/fluid_big_button.dart';
 import 'package:dachaturizm/components/no_result_univesal.dart';
-import 'package:dachaturizm/components/search_bar_with_filter.dart';
 import 'package:dachaturizm/components/small_button.dart';
 import 'package:dachaturizm/components/small_grey_text.dart';
 import 'package:dachaturizm/constants.dart';
@@ -210,11 +208,11 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
                 Navigator.of(context).pop();
               }),
         body: _isLoading
-            ? Center(
+            ? const Center(
                 child: CircularProgressIndicator(),
               )
             : Container(
-                padding: EdgeInsets.all(defaultPadding),
+                padding: const EdgeInsets.all(defaultPadding),
                 child: RefreshIndicator(onRefresh: () async {
                   _refresh();
                 }, child: LayoutBuilder(
@@ -222,7 +220,7 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
                     if (_allEstates.length > 0) {
                       return Column(
                         children: [
-                          SizedBox(height: defaultPadding / 4),
+                          const SizedBox(height: defaultPadding / 4),
                           SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             child: Row(
@@ -241,7 +239,7 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
                               ],
                             ),
                           ),
-                          SizedBox(height: defaultPadding / 4),
+                          const SizedBox(height: defaultPadding / 4),
                           Expanded(
                             child: SingleChildScrollView(
                               child: Column(
@@ -301,9 +299,7 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
                       Row(
                         children: [
                           _buildImageBox(estate),
-                          SizedBox(
-                            width: 10,
-                          ),
+                          const SizedBox(width: 10),
                           Expanded(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -385,13 +381,13 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
                         ),
                         visible: description != null,
                       ),
-                      SizedBox(height: defaultPadding / 2),
+                      const SizedBox(height: defaultPadding / 2),
                       Text(
                         Locales.string(
                           context,
                           "are_you_sure",
                         ),
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -408,7 +404,7 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
                     context,
                     "no",
                   ),
-                  style: TextStyle(color: darkPurple),
+                  style: const TextStyle(color: darkPurple),
                 )),
             ElevatedButton(
               onPressed: () async {
@@ -424,7 +420,7 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
                   context,
                   "yes",
                 ),
-                style: TextStyle(color: Colors.white),
+                style: const TextStyle(color: Colors.white),
               ),
               style: ElevatedButton.styleFrom(
                 primary: normalOrange,
@@ -487,7 +483,7 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
                     ],
                   ),
                 ),
-                Spacer(),
+                const Spacer(),
                 ..._plans
                     .map(
                       (plan) => CheckboxListTile(
@@ -514,9 +510,9 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
                       ),
                     )
                     .toList(),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 _buildButtonsBox(context, estateId: id),
-                SizedBox(height: 25),
+                const SizedBox(height: 25),
               ],
             ),
           );
@@ -533,7 +529,7 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
             "sum",
           ),
       style: plan.available
-          ? TextStyle(fontSize: 12)
+          ? const TextStyle(fontSize: 12)
           : TextStyle(
               color: Colors.grey[500],
               fontSize: 12,
@@ -670,12 +666,12 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
         Expanded(
           child: Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.calendar_today_rounded,
                 size: 15,
                 color: normalGrey,
               ),
-              SizedBox(width: 5),
+              const SizedBox(width: 5),
               SmallGreyText(
                 text: parseDateTime(
                   estate.created as DateTime,
@@ -688,12 +684,12 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Icon(
+              const Icon(
                 Icons.remove_red_eye,
                 size: 15,
                 color: normalGrey,
               ),
-              SizedBox(width: 5),
+              const SizedBox(width: 5),
               SmallGreyText(
                 text: "${estate.views}",
               ),
@@ -707,12 +703,12 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
   Widget _buildLocation(EstateModel estate) {
     return Row(
       children: [
-        Icon(
+        const Icon(
           Icons.location_city,
           size: 15,
           color: normalGrey,
         ),
-        SizedBox(width: 5),
+        const SizedBox(width: 5),
         SmallGreyText(text: estate.address),
       ],
     );
@@ -728,7 +724,7 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
         children: [
           Text(
             estate.title,
-            style: TextStyle(
+            style: const TextStyle(
               color: darkPurple,
               fontSize: 14,
               fontWeight: FontWeight.w600,
@@ -736,7 +732,7 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
             ),
             maxLines: 1,
           ),
-          SizedBox(height: 5),
+          const SizedBox(height: 5),
           RatingBar.builder(
             ignoreGestures: true,
             initialRating: estate.rating,
@@ -805,7 +801,7 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
                 child: Text(
                   heading,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 7,
                     color: Colors.white,
                     fontWeight: FontWeight.w500,
@@ -859,7 +855,7 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
                               ),
                               child: Text(
                                 Locales.string(context, "hot"),
-                                style: TextStyle(
+                                style: const TextStyle(
                                     color: Colors.white, fontSize: 10),
                               ),
                             ),

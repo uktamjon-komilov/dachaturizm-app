@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/helpers/call_with_auth.dart';
 import 'package:dachaturizm/helpers/format_price.dart';
@@ -215,7 +214,7 @@ class _EstateCardState extends State<EstateCard> {
         padding: EdgeInsets.symmetric(vertical: 2, horizontal: 5),
         decoration: BoxDecoration(
             color: normalOrange, borderRadius: BorderRadius.circular(5)),
-        child: Text(
+        child: const Text(
           "TOP",
           style: TextStyle(
             fontSize: 11,

@@ -26,7 +26,7 @@ class FluidOutlinedButton extends StatelessWidget {
       child: child ??
           Text(
             text ?? "",
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 14,
               color: normalOrange,
               fontWeight: FontWeight.w500,

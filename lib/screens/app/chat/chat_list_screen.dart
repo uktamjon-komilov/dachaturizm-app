@@ -25,7 +25,6 @@ class ChatListScreen extends StatefulWidget {
 class _ChatListScreenState extends State<ChatListScreen> {
   List<MessageModel> _chats = [];
   bool _isLoading = false;
-  bool _isInit = true;
   int _userId = 0;
 
   _refreshMyChats(BuildContext context) async {
@@ -98,7 +97,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                           contentPadding: EdgeInsets.symmetric(horizontal: 10),
                           title: Text(
                             user.fullname,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
                             ),
@@ -106,7 +105,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                           subtitle: Text(
                             estate.title,
                             maxLines: 1,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 12,
                               color: normalGrey,
                               overflow: TextOverflow.ellipsis,
@@ -124,7 +123,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                   ),
                                   child: Text(
                                     _chats[index].count.toString(),
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                         color: Colors.white, fontSize: 13),
                                   ),
                                 ),

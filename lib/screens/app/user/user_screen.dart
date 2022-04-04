@@ -48,13 +48,13 @@ class _UserPageScreenState extends State<UserPageScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildUserDetails(),
-              SizedBox(height: 1.5 * defaultPadding),
+              const SizedBox(height: 1.5 * defaultPadding),
               ColumnTitle(Locales.string(context, "my_profile")),
               _buildProfileList(),
-              SizedBox(height: 1.5 * defaultPadding),
+              const SizedBox(height: 1.5 * defaultPadding),
               ColumnTitle(Locales.string(context, "settings")),
               _buildSettingsList(),
-              SizedBox(height: 1.5 * defaultPadding),
+              const SizedBox(height: 1.5 * defaultPadding),
               ColumnTitle(Locales.string(context, "other_settings")),
               ...Provider.of<StaticPagesProvider>(context)
                   .pages
@@ -178,8 +178,6 @@ class _UserPageScreenState extends State<UserPageScreen> {
                 callWithAuth(context, () async {
                   await Provider.of<AuthProvider>(context, listen: false)
                       .logout();
-                  // Provider.of<AuthProvider>(context, listen: false).getUserData();
-                  // Navigator.of(context).pushNamed(LoginScreen.routeName);
                   RestartWidget.restartApp(context);
                 });
               },

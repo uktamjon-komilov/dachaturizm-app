@@ -37,7 +37,8 @@ class CategoryItem extends StatelessWidget {
                 height: 18.4,
                 width: 16.66,
                 child: icon == null
-                    ? Icon(Icons.all_inclusive_rounded, color: Colors.white)
+                    ? const Icon(Icons.all_inclusive_rounded,
+                        color: Colors.white)
                     : SvgPicture.network(
                         icon as String,
                         fit: BoxFit.scaleDown,
@@ -45,7 +46,7 @@ class CategoryItem extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 6),
+          const SizedBox(height: 6),
           Text(
             title,
             style: TextStyles.display4(),

@@ -82,10 +82,10 @@ class _ServiceScreenState extends State<ServiceScreen> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 24),
+                    const SizedBox(height: 24),
                     Text(
                       _service!.content,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 13,
                         height: 1.92,
                         fontWeight: FontWeight.w400,
@@ -98,19 +98,19 @@ class _ServiceScreenState extends State<ServiceScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SizedBox(height: defaultPadding),
+                          const SizedBox(height: defaultPadding),
                           Text(
                             Locales.string(context, "for_contact"),
                             style: TextStyles.display1(),
                           ),
-                          SizedBox(height: defaultPadding),
+                          const SizedBox(height: defaultPadding),
                           _buildContactPhones(),
-                          SizedBox(height: defaultPadding),
+                          const SizedBox(height: defaultPadding),
                           _buildContactEmail(),
                         ],
                       ),
                     ),
-                    SizedBox(height: 24),
+                    const SizedBox(height: 24),
                     Column(
                       children: [
                         ..._items
@@ -118,7 +118,8 @@ class _ServiceScreenState extends State<ServiceScreen> {
                               (item) => Container(
                                 width: 100.w,
                                 height: 80,
-                                padding: EdgeInsets.symmetric(vertical: 10),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 10),
                                 decoration: BoxDecoration(),
                                 child: Row(
                                     mainAxisAlignment:
@@ -154,7 +155,7 @@ class _ServiceScreenState extends State<ServiceScreen> {
                                           }
                                           UrlLauncher.launch("tel://${phone}");
                                         },
-                                        icon: Icon(Icons.phone),
+                                        icon: const Icon(Icons.phone),
                                       )
                                     ]),
                               ),
@@ -182,12 +183,12 @@ class _ServiceScreenState extends State<ServiceScreen> {
               color: darkPurple,
               borderRadius: BorderRadius.circular(18),
             ),
-            child: Icon(
+            child: const Icon(
               Icons.email_rounded,
               color: Colors.white,
             ),
           ),
-          SizedBox(width: defaultPadding),
+          const SizedBox(width: defaultPadding),
           Text(
             _service!.email.toString(),
             style: TextStyles.display1().copyWith(height: 1.21),
@@ -213,12 +214,12 @@ class _ServiceScreenState extends State<ServiceScreen> {
               color: darkPurple,
               borderRadius: BorderRadius.circular(18),
             ),
-            child: Icon(
+            child: const Icon(
               Icons.local_phone_rounded,
               color: Colors.white,
             ),
           ),
-          SizedBox(width: defaultPadding),
+          const SizedBox(width: defaultPadding),
           Column(
             children: [
               Text(
@@ -228,8 +229,9 @@ class _ServiceScreenState extends State<ServiceScreen> {
                 style: TextStyles.display1().copyWith(height: 1.21),
               ),
               Visibility(
-                  visible: _service!.phone2 != null,
-                  child: SizedBox(height: defaultPadding / 2)),
+                visible: _service!.phone2 != null,
+                child: const SizedBox(height: defaultPadding / 2),
+              ),
               Visibility(
                 visible: _service!.phone2 != null,
                 child: Text(

@@ -10,7 +10,7 @@ Widget buildCardsBlock(BuildContext context, List? estates,
     child: Container(
       width: 100.w,
       padding: padding ??
-          EdgeInsets.fromLTRB(
+          const EdgeInsets.fromLTRB(
             defaultPadding,
             0,
             defaultPadding,
