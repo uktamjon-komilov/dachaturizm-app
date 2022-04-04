@@ -40,11 +40,13 @@ class ServiceItem {
   final int id;
   final String title;
   final String phone;
+  final String? photo;
 
   ServiceItem({
     required this.id,
     required this.title,
     required this.phone,
+    this.photo,
   });
 
   static Future<ServiceItem> fromJson(data) async {
@@ -53,6 +55,7 @@ class ServiceItem {
       id: data["id"],
       title: data["translations"][locale]["title"],
       phone: data["phone"],
+      photo: data["image"],
     );
   }
 }
