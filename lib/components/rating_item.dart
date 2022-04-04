@@ -50,7 +50,7 @@ class RatingItem extends StatelessWidget {
             ),
           ),
           Text(
-            "${percent}%",
+            "$percent%",
             style: TextStyles.display8().copyWith(
               fontWeight: FontWeight.w600,
             ),

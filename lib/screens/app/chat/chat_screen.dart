@@ -8,6 +8,7 @@ import 'package:dachaturizm/helpers/url_helper.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/models/user_model.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
+import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/screens/app/estate/estate_detail_screen.dart';
 import 'package:dachaturizm/screens/auth/login_screen.dart';
@@ -63,9 +64,22 @@ class _ChatScreenState extends State<ChatScreen> {
     if (!_isInit) {
       Map<String, dynamic> data =
           ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
-      setState(() {
+      if (data.containsKey("estate_id") && data.containsKey("user_id")) {
+        Provider.of<AuthProvider>(context)
+            .getUser(data["user_id"])
+            .then((value) {
+          sender = value;
+        });
+        Provider.of<EstateProvider>(context)
+            .getEstateById(data["estate_id"])
+            .then((value) {
+          estate = value;
+        });
+      } else {
         estate = data["estate"];
         sender = data["sender"];
+      }
+      setState(() {
         _isInit = true;
         _isLoading = true;
       });

@@ -243,6 +243,31 @@ class AuthProvider with ChangeNotifier {
     return {"status": false};
   }
 
+  Future<Map> updateFCM(String token) async {
+    final userId = await getUserId();
+    final access = await getAccessToken();
+    print(token);
+    final url = "${baseUrl}api/users/${userId}/";
+    try {
+      final response = await dio.patch(
+        url,
+        data: {"fcm_token": token},
+        options: Options(
+          headers: {"Content-type": "application/json"},
+        ),
+      );
+      if (response.statusCode as int >= 200 ||
+          response.statusCode as int < 300) {
+        print(response.data);
+        return response.data;
+      }
+    } catch (e) {
+      DioError error = e as DioError;
+      print(error.response!.data);
+    }
+    return {"status": false};
+  }
+
   Future<UserModel?> getUserData() async {
     int userId = await getUserId();
     if (userId != null) {
