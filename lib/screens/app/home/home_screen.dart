@@ -6,6 +6,7 @@ import 'package:dachaturizm/components/horizontal_ad.dart';
 import 'package:dachaturizm/components/search_bar_with_filter.dart';
 import 'package:dachaturizm/components/text_link.dart';
 import 'package:dachaturizm/constants.dart';
+import 'package:dachaturizm/helpers/remove_doubles.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/models/category_model.dart';
 import 'package:dachaturizm/providers/banner_provider.dart';
@@ -94,6 +95,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
   @override
   void initState() {
     super.initState();
+
     Future.delayed(Duration.zero).then((_) {
       FocusScope.of(context).unfocus();
       _searchController.clear();
@@ -298,9 +300,12 @@ class _HomePageScreenState extends State<HomePageScreen> {
   }
 
   Widget _buildEstateTypeBlock(CategoryModel category) {
-    List topEstates =
+    List<EstateModel> topEstates =
         Provider.of<EstateProvider>(context).topEstates[category.id];
     List banners = Provider.of<BannerProvider>(context).banners[category.id];
+
+    topEstates.shuffle();
+    topEstates = removeDoubleEstates(topEstates);
 
     return Visibility(
       visible: (topEstates != null &&

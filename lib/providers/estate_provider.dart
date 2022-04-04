@@ -262,7 +262,7 @@ class EstateProvider with ChangeNotifier {
 
   // Get estate by ID
   Future<EstateModel> getEstateById(int estateId) async {
-    final url = "${baseUrl}api/estate/${estateId}/";
+    final url = "${baseUrl}api/estater/${estateId}/";
     Response response = await _fetch(url);
     var estate = await EstateModel.fromJson(response.data);
     return estate;

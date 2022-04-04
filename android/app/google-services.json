@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "369862002446",
+    "project_id": "dachaturizm-a5d40",
+    "storage_bucket": "dachaturizm-a5d40.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:369862002446:android:a3498d916fb13d0356f95f",
+        "android_client_info": {
+          "package_name": "uz.datasite.dachaturizm"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "369862002446-bibqeq39jhtssgr6l21jb2ih7u2mqkrb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBPyb5HO1AzfsOn2aEIMK-miCGaoIU5hfE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "369862002446-bibqeq39jhtssgr6l21jb2ih7u2mqkrb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
