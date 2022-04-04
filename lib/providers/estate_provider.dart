@@ -126,8 +126,8 @@ class EstateProvider with ChangeNotifier {
   Map<String, dynamic> _filters = {
     "sorting": "latest",
     "address": "",
-    "region": 0,
-    "district": 0,
+    "region": "",
+    "district": "",
     "place": 0,
     "minPrice": 0.0,
     "maxPrice": 0.0,
@@ -187,12 +187,12 @@ class EstateProvider with ChangeNotifier {
     _filters["address"] = address;
   }
 
-  filtersRegion(int regionId) {
-    _filters["region"] = regionId;
+  filtersRegion(String region) {
+    _filters["region"] = region;
   }
 
-  filtersDistrict(int districtId) {
-    _filters["district"] = districtId;
+  filtersDistrict(String district) {
+    _filters["district"] = district;
   }
 
   filtersPlace(int id) {
@@ -223,8 +223,8 @@ class EstateProvider with ChangeNotifier {
       "sorting": "latest",
       "address": "",
       "place": 0,
-      "region": 0,
-      "district": 0,
+      "region": "",
+      "district": "",
       "minPrice": 0.0,
       "maxPrice": 0.0,
       "priceType": null,

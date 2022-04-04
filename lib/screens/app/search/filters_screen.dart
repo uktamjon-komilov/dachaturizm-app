@@ -102,7 +102,7 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
   }
 
   _setAllFilters() {
-    int regionId = _regions
+    String region = _regions
         .firstWhere((region) => region.title == _currentRegion, orElse: () {
       return RegionModel(
         id: 0,
@@ -110,19 +110,19 @@ class _SearchFilersScreenState extends State<SearchFilersScreen> {
         translations: {},
         districts: [],
       );
-    }).id;
-    Provider.of<EstateProvider>(context, listen: false).filtersRegion(regionId);
+    }).title;
+    Provider.of<EstateProvider>(context, listen: false).filtersRegion(region);
 
-    int districtId = _districts.firstWhere(
+    String district = _districts.firstWhere(
         (district) => district.title == _currentDistrict, orElse: () {
       return DistrictModel(
         id: 0,
         title: "",
         translations: {},
       );
-    }).id;
+    }).title;
     Provider.of<EstateProvider>(context, listen: false)
-        .filtersDistrict(districtId);
+        .filtersDistrict(district);
 
     if (_currentPlace != "") {
       int _currentPlaceId =

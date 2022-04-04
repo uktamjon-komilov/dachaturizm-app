@@ -31,7 +31,6 @@ import 'package:dachaturizm/screens/app/search/filters_screen.dart';
 import 'package:dachaturizm/screens/app/user/my_announcements_screen.dart';
 import 'package:dachaturizm/styles/text_styles.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:image_picker/image_picker.dart';
@@ -338,10 +337,21 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
           .getUserDataWithoutNotifying()
           .then((user) {
         if (user.runtimeType.toString() == "UserModel") {
-          _announcerController.text = "${user!.firstName} ${user.lastName}";
-          _phoneController.text = "+${user.phone}";
+          try {
+            _announcerController.text = "${user!.firstName} ${user.lastName}";
+          } catch (e) {}
+          try {
+            _phoneController.text = "+${user!.phone}";
+          } catch (e) {}
         }
-        Map? data = ModalRoute.of(context)?.settings.arguments as Map?;
+
+        Map? data;
+        try {
+          data = ModalRoute.of(context)?.settings.arguments as Map?;
+        } catch (e) {
+          data = null;
+        }
+
         if (data == null) return;
         if (data.containsKey("estateId") && _estateId == 0) {
           _estateId = int.parse(data["estateId"]);
@@ -425,9 +435,11 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
           });
         }
       }).then((_) {
-        setState(() {
-          _isLoading = false;
-        });
+        try {
+          setState(() {
+            _isLoading = false;
+          });
+        } catch (e) {}
       });
     });
   }
@@ -574,6 +586,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                                     onPressed: () {
                                   setState(() {
                                     _currentSection = category.title;
+                                    _facilities = [];
                                   });
                                   Provider.of<FacilityProvider>(context,
                                           listen: false)

@@ -57,7 +57,7 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
   Future<void> _listenScroller(BuildContext context) async {
     _scrollController.addListener(() {
       ScrollPosition position = _scrollController.position;
-      if (position.pixels > position.maxScrollExtent - 120 &&
+      if (position.pixels > position.maxScrollExtent - 200 &&
           !_paginationLoading) {
         if (_showTop && _topNextLink != null) {
           setState(() {

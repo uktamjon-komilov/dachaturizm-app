@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:dachaturizm/providers/auth_provider.dart';
+import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/screens/app/chat/chat_screen.dart';
 import 'package:flutter/material.dart';
 import "package:firebase_messaging/firebase_messaging.dart";
@@ -82,6 +83,8 @@ class NotificationService {
     print(message);
     if (message != null && message.containsKey('data')) {
       if (message["data"]) {
+        Provider.of<NavigationScreenProvider>(context, listen: false)
+            .changePageIndex(3);
         Navigator.of(context).pushNamed(ChatScreen.routeName, arguments: {
           "estate_id": message["data"]["estate_id"],
           "user_id": message["data"]["user_id"]
