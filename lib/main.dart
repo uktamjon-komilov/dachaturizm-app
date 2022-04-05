@@ -5,6 +5,7 @@ import 'package:dachaturizm/providers/create_estate_provider.dart';
 import 'package:dachaturizm/providers/currency_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/facility_provider.dart';
+import 'package:dachaturizm/providers/horizontal_ads_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/providers/region_provider.dart';
 import 'package:dachaturizm/providers/static_pages_provider.dart';
@@ -87,6 +88,9 @@ void main() async {
             value: RegionProvider(dio: dio),
           ),
           ChangeNotifierProvider.value(
+            value: HorizontalAdsProvider(dio: dio),
+          ),
+          ChangeNotifierProvider.value(
             value: auth,
           ),
           ChangeNotifierProvider.value(
@@ -150,7 +154,6 @@ class _MyAppState extends State<MyApp> {
       Provider.of<AuthProvider>(context, listen: false)
           .getUserData()
           .then((data) {
-        print(data);
         Provider.of<RegionProvider>(context, listen: false).getAndSetRegions();
         Provider.of<StaticPagesProvider>(context, listen: false)
             .getStaticPages();

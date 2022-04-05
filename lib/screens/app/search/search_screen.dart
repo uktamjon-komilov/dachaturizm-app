@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:dachaturizm/components/card.dart';
 import 'package:dachaturizm/components/no_result.dart';
 import 'package:dachaturizm/components/search_bar_with_filter.dart';
@@ -11,7 +10,6 @@ import "package:flutter/material.dart";
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
 class SearchPageScreen extends StatefulWidget {
@@ -178,8 +176,10 @@ class _SearchPageScreenState extends State<SearchPageScreen> {
                                   child: Wrap(
                                     children: [
                                       ..._results
-                                          .map((estate) =>
-                                              EstateCard(estate: estate))
+                                          .map((estate) => EstateCard(
+                                                estate: estate,
+                                                needShadow: false,
+                                              ))
                                           .toList(),
                                     ],
                                   ),

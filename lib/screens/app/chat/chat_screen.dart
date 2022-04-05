@@ -114,6 +114,7 @@ class _ChatScreenState extends State<ChatScreen> {
           setState(() {
             _data = value;
           });
+          _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
         });
       });
     });

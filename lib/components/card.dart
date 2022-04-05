@@ -16,9 +16,11 @@ class EstateCard extends StatefulWidget {
   const EstateCard({
     Key? key,
     required this.estate,
+    this.needShadow = true,
   }) : super(key: key);
 
   final EstateModel estate;
+  final bool needShadow;
 
   @override
   State<EstateCard> createState() => _EstateCardState();
@@ -42,13 +44,15 @@ class _EstateCardState extends State<EstateCard> {
     return Container(
       width: (100.w - 2.25 * defaultPadding) / 2,
       height: 246,
-      decoration: BoxDecoration(boxShadow: [
-        BoxShadow(
-          offset: Offset(0, 2),
-          blurRadius: 15,
-          color: Colors.black.withOpacity(0.07),
-        )
-      ]),
+      decoration: widget.needShadow
+          ? BoxDecoration(boxShadow: [
+              BoxShadow(
+                offset: Offset(0, 2),
+                blurRadius: 15,
+                color: Colors.black.withOpacity(0.07),
+              )
+            ])
+          : null,
       child: Card(
         clipBehavior: Clip.antiAlias,
         shape: RoundedRectangleBorder(

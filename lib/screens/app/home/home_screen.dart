@@ -12,6 +12,7 @@ import 'package:dachaturizm/models/category_model.dart';
 import 'package:dachaturizm/providers/banner_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/category_provider.dart';
+import 'package:dachaturizm/providers/horizontal_ads_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/screens/app/home/listing_screen.dart';
 import 'package:dachaturizm/screens/app/home/services_list_screen.dart';
