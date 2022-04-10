@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:dachaturizm/components/app_bar.dart';
 import 'package:dachaturizm/components/bottom_navbar.dart';
 import 'package:dachaturizm/components/fluid_big_button.dart';
@@ -444,9 +442,14 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
         .then((user) {
       showModalBottomSheet(
         context: context,
-        builder: (context) => StatefulBuilder(builder: (context, setState) {
-          return Container(
-            child: Column(
+        constraints: BoxConstraints(
+          minHeight: 450,
+          maxHeight: 530,
+        ),
+        isScrollControlled: true,
+        builder: (context) => StatefulBuilder(
+          builder: (context, setState) {
+            return Column(
               children: [
                 Container(
                   padding: EdgeInsets.all(defaultPadding),
@@ -514,9 +517,9 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
                 _buildButtonsBox(context, estateId: id),
                 const SizedBox(height: 25),
               ],
-            ),
-          );
-        }),
+            );
+          },
+        ),
       );
     });
   }
@@ -620,12 +623,14 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
             onPressed: (user!.balance < _adsTotal || _adPlans.length == 0)
                 ? null
                 : () {
+                    print(_adPlans);
                     if (_adPlans.length == 0) return;
                     _showConfirmAlert(() async {
                       setState(() {
                         _isLoading = true;
                       });
                       _adPlans.forEach((planSlug) async {
+                        print(planSlug);
                         bool value = await Provider.of<EstateProvider>(context,
                                 listen: false)
                             .advertise(planSlug, int.parse(estateId));
@@ -641,6 +646,7 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
                             available: false,
                           );
                         }).title;
+                        print(value);
                         if (value) {
                           _showStatusSnackBar(value, hint: planTitle);
                         } else {

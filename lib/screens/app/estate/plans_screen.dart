@@ -206,6 +206,7 @@ class _PlansScreenState extends State<PlansScreen> {
                         },
                       );
                     }).toList(),
+                    SizedBox(height: defaultPadding * 4),
                   ],
                 )),
               ),

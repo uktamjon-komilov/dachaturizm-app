@@ -4,12 +4,10 @@ import 'package:dachaturizm/components/no_result.dart';
 import 'package:dachaturizm/components/search_bar_with_filter.dart';
 import 'package:dachaturizm/components/small_button.dart';
 import 'package:dachaturizm/constants.dart';
-import 'package:dachaturizm/helpers/remove_doubles.dart';
 import 'package:dachaturizm/models/ads_plus.dart';
 import 'package:dachaturizm/models/category_model.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
-import 'package:dachaturizm/providers/horizontal_ads_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/screens/app/cards_block.dart';
 import 'package:flutter/material.dart';
@@ -260,6 +258,7 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
                                 context,
                                 _currentEstates,
                                 ads: _ads,
+                                isTop: _showTop,
                               )
                             : Padding(
                                 padding: const EdgeInsets.fromLTRB(

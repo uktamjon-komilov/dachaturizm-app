@@ -6,9 +6,14 @@ import 'package:dachaturizm/models/estate_model.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
-Widget buildCardsBlock(BuildContext context, List<EstateModel>? estates,
-    {List<AdsPlusModel>? ads, EdgeInsetsGeometry? padding}) {
-  if (ads == null) {
+Widget buildCardsBlock(
+  BuildContext context,
+  List<EstateModel>? estates, {
+  List<AdsPlusModel>? ads,
+  EdgeInsetsGeometry? padding,
+  bool isTop = false,
+}) {
+  if (ads == null || isTop) {
     return Visibility(
       visible: estates!.length > 0,
       child: Container(

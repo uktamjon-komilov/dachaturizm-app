@@ -110,6 +110,10 @@ class _HomePageScreenState extends State<HomePageScreen> {
     List<EstateModel> topBanners =
         Provider.of<BannerProvider>(context).topBanners;
 
+    bool noItems = categories.length > 0 &&
+        Provider.of<BannerProvider>(context).banners.keys.length > 0 &&
+        Provider.of<EstateProvider>(context).topEstates.keys.length > 0;
+
     return Scaffold(
       body: _isLoading
           ? const Center(
@@ -136,17 +140,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                                 context, topBanners, _topBannerIndex),
                             const SizedBox(height: defaultPadding * 0.5),
                             Visibility(
-                              visible: categories.length > 0 &&
-                                  Provider.of<BannerProvider>(context)
-                                          .banners
-                                          .keys
-                                          .length >
-                                      0 &&
-                                  Provider.of<EstateProvider>(context)
-                                          .topEstates
-                                          .keys
-                                          .length >
-                                      0,
+                              visible: noItems,
                               replacement: Container(
                                 height: 150,
                                 margin: EdgeInsets.symmetric(vertical: 20),
@@ -177,7 +171,8 @@ class _HomePageScreenState extends State<HomePageScreen> {
                                   ),
                                 ),
                               ),
-                              child: _showCategoryRelatedItems(categories),
+                              child: _showCategoryRelatedItems(categories,
+                                  show: noItems),
                             )
                           ],
                         ),
@@ -190,7 +185,8 @@ class _HomePageScreenState extends State<HomePageScreen> {
     );
   }
 
-  Widget _showCategoryRelatedItems(List<CategoryModel> categories) {
+  Widget _showCategoryRelatedItems(List<CategoryModel> categories,
+      {bool show = true}) {
     return Container(
       padding: const EdgeInsets.fromLTRB(
         defaultPadding,
@@ -199,7 +195,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
         defaultPadding,
       ),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        color: show ? null : Colors.grey[100],
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(30),
           topRight: Radius.circular(30),
@@ -236,8 +232,8 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
   Widget _buildCardsBlock(BuildContext context, List? estates) {
     try {
-      if (estates != null && estates.length > 4)
-        estates = estates.sublist(0, 4);
+      if (estates != null && estates.length > 6)
+        estates = estates.sublist(0, 6);
       return Visibility(
         visible: estates != null,
         child: Container(

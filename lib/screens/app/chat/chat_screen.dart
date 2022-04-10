@@ -65,12 +65,12 @@ class _ChatScreenState extends State<ChatScreen> {
       Map<String, dynamic> data =
           ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
       if (data.containsKey("estate_id") && data.containsKey("user_id")) {
-        Provider.of<AuthProvider>(context)
+        Provider.of<AuthProvider>(context, listen: false)
             .getUser(data["user_id"])
             .then((value) {
           sender = value;
         });
-        Provider.of<EstateProvider>(context)
+        Provider.of<EstateProvider>(context, listen: false)
             .getEstateById(data["estate_id"])
             .then((value) {
           estate = value;
@@ -79,11 +79,15 @@ class _ChatScreenState extends State<ChatScreen> {
         estate = data["estate"];
         sender = data["sender"];
       }
+      Provider.of<AuthProvider>(context, listen: false)
+          .makeMessagesRead(estate!.id, sender!.id);
       setState(() {
         _isInit = true;
         _isLoading = true;
       });
-      Provider.of<AuthProvider>(context).getUserId().then((value) {
+      Provider.of<AuthProvider>(context, listen: false)
+          .getUserId()
+          .then((value) {
         if (value == null) {
           Navigator.of(context).pushNamed(LoginScreen.routeName);
         } else {

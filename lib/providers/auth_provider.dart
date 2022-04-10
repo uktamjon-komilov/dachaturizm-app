@@ -326,6 +326,30 @@ class AuthProvider with ChangeNotifier {
     return chats;
   }
 
+  Future makeMessagesRead(int estateId, int senderId) async {
+    const url = "${baseUrl}api/messages/make-read/";
+    String access = await getAccessToken();
+    String refresh = await getRefreshToken();
+    if (refresh == null || refresh == "") {
+      return null;
+    }
+    Map<String, String> headers = {
+      "Content-type": "application/json",
+      "Authorization": "Bearer ${access}"
+    };
+    try {
+      await dio.post(
+        url,
+        data: {
+          "estate": estateId,
+          "sender": senderId,
+        },
+        options: Options(headers: headers),
+      );
+    } catch (e) {}
+    return;
+  }
+
   Future getMessages(int estateId, int receiverId) async {
     const url = "${baseUrl}api/messages/get-messages/";
     String access = await getAccessToken();

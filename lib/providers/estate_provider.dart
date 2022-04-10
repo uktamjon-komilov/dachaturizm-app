@@ -424,10 +424,13 @@ class EstateProvider with ChangeNotifier {
           }));
       if (response.statusCode as int >= 200 ||
           response.statusCode as int < 300) {
+        print(response.data);
         return true;
       }
       return false;
-    } catch (e) {}
+    } catch (e) {
+      print(e);
+    }
     return false;
   }
 
