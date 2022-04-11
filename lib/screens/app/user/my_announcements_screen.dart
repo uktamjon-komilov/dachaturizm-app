@@ -40,6 +40,7 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
   List<EstateModel> _bannerEstates = [];
   List<EstateModel> _topBannerEstates = [];
   List<EstateModel> _adEstates = [];
+  List<EstateModel> _adsPlusEstates = [];
   List<EstateModel> _currentEstates = [];
   Map<String, bool> _show = {
     "all": true,
@@ -48,6 +49,7 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
     "banner": false,
     "topbanner": false,
     "ad": false,
+    "ads_plus": false,
   };
 
   List<AdPlan> _plans = [];
@@ -115,6 +117,7 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
       _topBannerEstates =
           value.where((element) => element.isTopBanner).toList();
       _adEstates = value.where((element) => element.isAd).toList();
+      _adsPlusEstates = value.where((element) => element.isAdsPlus).toList();
     });
   }
 
@@ -126,6 +129,7 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
       "banner": false,
       "topbanner": false,
       "ad": false,
+      "ads_plus": false,
     };
     temp[key] = true;
     setState(() {
@@ -144,6 +148,8 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
       _currentEstates = _topBannerEstates;
     } else if (_show["ad"] as bool) {
       _currentEstates = _adEstates;
+    } else if (_show["ads_plus"] as bool) {
+      _currentEstates = _adsPlusEstates;
     }
     setState(() {});
   }
@@ -768,6 +774,8 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
       type = Locales.string(context, "topbanner");
     } else if (estate.isTop) {
       type = Locales.string(context, "top");
+    } else if (estate.isAdsPlus) {
+      type = Locales.string(context, "ads_plus");
     } else {
       type = Locales.string(context, "simple");
     }

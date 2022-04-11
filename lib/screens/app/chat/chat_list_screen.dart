@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dachaturizm/components/no_result_univesal.dart';
 import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/helpers/url_helper.dart';
@@ -144,9 +145,20 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                   height: 50,
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(30),
-                                    child: Image.network(
-                                      fixMediaUrl(user.photo),
+                                    child: CachedNetworkImage(
+                                      imageUrl: fixMediaUrl(user.photo),
+                                      cacheKey: user.photo.toString(),
+                                      maxWidthDiskCache: 200,
+                                      maxHeightDiskCache: 200,
+                                      memCacheWidth: 200,
+                                      memCacheHeight: 200,
                                       fit: BoxFit.cover,
+                                      placeholder: (context, _) {
+                                        return Image.asset(
+                                          "assets/images/user.png",
+                                          fit: BoxFit.cover,
+                                        );
+                                      },
                                     ),
                                   ),
                                 ),
