@@ -1,4 +1,5 @@
 import 'package:dachaturizm/constants.dart';
+import 'package:dachaturizm/models/ads_plus.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/models/category_model.dart';
 import 'package:dachaturizm/models/estate_rating_model.dart';
@@ -15,7 +16,10 @@ class EstateProvider with ChangeNotifier {
 
   // Headers with auth token if exists
   Future<Map<String, String>> getHeaders() async {
-    Map<String, String> headers = {"Content-type": "application/json"};
+    Map<String, String> headers = {
+      "Content-type": "application/json",
+      "From-mobile": "1"
+    };
     String access = await auth.getAccessToken();
     if (access != "") {
       headers["Authorization"] = "Bearer ${access}";
@@ -82,7 +86,9 @@ class EstateProvider with ChangeNotifier {
     CategoryModel? category,
     String type,
   ) async {
-    Map<String, dynamic> data = {};
+    Map<String, dynamic> data = {
+      "ad": null,
+    };
     String url = "";
     if (type == "all") {
       url = "${baseUrl}api/estate/${category!.slug}/";
@@ -93,6 +99,13 @@ class EstateProvider with ChangeNotifier {
     try {
       Response response = await _fetch(url);
       data["next"] = response.data["links"]["next"];
+      if (response.data["ad"] != null) {
+        try {
+          data["ad"] = AdsPlusModel.fromJson(response.data["ad"]);
+        } catch (e) {
+          print(e);
+        }
+      }
       await response.data["results"].forEach((item) async {
         EstateModel estate = await EstateModel.fromJson(item);
         estates.add(estate);
@@ -104,11 +117,18 @@ class EstateProvider with ChangeNotifier {
 
   // Get any data from the next page
   Future<Map<String, dynamic>> getNextPage(String url) async {
-    Map<String, dynamic> data = {};
+    Map<String, dynamic> data = {"ad": null};
     List<EstateModel> estates = [];
     try {
       Response response = await _fetch(url);
       data["next"] = response.data["links"]["next"];
+      if (response.data["ad"] != null) {
+        try {
+          data["ad"] = AdsPlusModel.fromJson(response.data["ad"]);
+        } catch (e) {
+          print(e);
+        }
+      }
       await response.data["results"].forEach((item) async {
         try {
           EstateModel estate = await EstateModel.fromJson(item);
@@ -126,8 +146,8 @@ class EstateProvider with ChangeNotifier {
   Map<String, dynamic> _filters = {
     "sorting": "latest",
     "address": "",
-    "region": 0,
-    "district": 0,
+    "region": "",
+    "district": "",
     "place": 0,
     "minPrice": 0.0,
     "maxPrice": 0.0,
@@ -187,12 +207,12 @@ class EstateProvider with ChangeNotifier {
     _filters["address"] = address;
   }
 
-  filtersRegion(int regionId) {
-    _filters["region"] = regionId;
+  filtersRegion(String region) {
+    _filters["region"] = region;
   }
 
-  filtersDistrict(int districtId) {
-    _filters["district"] = districtId;
+  filtersDistrict(String district) {
+    _filters["district"] = district;
   }
 
   filtersPlace(int id) {
@@ -223,8 +243,8 @@ class EstateProvider with ChangeNotifier {
       "sorting": "latest",
       "address": "",
       "place": 0,
-      "region": 0,
-      "district": 0,
+      "region": "",
+      "district": "",
       "minPrice": 0.0,
       "maxPrice": 0.0,
       "priceType": null,
@@ -262,7 +282,7 @@ class EstateProvider with ChangeNotifier {
 
   // Get estate by ID
   Future<EstateModel> getEstateById(int estateId) async {
-    final url = "${baseUrl}api/estate/${estateId}/";
+    final url = "${baseUrl}api/estater/${estateId}/";
     Response response = await _fetch(url);
     var estate = await EstateModel.fromJson(response.data);
     return estate;
@@ -404,10 +424,13 @@ class EstateProvider with ChangeNotifier {
           }));
       if (response.statusCode as int >= 200 ||
           response.statusCode as int < 300) {
+        print(response.data);
         return true;
       }
       return false;
-    } catch (e) {}
+    } catch (e) {
+      print(e);
+    }
     return false;
   }
 

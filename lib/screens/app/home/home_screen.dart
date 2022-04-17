@@ -6,11 +6,13 @@ import 'package:dachaturizm/components/horizontal_ad.dart';
 import 'package:dachaturizm/components/search_bar_with_filter.dart';
 import 'package:dachaturizm/components/text_link.dart';
 import 'package:dachaturizm/constants.dart';
+import 'package:dachaturizm/helpers/remove_doubles.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/models/category_model.dart';
 import 'package:dachaturizm/providers/banner_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/category_provider.dart';
+import 'package:dachaturizm/providers/horizontal_ads_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/screens/app/home/listing_screen.dart';
 import 'package:dachaturizm/screens/app/home/services_list_screen.dart';
@@ -36,7 +38,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
   final FocusNode _searchFocusNode = FocusNode();
 
   int _topBannerIndex = 0;
-  final CarouselController _topBannerController = CarouselController();
 
   Future<void> _refreshHomePage() async {
     Future.delayed(Duration.zero).then((_) async {
@@ -94,6 +95,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
   @override
   void initState() {
     super.initState();
+
     Future.delayed(Duration.zero).then((_) {
       FocusScope.of(context).unfocus();
       _searchController.clear();
@@ -108,9 +110,13 @@ class _HomePageScreenState extends State<HomePageScreen> {
     List<EstateModel> topBanners =
         Provider.of<BannerProvider>(context).topBanners;
 
+    bool noItems = categories.length > 0 &&
+        Provider.of<BannerProvider>(context).banners.keys.length > 0 &&
+        Provider.of<EstateProvider>(context).topEstates.keys.length > 0;
+
     return Scaffold(
       body: _isLoading
-          ? Center(
+          ? const Center(
               child: CircularProgressIndicator(),
             )
           : RefreshIndicator(
@@ -129,22 +135,12 @@ class _HomePageScreenState extends State<HomePageScreen> {
                         child: Column(
                           children: [
                             _buidlCategoryRow(context, categories),
-                            SizedBox(height: defaultPadding * 0.5),
+                            const SizedBox(height: defaultPadding * 0.5),
                             _buildBannerBlock(
                                 context, topBanners, _topBannerIndex),
-                            SizedBox(height: defaultPadding * 0.5),
+                            const SizedBox(height: defaultPadding * 0.5),
                             Visibility(
-                              visible: categories.length > 0 &&
-                                  Provider.of<BannerProvider>(context)
-                                          .banners
-                                          .keys
-                                          .length >
-                                      0 &&
-                                  Provider.of<EstateProvider>(context)
-                                          .topEstates
-                                          .keys
-                                          .length >
-                                      0,
+                              visible: noItems,
                               replacement: Container(
                                 height: 150,
                                 margin: EdgeInsets.symmetric(vertical: 20),
@@ -161,20 +157,22 @@ class _HomePageScreenState extends State<HomePageScreen> {
                                           _refreshHomePage();
                                         },
                                       ),
-                                      SizedBox(height: 20),
+                                      const SizedBox(height: 20),
                                       Text(
                                         Locales.string(context,
                                             "refresh_to_get_new_results"),
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           color: disabledGrey,
                                           fontSize: 12,
                                         ),
+                                        textAlign: TextAlign.center,
                                       ),
                                     ],
                                   ),
                                 ),
                               ),
-                              child: _showCategoryRelatedItems(categories),
+                              child: _showCategoryRelatedItems(categories,
+                                  show: noItems),
                             )
                           ],
                         ),
@@ -187,16 +185,17 @@ class _HomePageScreenState extends State<HomePageScreen> {
     );
   }
 
-  Widget _showCategoryRelatedItems(List<CategoryModel> categories) {
+  Widget _showCategoryRelatedItems(List<CategoryModel> categories,
+      {bool show = true}) {
     return Container(
-      padding: EdgeInsets.fromLTRB(
+      padding: const EdgeInsets.fromLTRB(
         defaultPadding,
         24,
         defaultPadding,
         defaultPadding,
       ),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        color: show ? null : Colors.grey[100],
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(30),
           topRight: Radius.circular(30),
@@ -233,13 +232,13 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
   Widget _buildCardsBlock(BuildContext context, List? estates) {
     try {
-      if (estates != null && estates.length > 4)
-        estates = estates.sublist(0, 4);
+      if (estates != null && estates.length > 6)
+        estates = estates.sublist(0, 6);
       return Visibility(
         visible: estates != null,
         child: Container(
           width: 100.w,
-          padding: EdgeInsets.only(top: defaultPadding / 2),
+          padding: const EdgeInsets.only(top: defaultPadding / 2),
           child: Wrap(
             alignment: WrapAlignment.spaceBetween,
             runSpacing: 6,
@@ -298,16 +297,21 @@ class _HomePageScreenState extends State<HomePageScreen> {
   }
 
   Widget _buildEstateTypeBlock(CategoryModel category) {
-    List topEstates =
+    List<EstateModel> topEstates =
         Provider.of<EstateProvider>(context).topEstates[category.id];
     List banners = Provider.of<BannerProvider>(context).banners[category.id];
+
+    try {
+      topEstates.shuffle();
+      topEstates = removeDoubleEstates(topEstates);
+    } catch (e) {}
 
     return Visibility(
       visible: (topEstates != null &&
           banners != null &&
           (topEstates.length > 0 || banners.length > 0)),
       child: Container(
-        margin: EdgeInsets.only(top: 10),
+        margin: const EdgeInsets.only(top: 10),
         child: Column(
           children: [
             Row(
@@ -319,7 +323,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                     color: normalOrange,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  padding: EdgeInsets.fromLTRB(7, 0, 7, 3),
+                  padding: const EdgeInsets.fromLTRB(7, 0, 7, 3),
                   child: Text(
                     Locales.string(context, "top") +
                         " ${category.title.toLowerCase()}",
@@ -343,7 +347,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
     return Container(
       height: 100,
       width: 100.w,
-      padding: EdgeInsets.symmetric(horizontal: defaultPadding),
+      padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
       decoration: BoxDecoration(
         color: Colors.grey[100],
         borderRadius: BorderRadius.only(
@@ -371,7 +375,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                   );
                 }).toList(),
                 Container(
-                  margin: EdgeInsets.only(right: 30),
+                  margin: const EdgeInsets.only(right: 30),
                   child: CategoryItem(
                     title: Locales.string(context, "services"),
                     onTap: () {

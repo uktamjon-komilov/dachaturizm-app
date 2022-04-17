@@ -9,7 +9,7 @@ changeLocale(context, locale) async {
 
 Future<String> getCurrentLocale() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  var locale = prefs.get("language");
+  final locale = prefs.get("language");
   if (locale == null || locale == "") {
     prefs.setString("language", "uz");
   }

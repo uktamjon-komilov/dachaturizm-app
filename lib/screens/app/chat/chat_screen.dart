@@ -8,6 +8,7 @@ import 'package:dachaturizm/helpers/url_helper.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/models/user_model.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
+import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/screens/app/estate/estate_detail_screen.dart';
 import 'package:dachaturizm/screens/auth/login_screen.dart';
@@ -63,13 +64,30 @@ class _ChatScreenState extends State<ChatScreen> {
     if (!_isInit) {
       Map<String, dynamic> data =
           ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
-      setState(() {
+      if (data.containsKey("estate_id") && data.containsKey("user_id")) {
+        Provider.of<AuthProvider>(context, listen: false)
+            .getUser(data["user_id"])
+            .then((value) {
+          sender = value;
+        });
+        Provider.of<EstateProvider>(context, listen: false)
+            .getEstateById(data["estate_id"])
+            .then((value) {
+          estate = value;
+        });
+      } else {
         estate = data["estate"];
         sender = data["sender"];
+      }
+      Provider.of<AuthProvider>(context, listen: false)
+          .makeMessagesRead(estate!.id, sender!.id);
+      setState(() {
         _isInit = true;
         _isLoading = true;
       });
-      Provider.of<AuthProvider>(context).getUserId().then((value) {
+      Provider.of<AuthProvider>(context, listen: false)
+          .getUserId()
+          .then((value) {
         if (value == null) {
           Navigator.of(context).pushNamed(LoginScreen.routeName);
         } else {
@@ -83,8 +101,6 @@ class _ChatScreenState extends State<ChatScreen> {
               _data = value;
               _isLoading = false;
             });
-            // _scrollController
-            //     .jumpTo(_scrollController.position.maxScrollExtent);
           });
         }
       });
@@ -102,7 +118,7 @@ class _ChatScreenState extends State<ChatScreen> {
           setState(() {
             _data = value;
           });
-          // _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+          _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
         });
       });
     });
@@ -197,14 +213,14 @@ class _ChatScreenState extends State<ChatScreen> {
         children: [
           Text(
             estate.title,
-            style: TextStyle(
+            style: const TextStyle(
               color: darkPurple,
               fontWeight: FontWeight.bold,
               overflow: TextOverflow.ellipsis,
             ),
             maxLines: 1,
           ),
-          SizedBox(height: 5),
+          const SizedBox(height: 5),
           RatingBar.builder(
             ignoreGestures: true,
             initialRating: estate.rating,
@@ -227,12 +243,12 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget _buildLocation(EstateModel estate) {
     return Row(
       children: [
-        Icon(
+        const Icon(
           Icons.location_on,
           size: 15,
           color: normalGrey,
         ),
-        SizedBox(width: 5),
+        const SizedBox(width: 5),
         SmallGreyText(text: estate.address),
       ],
     );
@@ -261,14 +277,12 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ),
         ),
-        padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        margin: EdgeInsets.only(bottom: 5),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        margin: const EdgeInsets.only(bottom: 5),
         child: Row(
           children: [
             _buildImageBox(estate as EstateModel),
-            SizedBox(
-              width: 10,
-            ),
+            const SizedBox(width: 10),
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -289,7 +303,7 @@ class _ChatScreenState extends State<ChatScreen> {
     return Container(
       width: 100.w,
       decoration: BoxDecoration(color: chatInputBackground),
-      padding: EdgeInsets.fromLTRB(
+      padding: const EdgeInsets.fromLTRB(
         defaultPadding,
         defaultPadding / 2,
         defaultPadding,
@@ -301,7 +315,7 @@ class _ChatScreenState extends State<ChatScreen> {
           Expanded(
             child: TextFormField(
               controller: _textController,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
                 height: 1.29,
@@ -313,7 +327,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 fillColor: Colors.white,
                 isDense: true,
                 hintText: Locales.string(context, "write_a_message"),
-                hintStyle: TextStyle(color: greyishLight),
+                hintStyle: const TextStyle(color: greyishLight),
                 contentPadding:
                     EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 border: OutlineInputBorder(
@@ -406,8 +420,8 @@ class MessageItem extends StatelessWidget {
                 color: isSent ? sentMessageColor : inputGrey,
                 borderRadius: BorderRadius.circular(15),
               ),
-              padding: EdgeInsets.fromLTRB(12, 7, 45, 7),
-              margin: EdgeInsets.symmetric(vertical: 6),
+              padding: const EdgeInsets.fromLTRB(12, 7, 45, 7),
+              margin: const EdgeInsets.symmetric(vertical: 6),
               child: Text(
                 text,
                 style: TextStyle(color: darkPurple, fontSize: 17),
@@ -418,7 +432,7 @@ class MessageItem extends StatelessWidget {
               right: 12,
               child: Text(
                 time,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 9,
                   fontWeight: FontWeight.w400,
                   color: normalOrange,

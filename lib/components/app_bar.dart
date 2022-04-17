@@ -14,7 +14,7 @@ AppBar buildNavigationalAppBar(BuildContext context, String title,
           Navigator.of(context).pop();
         }
       },
-      icon: Icon(
+      icon: const Icon(
         Icons.chevron_left_rounded,
         size: 24,
         color: greyishLight,

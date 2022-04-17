@@ -99,7 +99,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                   Locales.string(context, "phone"),
                   style: TextStyles.display2().copyWith(letterSpacing: 0.3),
                 ),
-                SizedBox(height: defaultPadding * 3 / 4),
+                const SizedBox(height: defaultPadding * 3 / 4),
                 CustomInput(
                   controller: _phoneController,
                   hintText: "+998 (__) ___ __ __",
@@ -114,12 +114,12 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                     return null;
                   },
                 ),
-                SizedBox(height: 1.5 * defaultPadding),
+                const SizedBox(height: 1.5 * defaultPadding),
                 Text(
                   Locales.string(context, "first_name"),
                   style: TextStyles.display2().copyWith(letterSpacing: 0.3),
                 ),
-                SizedBox(height: defaultPadding * 3 / 4),
+                const SizedBox(height: defaultPadding * 3 / 4),
                 CustomInput(
                   controller: _nameController,
                   hintText: Locales.string(context, "first_name"),
@@ -130,7 +130,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                     return null;
                   },
                 ),
-                SizedBox(height: defaultPadding * 3 / 4),
+                const SizedBox(height: defaultPadding * 3 / 4),
                 CustomInput(
                   controller: _textController,
                   hintText: Locales.string(context, "write_feedback"),

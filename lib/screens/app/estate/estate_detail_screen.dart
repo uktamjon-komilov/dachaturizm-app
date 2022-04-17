@@ -68,9 +68,8 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    final Map args = ModalRoute.of(context)?.settings.arguments as Map;
-
     Future.delayed(Duration.zero).then((_) async {
+      final Map args = ModalRoute.of(context)?.settings.arguments as Map;
       Future.wait([
         Provider.of<AuthProvider>(context, listen: false)
             .getUserId()
@@ -226,7 +225,7 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
             Locales.string(context, "similar_estates"),
             style: TextStyles.display7(),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           buildCardsBlock(context, _similarEstates, padding: EdgeInsets.all(0)),
         ],
       ),
@@ -252,7 +251,7 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
             _rating = rating;
           },
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         FluidBigButton(
           onPress: () {
             callWithAuth(context, () {
@@ -260,12 +259,12 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
             });
           },
           text: Locales.string(context, "send"),
-          size: Size(180, 36),
+          size: const Size(180, 36),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         Divider(
           height: 1,
           color: lightGrey,

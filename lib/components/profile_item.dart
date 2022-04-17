@@ -44,14 +44,14 @@ class ProfileListItem extends StatelessWidget {
                   size: 14,
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 10,
               ),
               Text(
                 title,
                 style: TextStyles.display1().copyWith(height: 1.5),
               ),
-              Spacer(),
+              const Spacer(),
               Icon(Icons.keyboard_arrow_right_rounded)
             ],
           ),

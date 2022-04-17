@@ -5,9 +5,11 @@ import 'package:dachaturizm/providers/create_estate_provider.dart';
 import 'package:dachaturizm/providers/currency_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/facility_provider.dart';
+import 'package:dachaturizm/providers/horizontal_ads_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
 import 'package:dachaturizm/providers/region_provider.dart';
 import 'package:dachaturizm/providers/static_pages_provider.dart';
+import 'package:dachaturizm/push_nofitication_service.dart';
 import 'package:dachaturizm/restartable_app.dart';
 import 'package:dachaturizm/screens/app/chat/chat_list_screen.dart';
 import 'package:dachaturizm/screens/app/chat/chat_screen.dart';
@@ -41,19 +43,22 @@ import 'package:dachaturizm/screens/auth/reset_password_step2_screen.dart';
 import 'package:dachaturizm/screens/auth/reset_password_step3_screen.dart';
 import 'package:dachaturizm/screens/loading/choose_language_screen.dart';
 import 'package:dachaturizm/screens/splash_screen.dart';
-import 'package:dachaturizm/screens/temp.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import 'providers/category_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  Firebase.initializeApp();
+
+  NotificationService notificationService = NotificationService();
 
   await Locales.init(["en", "uz", "ru"]);
   Dio dio = Dio();
@@ -83,6 +88,9 @@ void main() async {
             value: RegionProvider(dio: dio),
           ),
           ChangeNotifierProvider.value(
+            value: HorizontalAdsProvider(dio: dio),
+          ),
+          ChangeNotifierProvider.value(
             value: auth,
           ),
           ChangeNotifierProvider.value(
@@ -99,16 +107,21 @@ void main() async {
             update: (context, auth, _) => NavigationScreenProvider(auth: auth),
           ),
         ],
-        child: MyApp(dio: dio),
+        child: MyApp(
+          dio: dio,
+          notificationService: notificationService,
+        ),
       ),
     ),
   );
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({Key? key, required this.dio}) : super(key: key);
+  const MyApp({Key? key, required this.dio, required this.notificationService})
+      : super(key: key);
 
   final Dio dio;
+  final NotificationService notificationService;
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -126,7 +139,7 @@ class _MyAppState extends State<MyApp> {
         retries: 100,
         retryDelays: List.generate(
           100,
-          (index) => Duration(seconds: 2),
+          (index) => Duration(seconds: index * 1),
         ),
       ),
     );
@@ -137,7 +150,10 @@ class _MyAppState extends State<MyApp> {
     super.didChangeDependencies();
     if (_isInit) {
       _isInit = false;
-      Provider.of<AuthProvider>(context, listen: false).getUserData().then((_) {
+      widget.notificationService.registerNotification(context);
+      Provider.of<AuthProvider>(context, listen: false)
+          .getUserData()
+          .then((data) {
         Provider.of<RegionProvider>(context, listen: false).getAndSetRegions();
         Provider.of<StaticPagesProvider>(context, listen: false)
             .getStaticPages();

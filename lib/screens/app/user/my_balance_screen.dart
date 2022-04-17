@@ -72,11 +72,11 @@ class _MyBalanceScreenState extends State<MyBalanceScreen> {
         Navigator.of(context).pop();
       }),
       body: _isLoading
-          ? Center(
+          ? const Center(
               child: CircularProgressIndicator(),
             )
           : Container(
-              padding: EdgeInsets.fromLTRB(
+              padding: const EdgeInsets.fromLTRB(
                 defaultPadding,
                 defaultPadding,
                 defaultPadding,
@@ -87,24 +87,24 @@ class _MyBalanceScreenState extends State<MyBalanceScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildCardBlock(),
-                    SizedBox(height: defaultPadding / 2),
-                    Divider(
+                    const SizedBox(height: defaultPadding / 2),
+                    const Divider(
                       color: lightGrey,
                       thickness: 1,
                       height: 0,
                     ),
-                    SizedBox(height: defaultPadding / 2),
+                    const SizedBox(height: defaultPadding / 2),
                     _buildTransactionsList(
                       Locales.string(context, "last_payments"),
                       _inTransactions,
                     ),
-                    SizedBox(height: defaultPadding / 2),
-                    Divider(
+                    const SizedBox(height: defaultPadding / 2),
+                    const Divider(
                       color: lightGrey,
                       thickness: 1,
                       height: 0,
                     ),
-                    SizedBox(height: defaultPadding / 2),
+                    const SizedBox(height: defaultPadding / 2),
                     _buildTransactionsList(
                       Locales.string(context, "last_charges"),
                       _outTransactions,
@@ -140,7 +140,7 @@ class _MyBalanceScreenState extends State<MyBalanceScreen> {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(15),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.refresh_rounded,
                   color: normalOrange,
                   size: 20,
@@ -149,7 +149,7 @@ class _MyBalanceScreenState extends State<MyBalanceScreen> {
             ),
           ),
           Container(
-            padding: EdgeInsets.all(28),
+            padding: const EdgeInsets.all(28),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -162,7 +162,7 @@ class _MyBalanceScreenState extends State<MyBalanceScreen> {
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                SizedBox(height: 3 * defaultPadding),
+                const SizedBox(height: 3 * defaultPadding),
                 Text(
                   "${Locales.string(context, 'renewed')}: ${formatDateTime(_date)}",
                   style: TextStyle(
@@ -187,7 +187,7 @@ class _MyBalanceScreenState extends State<MyBalanceScreen> {
                   ),
                   child: Text(
                     Locales.string(context, "fill_balance"),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                       letterSpacing: 0.2,
@@ -215,7 +215,7 @@ class _MyBalanceScreenState extends State<MyBalanceScreen> {
                   title,
                   style: TextStyles.display2().copyWith(letterSpacing: 0.3),
                 ),
-                SizedBox(height: defaultPadding / 2),
+                const SizedBox(height: defaultPadding / 2),
                 Expanded(
                   child: SingleChildScrollView(
                     child: Column(

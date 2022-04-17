@@ -6,7 +6,6 @@ import 'package:dachaturizm/constants.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
-import 'package:dachaturizm/styles/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:provider/provider.dart';
@@ -41,10 +40,10 @@ class _WishlistScreenState extends State<WishlistScreen> {
 
   @override
   void initState() {
+    super.initState();
     Future.delayed(Duration.zero).then((_) async {
       await _refresh();
     });
-    super.initState();
   }
 
   @override

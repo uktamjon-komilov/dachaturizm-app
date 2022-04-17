@@ -9,9 +9,7 @@ import 'package:dachaturizm/helpers/url_helper.dart';
 import 'package:dachaturizm/models/user_model.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
-import 'package:dachaturizm/restartable_app.dart';
 import 'package:dachaturizm/styles/input.dart';
-import 'package:dachaturizm/styles/text_styles.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -89,25 +87,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     });
   }
 
-  Future _refreshUserSettings() async {
-    Future.delayed(Duration.zero).then((_) {
-      setState(() {
-        _isLoading = true;
-      });
-      Provider.of<AuthProvider>(context, listen: false).getUserData().then((_) {
-        setState(() {
-          _isLoading = false;
-          _firstNameController.text =
-              Provider.of<AuthProvider>(context, listen: false).user!.firstName;
-          _lastNameController.text =
-              Provider.of<AuthProvider>(context, listen: false).user!.lastName;
-          _phoneController.text =
-              Provider.of<AuthProvider>(context, listen: false).user!.phone;
-        });
-      });
-    });
-  }
-
   @override
   void initState() {
     super.initState();
@@ -142,8 +121,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     UserModel? user = Provider.of<AuthProvider>(context, listen: false).user;
 
     return (_isLoading || user == null)
-        ? Scaffold(
-            body: Center(
+        ? const Scaffold(
+            body: const Center(
               child: CircularProgressIndicator(),
             ),
           )
@@ -222,7 +201,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                               );
                                             },
                                           ),
-                                Center(
+                                const Center(
                                   child: Icon(
                                     Icons.camera_alt_rounded,
                                     color: Colors.white,
@@ -236,7 +215,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ),
                       ),
                     ),
-                    SizedBox(height: defaultPadding * 1.5),
+                    const SizedBox(height: defaultPadding * 1.5),
                     TextFormField(
                       controller: _firstNameController,
                       decoration: InputDecoration(
@@ -249,7 +228,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ),
                       ),
                     ),
-                    SizedBox(height: defaultPadding * 1.5),
+                    const SizedBox(height: defaultPadding * 1.5),
                     TextFormField(
                       controller: _lastNameController,
                       decoration: InputDecoration(
@@ -262,7 +241,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ),
                       ),
                     ),
-                    SizedBox(height: defaultPadding * 1.5),
+                    const SizedBox(height: defaultPadding * 1.5),
                     TextFormField(
                       controller: _phoneController,
                       decoration: InputDecoration(

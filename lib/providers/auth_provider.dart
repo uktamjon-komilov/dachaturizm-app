@@ -243,6 +243,31 @@ class AuthProvider with ChangeNotifier {
     return {"status": false};
   }
 
+  Future<Map> updateFCM(String token) async {
+    final userId = await getUserId();
+    final access = await getAccessToken();
+    print(token);
+    final url = "${baseUrl}api/users/${userId}/";
+    try {
+      final response = await dio.patch(
+        url,
+        data: {"fcm_token": token},
+        options: Options(
+          headers: {"Content-type": "application/json"},
+        ),
+      );
+      if (response.statusCode as int >= 200 ||
+          response.statusCode as int < 300) {
+        print(response.data);
+        return response.data;
+      }
+    } catch (e) {
+      DioError error = e as DioError;
+      print(error.response!.data);
+    }
+    return {"status": false};
+  }
+
   Future<UserModel?> getUserData() async {
     int userId = await getUserId();
     if (userId != null) {
@@ -299,6 +324,30 @@ class AuthProvider with ChangeNotifier {
       return chats;
     } catch (e) {}
     return chats;
+  }
+
+  Future makeMessagesRead(int estateId, int senderId) async {
+    const url = "${baseUrl}api/messages/make-read/";
+    String access = await getAccessToken();
+    String refresh = await getRefreshToken();
+    if (refresh == null || refresh == "") {
+      return null;
+    }
+    Map<String, String> headers = {
+      "Content-type": "application/json",
+      "Authorization": "Bearer ${access}"
+    };
+    try {
+      await dio.post(
+        url,
+        data: {
+          "estate": estateId,
+          "sender": senderId,
+        },
+        options: Options(headers: headers),
+      );
+    } catch (e) {}
+    return;
   }
 
   Future getMessages(int estateId, int receiverId) async {

@@ -42,7 +42,7 @@ class _ImageZoomerState extends State<ImageZoomer> {
       body: Container(
         height: 100.h,
         width: 100.w,
-        decoration: BoxDecoration(color: Colors.black),
+        decoration: const BoxDecoration(color: Colors.black),
         child: Stack(
           children: [
             PhotoViewGallery.builder(
@@ -75,7 +75,7 @@ class _ImageZoomerState extends State<ImageZoomer> {
               top: 40,
               left: 25,
               child: IconButton(
-                icon: Icon(
+                icon: const Icon(
                   Icons.arrow_back,
                   color: Colors.white,
                 ),

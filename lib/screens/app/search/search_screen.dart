@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:dachaturizm/components/card.dart';
 import 'package:dachaturizm/components/no_result.dart';
 import 'package:dachaturizm/components/search_bar_with_filter.dart';
@@ -11,7 +10,6 @@ import "package:flutter/material.dart";
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
 class SearchPageScreen extends StatefulWidget {
@@ -31,46 +29,6 @@ class _SearchPageScreenState extends State<SearchPageScreen> {
 
   List<EstateModel> _results = [];
   String? _nextPage;
-
-  void _saveSearchTerm(String term) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    var searchedTerms = prefs.getString("searchedTerms");
-    if (searchedTerms != null && searchedTerms != "") {
-      List<String> data = json.decode(searchedTerms);
-      data.insert(0, term);
-      if (data.length > 3) {
-        data = data.sublist(0, 3);
-      }
-      searchedTerms = json.encode(data);
-      prefs.setString("searchedTerms", searchedTerms);
-    } else {
-      List<String> data = [term];
-      searchedTerms = json.encode(data);
-      prefs.setString("searchedTerms", searchedTerms);
-    }
-  }
-
-  void _removeSearchTerm(String term) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    var searchedTerms = prefs.getString("searchedTerms");
-    if (searchedTerms != null && searchedTerms != "") {
-      List<String> data = json.decode(searchedTerms);
-      data.remove(term);
-      searchedTerms = json.encode(data);
-      prefs.setString("searchedTerms", searchedTerms);
-    }
-  }
-
-  Future<List<String>> _getSearchedTerms() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    var searchedTerms = prefs.getString("searchedTerms");
-    if (searchedTerms != null && searchedTerms != "") {
-      List<String> data = json.decode(searchedTerms);
-      return data;
-    } else {
-      return [];
-    }
-  }
 
   Future _search(context, value) async {
     setState(() {
@@ -120,6 +78,7 @@ class _SearchPageScreenState extends State<SearchPageScreen> {
   @override
   void didChangeDependencies() async {
     super.didChangeDependencies();
+
     Future.delayed(Duration.zero).then((_) {
       _listenScroller(context);
     });
@@ -150,7 +109,7 @@ class _SearchPageScreenState extends State<SearchPageScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
             Visibility(
               visible: !_isLoading,
               child: SearchBarWithFilter(
@@ -172,21 +131,21 @@ class _SearchPageScreenState extends State<SearchPageScreen> {
               child: _isLoading
                   ? Container(
                       height: 100,
-                      child: Center(
+                      child: const Center(
                         child: CircularProgressIndicator(),
                       ),
                     )
                   : ((_results.length == 0)
                       ? Visibility(
                           visible: _results.length == 0,
-                          child: Padding(
+                          child: const Padding(
                             padding: const EdgeInsets.fromLTRB(
                               2 * defaultPadding,
                               100,
                               2 * defaultPadding,
                               0,
                             ),
-                            child: NoResult(),
+                            child: const NoResult(),
                           ),
                         )
                       : Column(
@@ -217,8 +176,10 @@ class _SearchPageScreenState extends State<SearchPageScreen> {
                                   child: Wrap(
                                     children: [
                                       ..._results
-                                          .map((estate) =>
-                                              EstateCard(estate: estate))
+                                          .map((estate) => EstateCard(
+                                                estate: estate,
+                                                needShadow: false,
+                                              ))
                                           .toList(),
                                     ],
                                   ),

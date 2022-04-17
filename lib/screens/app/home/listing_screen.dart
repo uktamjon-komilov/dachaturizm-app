@@ -4,7 +4,7 @@ import 'package:dachaturizm/components/no_result.dart';
 import 'package:dachaturizm/components/search_bar_with_filter.dart';
 import 'package:dachaturizm/components/small_button.dart';
 import 'package:dachaturizm/constants.dart';
-import 'package:dachaturizm/helpers/remove_doubles.dart';
+import 'package:dachaturizm/models/ads_plus.dart';
 import 'package:dachaturizm/models/category_model.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
@@ -33,6 +33,7 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
   CategoryModel? _category;
 
   List<EstateModel> _allEstates = [];
+  List<AdsPlusModel> _ads = [];
   List<EstateModel> _topEstates = [];
   List<EstateModel> _currentEstates = [];
 
@@ -57,7 +58,7 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
   Future<void> _listenScroller(BuildContext context) async {
     _scrollController.addListener(() {
       ScrollPosition position = _scrollController.position;
-      if (position.pixels > position.maxScrollExtent - 80 &&
+      if (position.pixels > position.maxScrollExtent - 150 &&
           !_paginationLoading) {
         if (_showTop && _topNextLink != null) {
           setState(() {
@@ -69,16 +70,13 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
             List<EstateModel> _estates = value["estates"];
             _estates.shuffle();
             _topEstates.addAll(_estates);
-            _topEstates = removeDoubleEstates(_topEstates);
             _topNextLink = value["next"];
             setState(() {
               _currentEstates = _topEstates;
               _paginationLoading = false;
             });
           });
-        } else if (
-            !_showTop &&
-            _simpleNextLink != null) {
+        } else if (!_showTop && _simpleNextLink != null) {
           setState(() {
             _paginationLoading = true;
           });
@@ -88,8 +86,10 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
             List<EstateModel> _estates = value["estates"];
             _estates.shuffle();
             _allEstates.addAll(_estates);
-            _allEstates = removeDoubleEstates(_allEstates);
             _simpleNextLink = value["next"];
+            if (value["ad"] != null) {
+              _ads.add(value["ad"]);
+            }
             setState(() {
               _currentEstates = _allEstates;
               _paginationLoading = false;
@@ -112,7 +112,6 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
           }).then((data) {
         List<EstateModel> _estates = data["estates"];
         _estates.shuffle();
-        _topEstates = removeDoubleEstates(_estates);
         setState(() {
           _topNextLink = data["next"];
         });
@@ -125,7 +124,6 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
           }).then((data) {
         List<EstateModel> _estates = data["estates"];
         _estates.shuffle();
-        _allEstates = removeDoubleEstates(_estates);
         setState(() {
           _simpleNextLink = data["next"];
         });
@@ -152,8 +150,7 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
           .then((value) {
         List<EstateModel> _estates = value["estates"];
         _estates.shuffle();
-        _estates = removeDoubleEstates(_estates);
-          _topEstates = _estates;
+        _topEstates = _estates;
         setState(() {
           _topNextLink = value["next"];
         });
@@ -163,8 +160,10 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
           .then((value) {
         List<EstateModel> _estates = value["estates"];
         _estates.shuffle();
-        _estates = removeDoubleEstates(_estates);
-          _allEstates = _estates;
+        _allEstates = _estates;
+        if (value["ad"] != null) {
+          _ads.add(value["ad"]);
+        }
         setState(() {
           _simpleNextLink = value["next"];
         });
@@ -196,7 +195,7 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
         }, [
           IconButton(
             onPressed: () => _refreshAction(),
-            icon: Icon(Icons.refresh_rounded),
+            icon: const Icon(Icons.refresh_rounded),
             color: greyishLight,
           ),
         ]),
@@ -214,9 +213,7 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(
-                          height: 24,
-                        ),
+                        const SizedBox(height: 24),
                         Padding(
                           padding: const EdgeInsets.symmetric(
                               horizontal: defaultPadding),
@@ -257,7 +254,12 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
                           ),
                         ),
                         _currentEstates.length > 0
-                            ? buildCardsBlock(context, _currentEstates)
+                            ? buildCardsBlock(
+                                context,
+                                _currentEstates,
+                                ads: _ads,
+                                isTop: _showTop,
+                              )
                             : Padding(
                                 padding: const EdgeInsets.fromLTRB(
                                   2 * defaultPadding,
@@ -267,11 +269,11 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
                                 ),
                                 child: NoResult(),
                               ),
-                        SizedBox(height: defaultPadding),
+                        const SizedBox(height: defaultPadding),
                         Visibility(
                           visible: _paginationLoading,
                           child: Container(
-                            padding: EdgeInsets.only(bottom: 20),
+                            padding: const EdgeInsets.only(bottom: 20),
                             height: 60,
                             child: Center(
                               child: SpinKitFadingCircle(

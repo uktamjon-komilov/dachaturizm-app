@@ -105,29 +105,36 @@ class EstateModel {
     List<String> langs = ["uz", "en", "ru"];
     String? locale = await getCurrentLocale();
 
-  Map<String, dynamic> localData = {};
+    Map<String, dynamic> localData = {};
 
-  int counter = 0;
+    int counter = 0;
 
-  while(counter < langs.length && !data["translations"].containsKey(locale)){
-    locale = langs[counter];
-    counter += 1;
-  }
+    while (
+        counter < langs.length && !data["translations"].containsKey(locale)) {
+      locale = langs[counter];
+      counter += 1;
+    }
 
-    try{
-    localData = data["translations"][locale];
-    }catch(e){
+    try {
+      localData = data["translations"][locale];
+    } catch (e) {
       locale = null;
     }
 
     return EstateModel(
       id: data.containsKey("id") ? data["id"] : 0,
-      title: locale == null ? "-" : (localData.containsKey("title")
-          ? localData["title"]
-          : getFromOtherLang(data["translations"], "title", "uz")),
+      title: locale == null
+          ? "-"
+          : (localData.containsKey("title")
+              ? localData["title"]
+              : getFromOtherLang(data["translations"], "title", "uz")),
       description: locale == null ? "-" : (localData["description"]),
-      region: locale == null ? "-" :(localData.containsKey("region") ? localData["region"] : ""),
-      district: locale == null ? "-" : (localData.containsKey("district") ? localData["district"] : ""),
+      region: locale == null
+          ? "-"
+          : (localData.containsKey("region") ? localData["region"] : ""),
+      district: locale == null
+          ? "-"
+          : (localData.containsKey("district") ? localData["district"] : ""),
       priceType: data["price_type"]["translations"][locale]["title"],
       rating: data["rating"],
       views: data["views"],
@@ -191,13 +198,14 @@ class EstateModel {
     String locale = await getCurrentLocale();
 
     return EstateModel(
-        id: data["id"],
-        title: data["translations"][locale]["title"],
-        description: data["translations"][locale]["description"],
-        priceType: data["price_type"]["translations"][locale]["title"],
-        weekdayPrice: data["weekday_price"],
-        weekendPrice: data["weekend_price"],
-        photo: fixMediaUrl(data["photo"]),
-        expiryDate: DateTime.now());
+      id: data["id"],
+      title: data["translations"][locale]["title"],
+      description: data["translations"][locale]["description"],
+      priceType: data["price_type"]["translations"][locale]["title"],
+      weekdayPrice: data["weekday_price"],
+      weekendPrice: data["weekend_price"],
+      photo: fixMediaUrl(data["photo"]),
+      expiryDate: DateTime.now(),
+    );
   }
 }

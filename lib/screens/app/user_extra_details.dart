@@ -30,7 +30,7 @@ Widget buildUserDetails(BuildContext context, UserModel? user,
               ),
             ),
           ),
-          SizedBox(width: defaultPadding),
+          const SizedBox(width: defaultPadding),
           Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -42,17 +42,17 @@ Widget buildUserDetails(BuildContext context, UserModel? user,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                SizedBox(height: defaultPadding * 3 / 4),
+                const SizedBox(height: defaultPadding * 3 / 4),
                 buildUserDetailPair(
                   Locales.string(context, "id_number"),
                   "# ${user == null ? '' : user.id}",
                 ),
-                SizedBox(height: defaultPadding / 2),
+                const SizedBox(height: defaultPadding / 2),
                 buildUserDetailPair(
                   "${Locales.string(context, 'phone')}:",
                   "+" + (user == null ? "" : user.phone),
                 ),
-                SizedBox(height: defaultPadding / 2),
+                const SizedBox(height: defaultPadding / 2),
                 showBalance
                     ? buildUserDetailPair(
                         Locales.string(context, "my_account_balance"),

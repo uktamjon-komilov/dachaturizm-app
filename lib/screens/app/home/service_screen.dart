@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dachaturizm/components/app_bar.dart';
 import 'package:dachaturizm/components/bottom_navbar.dart';
 import 'package:dachaturizm/constants.dart';
@@ -57,8 +58,8 @@ class _ServiceScreenState extends State<ServiceScreen> {
           ..pop();
       }),
       body: _isLoading
-          ? Center(
-              child: CircularProgressIndicator(),
+          ? const Center(
+              child: const CircularProgressIndicator(),
             )
           : SingleChildScrollView(
               child: Padding(
@@ -71,101 +72,141 @@ class _ServiceScreenState extends State<ServiceScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: Container(
-                        height: 150,
-                        width: 100.w,
-                        child: Image.network(
-                          fixMediaUrl(_service!.photo),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 24),
-                    Text(
-                      _service!.content,
-                      style: TextStyle(
-                        fontSize: 13,
-                        height: 1.92,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                    Visibility(
-                      visible: (_service!.email != null ||
-                          _service!.phone1 != null ||
-                          _service!.phone2 != null),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(height: defaultPadding),
-                          Text(
-                            Locales.string(context, "for_contact"),
-                            style: TextStyles.display1(),
-                          ),
-                          SizedBox(height: defaultPadding),
-                          _buildContactPhones(),
-                          SizedBox(height: defaultPadding),
-                          _buildContactEmail(),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 24),
-                    Column(
-                      children: [
-                        ..._items
-                            .map(
-                              (item) => Container(
-                                width: 100.w,
-                                height: 80,
-                                padding: EdgeInsets.symmetric(vertical: 10),
-                                decoration: BoxDecoration(),
-                                child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Flexible(
-                                              child: Text(
-                                                item.title,
-                                                maxLines: 2,
-                                                style: TextStyles.display2()
-                                                    .copyWith(
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                            ),
-                                            Text(item.phone)
-                                          ],
-                                        ),
-                                      ),
-                                      IconButton(
-                                        onPressed: () {
-                                          String phone = item.phone;
-                                          if (!phone.startsWith("+")) {
-                                            phone = "+" + phone;
-                                          }
-                                          UrlLauncher.launch("tel://${phone}");
-                                        },
-                                        icon: Icon(Icons.phone),
-                                      )
-                                    ]),
-                              ),
-                            )
-                            .toList()
-                      ],
-                    )
+                    _buildMainImage(),
+                    const SizedBox(height: 24),
+                    _buildServiceContent(),
+                    _buildContactDetails(context),
+                    const SizedBox(height: 24),
+                    ..._items
+                        .map(
+                          (item) => _buildServiceItem(item, context),
+                        )
+                        .toList()
                   ],
                 ),
               ),
             ),
+    );
+  }
+
+  Widget _buildServiceItem(ServiceItem item, BuildContext context) {
+    return IntrinsicHeight(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          minWidth: 100.w,
+          maxHeight: 100.h,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildServiceItemImage(item),
+              _buildServiceItemContent(item),
+              _buildServiceItemContact(context, item),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildServiceItemContact(BuildContext context, ServiceItem item) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          Locales.string(context, "phone") + ": " + item.phone,
+          style: TextStyles.display2().copyWith(
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        IconButton(
+          onPressed: () {
+            String phone = item.phone;
+            if (!phone.startsWith("+")) {
+              phone = "+" + phone;
+            }
+            UrlLauncher.launch("tel://${phone}");
+          },
+          icon: const Icon(Icons.phone),
+        )
+      ],
+    );
+  }
+
+  Widget _buildServiceItemContent(ServiceItem item) {
+    return Flexible(
+      child: Text(
+        item.title,
+        style: const TextStyle(
+          fontSize: 13,
+          height: 1.92,
+          fontWeight: FontWeight.w400,
+          overflow: TextOverflow.ellipsis,
+        ),
+        maxLines: 10,
+        textAlign: TextAlign.start,
+      ),
+    );
+  }
+
+  Widget _buildServiceItemImage(ServiceItem item) {
+    return Visibility(
+      visible: item.photo != null,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: CachedNetworkImage(
+          imageUrl: fixMediaUrl(item.photo.toString()),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildContactDetails(BuildContext context) {
+    return Visibility(
+      visible: (_service!.email != null ||
+          _service!.phone1 != null ||
+          _service!.phone2 != null),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: defaultPadding),
+          Text(
+            Locales.string(context, "for_contact"),
+            style: TextStyles.display1(),
+          ),
+          const SizedBox(height: defaultPadding),
+          _buildContactPhones(),
+          const SizedBox(height: defaultPadding),
+          _buildContactEmail(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildServiceContent() {
+    return Text(
+      _service!.content,
+      style: const TextStyle(
+        fontSize: 13,
+        height: 1.92,
+        fontWeight: FontWeight.w400,
+      ),
+    );
+  }
+
+  Widget _buildMainImage() {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        height: 150,
+        width: 100.w,
+        child: Image.network(
+          fixMediaUrl(_service!.photo),
+          fit: BoxFit.cover,
+        ),
+      ),
     );
   }
 
@@ -182,12 +223,12 @@ class _ServiceScreenState extends State<ServiceScreen> {
               color: darkPurple,
               borderRadius: BorderRadius.circular(18),
             ),
-            child: Icon(
+            child: const Icon(
               Icons.email_rounded,
               color: Colors.white,
             ),
           ),
-          SizedBox(width: defaultPadding),
+          const SizedBox(width: defaultPadding),
           Text(
             _service!.email.toString(),
             style: TextStyles.display1().copyWith(height: 1.21),
@@ -213,12 +254,12 @@ class _ServiceScreenState extends State<ServiceScreen> {
               color: darkPurple,
               borderRadius: BorderRadius.circular(18),
             ),
-            child: Icon(
+            child: const Icon(
               Icons.local_phone_rounded,
               color: Colors.white,
             ),
           ),
-          SizedBox(width: defaultPadding),
+          const SizedBox(width: defaultPadding),
           Column(
             children: [
               Text(
@@ -228,8 +269,9 @@ class _ServiceScreenState extends State<ServiceScreen> {
                 style: TextStyles.display1().copyWith(height: 1.21),
               ),
               Visibility(
-                  visible: _service!.phone2 != null,
-                  child: SizedBox(height: defaultPadding / 2)),
+                visible: _service!.phone2 != null,
+                child: const SizedBox(height: defaultPadding / 2),
+              ),
               Visibility(
                 visible: _service!.phone2 != null,
                 child: Text(

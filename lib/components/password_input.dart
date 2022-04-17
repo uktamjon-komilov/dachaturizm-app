@@ -47,7 +47,7 @@ class _PasswordInputFieldState extends State<PasswordInputField> {
         suffixIcon: Container(
           margin: EdgeInsets.only(right: defaultPadding / 3),
           child: IconButton(
-            icon: Icon(
+            icon: const Icon(
               Icons.remove_red_eye_outlined,
               color: greyishLight,
             ),

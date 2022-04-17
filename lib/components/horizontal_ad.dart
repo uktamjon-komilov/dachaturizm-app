@@ -67,7 +67,7 @@ class HorizontalAd extends StatelessWidget {
                         children: [
                           Text(
                             estate.title,
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
                               fontSize: 16,

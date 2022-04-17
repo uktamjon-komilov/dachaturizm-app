@@ -19,10 +19,10 @@ class NoResult extends StatelessWidget {
             height: 50,
             width: 50,
           ),
-          SizedBox(height: 30),
+          const SizedBox(height: 30),
           Text(
             Locales.string(context, "result_not_found"),
-            style: TextStyle(
+            style: const TextStyle(
               color: Colors.black,
               height: 1.25,
               fontSize: 16,
@@ -30,14 +30,15 @@ class NoResult extends StatelessWidget {
               fontWeight: FontWeight.w500,
             ),
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Text(
             Locales.string(context, "no_estates_found_with_these_query"),
-            style: TextStyle(
-                fontSize: 14,
-                height: 1.42,
-                fontWeight: FontWeight.w300,
-                color: Color(0xFF838589)),
+            style: const TextStyle(
+              fontSize: 14,
+              height: 1.42,
+              fontWeight: FontWeight.w300,
+              color: Color(0xFF838589),
+            ),
             textAlign: TextAlign.center,
           ),
         ],
