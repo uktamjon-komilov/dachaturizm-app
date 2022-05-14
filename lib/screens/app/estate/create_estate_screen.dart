@@ -70,6 +70,10 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
   GlobalKey<FormState> _form = GlobalKey<FormState>();
   ScrollController _scrollController = ScrollController();
 
+  Set<BookingDay> _selectedDays = Set<BookingDay>();
+  DateTime now = DateTime.now();
+  DateTime _focusedDay = DateTime.now();
+
   FocusNode _titleFocusNode = FocusNode();
   FocusNode _descriptionFocusNode = FocusNode();
   FocusNode _announcerFocusNode = FocusNode();
@@ -104,6 +108,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     setState(() {
       _mainImage = null;
       _extraImages = List.generate(8, (_) => null);
+      images = <Asset>[];
       _currentSection = "";
       _titleController.text = "";
       _descriptionController.text = "";
@@ -116,6 +121,9 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
       _currentRegion = null;
       _currentDistrict = null;
       _currentPopularPlace = "";
+      _selectedDays = Set<BookingDay>();
+      now = DateTime.now();
+      _focusedDay = DateTime.now();
       _facilities = [];
       _longtitude = 0.0;
       _latitute = 0.0;
@@ -220,10 +228,6 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
       return value;
     });
   }
-
-  Set<BookingDay> _selectedDays = Set<BookingDay>();
-  DateTime now = DateTime.now();
-  DateTime _focusedDay = DateTime.now();
 
   void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
     BookingDay tempSelectedDay = BookingDay.toObj(selectedDay);

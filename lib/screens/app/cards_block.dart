@@ -35,26 +35,33 @@ Widget buildCardsBlock(
       ),
     );
   } else {
-    print(ads.length);
+    int _divider = 6;
+    if (estates!.length < 6) {
+      _divider = estates.length;
+    }
     int adIndex = 0;
-    List<List<Widget>> items = estates!.map((estate) {
+    List<List<Widget>> items = estates.map((estate) {
       int index = estates.indexOf(estate);
-      if (index != 0 && index % 6 == 0 && adIndex < ads.length) {
+      if (index != 0 && ((index + 1) % _divider) == 0 && adIndex < ads.length) {
         AdsPlusModel ad = ads[adIndex];
         adIndex += 1;
         return [
-          AdsPlusHorizontal(ad: ad),
           EstateCard(estate: estate),
+          AdsPlusHorizontal(ad: ad),
         ];
       }
       return [EstateCard(estate: estate)];
     }).toList();
+
+    print(items);
 
     List<Widget> flattened = [];
     for (int i = 0; i < items.length; i++) {
       var item = items[i];
       flattened.addAll(item);
     }
+
+    print(ads);
 
     return Visibility(
       visible: estates.length > 0,

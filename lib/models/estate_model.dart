@@ -38,6 +38,7 @@ class EstateModel {
   final bool isBanner;
   final bool isTopBanner;
   final bool isAd;
+  final bool isAdsPlus;
   final DateTime? created;
   final DateTime? updated;
   final DateTime expiryDate;
@@ -77,6 +78,7 @@ class EstateModel {
     this.isBanner = false,
     this.isTopBanner = false,
     this.isAd = false,
+    this.isAdsPlus = false,
     this.created,
     this.updated,
     required this.expiryDate,
@@ -187,6 +189,7 @@ class EstateModel {
       isBanner: data["is_banner"],
       isTopBanner: data["is_topbanner"],
       isAd: data["is_ads"],
+      isAdsPlus: data["is_ads_plus"],
       created: DateTime.parse(data["created_at"].toString().substring(0, 10)),
       updated: DateTime.parse(data["updated_at"].toString().substring(0, 10)),
       expiryDate: DateTime.parse(data["expires_in"]),
