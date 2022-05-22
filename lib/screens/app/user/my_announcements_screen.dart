@@ -11,6 +11,7 @@ import 'package:dachaturizm/models/ads_plan.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/models/user_model.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
+import 'package:dachaturizm/providers/create_estate_provider.dart';
 import 'package:dachaturizm/providers/currency_provider.dart';
 import 'package:dachaturizm/providers/estate_provider.dart';
 import 'package:dachaturizm/providers/navigation_screen_provider.dart';
@@ -58,6 +59,15 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
   List<String> _adPlans = [];
   double _adsTotal = 0.0;
 
+  _navigateTo(page) async {
+    Map result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => page,
+      ),
+    ) as Map;
+  }
+
   void _chooseAction(EstateModel estate, String action) async {
     final chosenAction =
         _actions.firstWhere((_action) => _action["key"] == action);
@@ -66,13 +76,13 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
     });
   }
 
-  void _refresh() {
+  void _refresh(BuildContext context, [Function? callback]) {
     setState(() {
       _isLoading = true;
     });
 
     Future.wait([
-      _fetchEstates(),
+      _fetchEstates(context),
       Provider.of<AuthProvider>(context, listen: false)
           .getUserDataWithoutNotifying(),
       Provider.of<CurrencyProvider>(context, listen: false)
@@ -89,10 +99,13 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
       });
       Provider.of<NavigationScreenProvider>(context, listen: false)
           .changePageIndex(4);
+      if (callback != null) {
+        callback();
+      }
     });
   }
 
-  Future _fetchEstates([String? term]) async {
+  Future _fetchEstates(BuildContext context, [String? term]) async {
     await Provider.of<EstateProvider>(context, listen: false)
         .getMyEstates(term)
         .then((value) {
@@ -154,19 +167,34 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
     setState(() {});
   }
 
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(Duration.zero).then((_) async {
-      _refresh();
+  void _openDeleteConfirmation(BuildContext context, String? id) {
+    _showConfirmAlert(() async {
+      Map<String, dynamic> data =
+          await Provider.of<CreateEstateProvider>(context, listen: false)
+              .deleteEstate(id);
+
+      if (data["statusCode"] == 400) {
+        _showDeletionStatusSnackBar(context, false);
+      } else {
+        _showDeletionStatusSnackBar(context, true);
+      }
+
+      // _refresh(context, () {
+      //   callWithAuth(context, () async {
+      //     final myAnnouncements = MyAnnouncements();
+      //     await _navigateTo(myAnnouncements);
+      //   });
+      // });
     });
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+
     if (_isInit) {
       _isInit = false;
+      _refresh(context);
       _actions = [
         {
           "key": "edit",
@@ -183,6 +211,14 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
             _openAdsPriceList(context, id);
           },
           "hot": true,
+        },
+        {
+          "key": "delete",
+          "value": Locales.string(context, "delete"),
+          "callback": ([String? id]) {
+            _openDeleteConfirmation(context, id);
+          },
+          "hot": false,
         },
       ];
     }
@@ -218,7 +254,7 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
             : Container(
                 padding: const EdgeInsets.all(defaultPadding),
                 child: RefreshIndicator(onRefresh: () async {
-                  _refresh();
+                  _refresh(context);
                 }, child: LayoutBuilder(
                   builder: (context, _) {
                     if (_allEstates.length > 0) {
@@ -247,7 +283,7 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
                           Expanded(
                             child: SingleChildScrollView(
                               child: Column(
-                                children: [..._estateBlockList()],
+                                children: [..._estateBlockList(context)],
                               ),
                             ),
                           ),
@@ -282,14 +318,18 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
     );
   }
 
-  List _estateBlockList() {
+  List _estateBlockList(BuildContext context) {
     if (_currentEstates.length > 0) {
       return _currentEstates
           .map(
             (estate) => GestureDetector(
               onTap: () {
-                Navigator.of(context).pushNamed(EstateDetailScreen.routeName,
-                    arguments: {"id": estate.id, "typeId": estate.typeId});
+                try {
+                  Navigator.of(context).pushNamed(EstateDetailScreen.routeName,
+                      arguments: {"id": estate.id, "typeId": estate.typeId});
+                } catch (e) {
+                  print(e);
+                }
               },
               child: Card(
                 shadowColor: Colors.transparent,
@@ -353,6 +393,27 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
                       context,
                       "something_wrong_not_enough_money",
                     ),
+              ),
+      ),
+    );
+  }
+
+  _showDeletionStatusSnackBar(BuildContext context, bool value) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: value ? Colors.green : Colors.red,
+        content: value
+            ? Text(
+                Locales.string(
+                  context,
+                  "estate_was_deleted",
+                ),
+              )
+            : Text(
+                Locales.string(
+                  context,
+                  "estate_was_not_deleted",
+                ),
               ),
       ),
     );
@@ -659,7 +720,7 @@ class _MyAnnouncementsState extends State<MyAnnouncements> {
                           _showStatusSnackBar(value, hint: planTitle);
                         }
                       });
-                      _refresh();
+                      _refresh(context);
                       setState(() {
                         _isLoading = false;
                       });

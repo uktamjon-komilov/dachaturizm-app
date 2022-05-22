@@ -110,8 +110,10 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
         final ip = await getPublicIP(dio);
         if (ip == null) {
         } else {
-          Provider.of<EstateProvider>(context, listen: false)
-              .addEstateView(ip, detail.id);
+          try {
+            Provider.of<EstateProvider>(context, listen: false)
+                .addEstateView(ip, detail.id);
+          } catch (e) {}
         }
       });
     });
@@ -172,6 +174,7 @@ class _EstateDetailScreenState extends State<EstateDetailScreen> {
                               _detailBuilder.buildDescription(context),
                               _detailBuilder.buildPopularPlaceBox(context),
                               _detailBuilder.buildAddressBox(context),
+                              _detailBuilder.buildCapacities(context),
                               _detailBuilder.buildChips(),
                               _detailBuilder.buildAnnouncerBox(context),
                               buildRatingResults(context, _estateRating),

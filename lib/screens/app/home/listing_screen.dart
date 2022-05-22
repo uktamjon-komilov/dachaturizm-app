@@ -38,7 +38,6 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
   List<EstateModel> _currentEstates = [];
 
   String? _topNextLink;
-  String? _simpleNextLink;
 
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
@@ -76,25 +75,6 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
               _paginationLoading = false;
             });
           });
-        } else if (!_showTop && _simpleNextLink != null) {
-          setState(() {
-            _paginationLoading = true;
-          });
-          Provider.of<EstateProvider>(context, listen: false)
-              .getNextPage(_simpleNextLink as String)
-              .then((value) {
-            List<EstateModel> _estates = value["estates"];
-            _estates.shuffle();
-            _allEstates.addAll(_estates);
-            _simpleNextLink = value["next"];
-            if (value["ad"] != null) {
-              _ads.add(value["ad"]);
-            }
-            setState(() {
-              _currentEstates = _allEstates;
-              _paginationLoading = false;
-            });
-          });
         }
       }
     });
@@ -116,17 +96,13 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
           _topNextLink = data["next"];
         });
       }),
-      Provider.of<EstateProvider>(context, listen: false).getSearchedResults(
+      Provider.of<EstateProvider>(context, listen: false).getAllSearchedResults(
           term: _searchController.text,
           category: _category,
           extraArgs: {
             "all": true,
           }).then((data) {
-        List<EstateModel> _estates = data["estates"];
-        _estates.shuffle();
-        setState(() {
-          _simpleNextLink = data["next"];
-        });
+        _allEstates = data["estates"];
       }),
     ]).then((_) {
       if (_showTop) {
@@ -156,17 +132,12 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
         });
       }),
       Provider.of<EstateProvider>(context, listen: false)
-          .getEstatesByType(_category, "all")
+          .getAllSearchedResults(category: _category)
           .then((value) {
-        List<EstateModel> _estates = value["estates"];
-        _estates.shuffle();
-        _allEstates = _estates;
-        if (value["ad"] != null) {
-          _ads.add(value["ad"]);
+        _allEstates = value["estates"];
+        if (value["ads"] != null) {
+          _ads.addAll(value["ads"]);
         }
-        setState(() {
-          _simpleNextLink = value["next"];
-        });
       }),
     ]);
     setState(() {

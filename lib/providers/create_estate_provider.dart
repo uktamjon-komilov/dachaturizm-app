@@ -17,7 +17,10 @@ class CreateEstateProvider extends ChangeNotifier {
     final locale = await getCurrentLocale();
     Map<String, dynamic> tempData = {};
 
+    print(data["photos"]);
+
     tempData["photos"] = "[${data['photos'].join(',')}]";
+    print(tempData["photos"]);
 
     tempData["photo"] = data["photo"];
 
@@ -26,19 +29,19 @@ class CreateEstateProvider extends ChangeNotifier {
         "title": "",
         "description": "",
         "region": data["region"].translations["en"]["title"],
-        "district": data["region"].translations["en"]["title"],
+        "district": data["district"].translations["en"]["title"],
       },
       "uz": {
         "title": "",
         "description": "",
         "region": data["region"].translations["uz"]["title"],
-        "district": data["region"].translations["uz"]["title"],
+        "district": data["district"].translations["uz"]["title"],
       },
       "ru": {
         "title": "",
         "description": "",
         "region": data["region"].translations["ru"]["title"],
-        "district": data["region"].translations["ru"]["title"],
+        "district": data["district"].translations["ru"]["title"],
       }
     };
 
@@ -69,15 +72,15 @@ class CreateEstateProvider extends ChangeNotifier {
     }
 
     if (data.containsKey("beds")) {
-      tempData["beds"] = 5;
+      tempData["beds"] = data["beds"];
     }
 
     if (data.containsKey("pool")) {
-      tempData["pool"] = 1;
+      tempData["pool"] = data["pool"];
     }
 
     if (data.containsKey("people")) {
-      tempData["people"] = 5;
+      tempData["people"] = data["people"];
     }
 
     if (data.containsKey("weekday_price")) {
@@ -233,6 +236,7 @@ class CreateEstateProvider extends ChangeNotifier {
         "Content-type": "multipart/form-data",
         "Authorization": "Bearer ${access}",
       });
+      print(url);
       final response = await dio.delete(url, options: options);
       if (response.statusCode as int >= 200 &&
           response.statusCode as int < 300) {
@@ -242,5 +246,31 @@ class CreateEstateProvider extends ChangeNotifier {
       print(e);
     }
     return {"status": false};
+  }
+
+  // Estate creation future
+  Future<Map<String, dynamic>> deleteEstate(String? id) async {
+    final url = "${baseUrl}api/estater/${id}/";
+    print(url);
+    String? refresh = await auth.getRefreshToken();
+    if (refresh == null || refresh == "") {
+      return {"statusCode": 400};
+    }
+    String access = await auth.getAccessToken();
+    Options options = Options(
+      headers: {
+        "Content-type": "multipart/form-data",
+        "Authorization": "Bearer ${access}",
+      },
+    );
+
+    try {
+      final response = await dio.delete(url, options: options);
+      print(response.data);
+      return {"statusCode": response.statusCode};
+    } catch (e) {
+      print(e);
+    }
+    return {"statusCode": 400};
   }
 }

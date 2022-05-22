@@ -203,5 +203,12 @@
     "charging_amount": "Yechiladigan summa: ",
     "target_address": "Mo'ljal: ",
     "something_went_wrong_try_in_your_profile": "Nimadir xato ketdi, qayta urinib ko‘ring!",
-    "ads_plus": "6/1 reklama"
+    "ads_plus": "6/1 reklama",
+    "number_of_beds": " yotoqlari",
+    "number_of_people": " mehmonlar",
+    "number_of_pool": " basseynlar",
+    "capacities": "Imkoniyatlar",
+    "delete": "Oʻchirish",
+    "estate_was_deleted": "E'lon o'chirildi",
+    "estate_was_not_deleted": "E'lon o'chirilmadi"
 }

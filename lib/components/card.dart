@@ -11,6 +11,7 @@ import "package:flutter/material.dart";
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
+import 'package:animate_do/animate_do.dart';
 
 class EstateCard extends StatefulWidget {
   const EstateCard({
@@ -214,19 +215,43 @@ class _EstateCardState extends State<EstateCard> {
     return Positioned(
       top: 10,
       left: 10,
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 2, horizontal: 5),
-        decoration: BoxDecoration(
-            color: normalOrange, borderRadius: BorderRadius.circular(5)),
-        child: const Text(
-          "TOP",
-          style: TextStyle(
-            fontSize: 11,
-            color: Colors.white,
-            fontWeight: FontWeight.w700,
+      child: Flash(
+        infinite: true,
+        controller: _infiniteAnimation,
+        key: Key(widget.estate.id.toString()),
+        duration: Duration(milliseconds: 2000),
+        child: Container(
+          padding: EdgeInsets.symmetric(vertical: 2, horizontal: 5),
+          decoration: BoxDecoration(
+            color: normalOrange,
+            borderRadius: BorderRadius.circular(5),
+            // gradient: LinearGradient(
+            //   begin: Alignment.centerLeft,
+            //   end: Alignment.centerRight,
+            //   colors: [
+            //     Color.fromARGB(255, 255, 251, 32),
+            //     Color.fromARGB(255, 243, 117, 33)
+            //   ],
+            // ),
+          ),
+          child: const Text(
+            "TOP",
+            style: TextStyle(
+              fontSize: 11,
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
       ),
     );
+  }
+
+  _infiniteAnimation(AnimationController animationController) {
+    animationController.addStatusListener((AnimationStatus status) {
+      if (status != AnimationStatus.forward) {
+        animationController.repeat();
+      }
+    });
   }
 }
