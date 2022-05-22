@@ -200,7 +200,8 @@ class _EstateListingScreenState extends State<EstateListingScreen> {
                           ),
                         ),
                         Visibility(
-                          visible: _allEstates.length > 0,
+                          // visible: _isLoading || _allEstates.length > 0,
+                          visible: true,
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: defaultPadding),
