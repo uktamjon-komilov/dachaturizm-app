@@ -203,5 +203,12 @@
     "charging_amount": "Withdrawals from your account: ",
     "target_address": "Target address: ",
     "something_went_wrong_try_in_your_profile": "Something went wrong, please try again!",
-    "ads_plus": "6/1 advertising"
+    "ads_plus": "6/1 advertising",
+    "number_of_beds": " beds",
+    "number_of_people": " people",
+    "number_of_pool": " pools",
+    "capacities": "Capacities",
+    "delete": "Delete",
+    "estate_was_deleted": "Announcement was deleted",
+    "estate_was_not_deleted": "Announcement wasn't deleted"
 }

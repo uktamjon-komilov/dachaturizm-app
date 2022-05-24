@@ -40,6 +40,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
           }
           return sum;
         });
+        print(value);
         setState(() {
           _chats = value;
         });

@@ -583,7 +583,13 @@ class CustomCheckbox extends StatelessWidget {
                   ),
                 ),
               ),
-              Text(title)
+              Flexible(
+                child: Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              )
             ],
           ),
         ),

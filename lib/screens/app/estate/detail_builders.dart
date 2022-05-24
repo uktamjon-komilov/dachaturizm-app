@@ -19,6 +19,7 @@ import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:intl/intl.dart';
+import 'package:sizer/sizer.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 
@@ -26,6 +27,62 @@ class DetailBuilder {
   final EstateModel detail;
 
   DetailBuilder(this.detail);
+
+  Widget buildCapacities(context) {
+    return Container(
+      height: 70,
+      width: 100.w,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          _capacityItem(
+            context,
+            Icons.bed,
+            detail.beds.toString() + Locales.string(context, "number_of_beds"),
+          ),
+          SizedBox(width: 10),
+          _capacityItem(
+            context,
+            Icons.people,
+            detail.people.toString() +
+                Locales.string(context, "number_of_people"),
+          ),
+          SizedBox(width: 10),
+          _capacityItem(
+            context,
+            Icons.pool,
+            detail.pool.toString() + Locales.string(context, "number_of_pool"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _capacityItem(context, IconData icon, String text) {
+    return Container(
+      width: 22.w,
+      decoration: BoxDecoration(
+        // color: Colors.red,
+        border: Border.all(
+          color: darkPurple,
+        ),
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            size: 40,
+          ),
+          Text(
+            text,
+            style: TextStyles.display4(),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget buildChips() {
     return Padding(
@@ -44,7 +101,7 @@ class DetailBuilder {
     return Visibility(
       visible: detail.popularPlaceTitle != null,
       child: Container(
-        margin: EdgeInsets.only(top: 10),
+        margin: EdgeInsets.only(top: 10, bottom: 10),
         padding: EdgeInsets.symmetric(
           horizontal: 7,
           vertical: 5,
@@ -215,18 +272,56 @@ class DetailBuilder {
   }
 
   Row buildPriceRow(context, callback) {
-    final NumberFormat formatter = NumberFormat("#,##0.00", "en_US");
+    final NumberFormat formatter = NumberFormat(",###", "en_US");
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          "${formatter.format(detail.weekdayPrice)} ${detail.priceType}",
-          style: const TextStyle(
-            color: normalOrange,
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Text(
+                  Locales.string(context, "weekday_price") + ": ",
+                  style: const TextStyle(
+                    color: darkPurple,
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  "${formatter.format(detail.weekdayPrice)} ${detail.priceType}",
+                  style: const TextStyle(
+                    color: normalOrange,
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                Text(
+                  Locales.string(context, "weekend_price") + ": ",
+                  style: const TextStyle(
+                    color: darkPurple,
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  "${formatter.format(detail.weekendPrice)} ${detail.priceType}",
+                  style: const TextStyle(
+                    color: normalOrange,
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
         ElevatedButton(
           onPressed: callback,

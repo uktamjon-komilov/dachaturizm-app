@@ -203,5 +203,12 @@
     "charging_amount": "Снятие с вашего счета: ",
     "target_address": "Пункт назначения: ",
     "something_went_wrong_try_in_your_profile": "Что-то пошло не так. Пожалуйста, попытайтесь еще раз!",
-    "ads_plus": "6/1 реклама"
+    "ads_plus": "6/1 реклама",
+    "number_of_beds": " коек",
+    "number_of_people": " гостей",
+    "number_of_pool": " бассейны",
+    "capacities": "Емкости",
+    "delete": "Удалить",
+    "estate_was_deleted": "Объявление было удалено",
+    "estate_was_not_deleted": "Объявление не было удалено"
 }

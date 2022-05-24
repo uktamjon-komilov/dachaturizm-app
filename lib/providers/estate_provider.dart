@@ -3,7 +3,6 @@ import 'package:dachaturizm/models/ads_plus.dart';
 import 'package:dachaturizm/models/estate_model.dart';
 import 'package:dachaturizm/models/category_model.dart';
 import 'package:dachaturizm/models/estate_rating_model.dart';
-import 'package:dachaturizm/models/static_page_model.dart';
 import 'package:dachaturizm/providers/auth_provider.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
@@ -280,6 +279,36 @@ class EstateProvider with ChangeNotifier {
     return data;
   }
 
+  // Search all random and return results
+  Future<Map<String, dynamic>> getAllSearchedResults({
+    String? term,
+    CategoryModel? category,
+    Map<String, dynamic>? extraArgs = const {},
+  }) async {
+    Map<String, dynamic> data = {};
+    List<EstateModel> estates = [];
+    List<AdsPlusModel> ads = [];
+    String queryString = getQueryStringFromFilters(
+      term: term,
+      category: category,
+      extraArgs: extraArgs,
+    );
+    final url = "${baseUrl}api/estater/all-random/?${queryString}";
+    final response = await _fetch(url);
+    await response.data["estates"].forEach((item) async {
+      EstateModel estate = await EstateModel.fromJson(item);
+      estates.add(estate);
+    });
+    await response.data["ads"].forEach((item) async {
+      AdsPlusModel ad = AdsPlusModel.fromJson(item);
+      ads.add(ad);
+    });
+    data["estates"] = estates;
+    data["count"] = estates.length;
+    data["ads"] = ads;
+    return data;
+  }
+
   // Get estate by ID
   Future<EstateModel> getEstateById(int estateId) async {
     final url = "${baseUrl}api/estater/${estateId}/";
@@ -485,5 +514,18 @@ class EstateProvider with ChangeNotifier {
   Future addEstateView(String ip, int estateId) async {
     const url = "${baseUrl}api/views/";
     await dio.post(url, data: {"estate": estateId, "ip": ip});
+  }
+
+  // Get estate extra photo
+  Future<String?> getExtraPhoto(int id) async {
+    try {
+      final url = "${baseUrl}api/estatephotos/${id}/";
+      final response = await dio.get(url);
+      if (response.statusCode as int >= 200 &&
+          response.statusCode as int < 300) {
+        return response.data["photo"];
+      }
+    } catch (e) {}
+    return null;
   }
 }

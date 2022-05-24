@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dachaturizm/components/app_bar.dart';
 import 'package:dachaturizm/components/booked_days_hint.dart';
 import 'package:dachaturizm/components/fluid_big_button.dart';
@@ -40,6 +41,7 @@ import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:http_parser/src/media_type.dart';
+import 'package:flutter_spinbox/cupertino.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
 class EstateCreationPageScreen extends StatefulWidget {
@@ -60,7 +62,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
   bool _isSubmitted = false;
   bool _isEditing = false;
   bool _filtersOpen = false;
-  int _currentExtraImageIndex = 7;
+  int _currentExtraImageIndex = 0;
   int _descriptionMaxLength = 1000;
   EstateModel? _estate;
   int _estateId = 0;
@@ -102,6 +104,9 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
   List<int> _facilities = [];
   double _longtitude = 0.0;
   double _latitute = 0.0;
+  int _people = 1;
+  int _beds = 1;
+  int _pools = 1;
   String _locationName = "";
 
   void _resetInputs() {
@@ -117,6 +122,9 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
       _addressController.text = "";
       _weekdayPriceController.text = "";
       _weekendPriceController.text = "";
+      _people = 1;
+      _beds = 1;
+      _pools = 1;
       _currentCurrencyId = 0;
       _currentRegion = null;
       _currentDistrict = null;
@@ -169,9 +177,9 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     data["title"] = _titleController.text;
     data["region"] = Provider.of<FacilityProvider>(context, listen: false)
         .regions
-        .firstWhere((region) => region.title.toString() == _currentRegion);
-    data["district"] = _districts.firstWhere(
-        (district) => district.title.toString() == _currentDistrict);
+        .firstWhere((region) => region.title == _currentRegion);
+    data["district"] =
+        _districts.firstWhere((district) => district.title == _currentDistrict);
     data["popular_place_id"] =
         Provider.of<FacilityProvider>(context, listen: false).places.firstWhere(
             (place) => place.title.toString() == _currentPopularPlace,
@@ -190,10 +198,11 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
     data["weekend_price"] = _weekendPriceController.text;
     data["price_type"] = _currentCurrencyId.toString();
 
-    data["beds"] = "0";
-    data["pool"] = "0";
-    data["people"] = "0";
+    data["beds"] = _beds.toString();
+    data["pool"] = _pools.toString();
+    data["people"] = _people.toString();
     data["is_published"] = "true";
+    print(data["photos"]);
     return data;
   }
 
@@ -310,7 +319,9 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
       images = resultList;
     });
 
-    images.forEach((image) async {
+    for (int i = 0; i < images.length; i++) {
+      Asset image = images[i];
+
       ByteData byteData = await image.getByteData();
       List<int> imageData = byteData.buffer.asUint8List();
       MultipartFile photo = MultipartFile.fromBytes(
@@ -318,13 +329,41 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
         filename: "image.jpg",
         contentType: MediaType("image", "jpg"),
       );
-      int index = images.indexOf(image);
-      Provider.of<CreateEstateProvider>(context, listen: false)
-          .uploadExtraPhoto(photo)
-          .then((value) {
-        _extraImagesId[index] = value;
+
+      print(_currentExtraImageIndex);
+      int index = i + _currentExtraImageIndex;
+      print(_extraImagesId);
+      print(index);
+      print("----------------");
+
+      while (index < 8 && _extraImagesId[index] != 0) {
+        index += 1;
+        if (index >= 8) break;
+      }
+
+      if (index >= 8) return;
+
+      setState(() {
+        _extraImagesLoading[index] = true;
       });
-    });
+
+      int value =
+          await Provider.of<CreateEstateProvider>(context, listen: false)
+              .uploadExtraPhoto(photo);
+
+      _extraImagesId[index] = value;
+
+      String? name = await Provider.of<EstateProvider>(context, listen: false)
+          .getExtraPhoto(value);
+
+      _extraImages[index] = name;
+
+      setState(() {
+        _extraImagesLoading[index] = false;
+      });
+    }
+
+    setState(() {});
   }
 
   @override
@@ -374,7 +413,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
               _extraImages[index] = photo.photo;
               _extraImagesId[index] = photo.id;
             });
-            _currentExtraImageIndex = 8;
+            _currentExtraImageIndex = value.photos.length;
             _titleController.text = value.title;
             _descriptionController.text = value.description;
             _announcerController.text = value.announcer;
@@ -403,20 +442,18 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                     })
                     .title
                     .toString();
-            _currentRegion =
-                Provider.of<FacilityProvider>(context, listen: false)
-                    .regions
-                    .firstWhere((region) => region.title == value.region,
-                        orElse: () {
-                      return RegionModel(
-                          id: 0, title: "", translations: {}, districts: []);
-                    })
-                    .title
-                    .toString();
-            _districts = Provider.of<FacilityProvider>(context, listen: false)
-                .regions
-                .firstWhere((region) => region.id.toString() == _currentRegion,
+            List<RegionModel> tempRegions =
+                Provider.of<FacilityProvider>(context, listen: false).regions;
+            _currentRegion = tempRegions
+                .firstWhere((region) => region.title == value.region,
                     orElse: () {
+                  return RegionModel(
+                      id: 0, title: "", translations: {}, districts: []);
+                })
+                .title
+                .toString();
+            _districts = tempRegions.firstWhere(
+                (region) => region.title == _currentRegion, orElse: () {
               return RegionModel(
                   id: 0, title: "", districts: [], translations: {});
             }).districts;
@@ -436,6 +473,9 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
             _longtitude = value.longtitute;
             _latitute = value.latitute;
             _selectedDays = value.bookedDays.toSet();
+            _people = value.people;
+            _beds = value.beds;
+            _pools = value.pool;
           });
         }
       }).then((_) {
@@ -652,7 +692,7 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                                       listen: false)
                                   .regions
                                   .firstWhere((region) =>
-                                      region.title.toString() == _currentRegion)
+                                      region.title == _currentRegion)
                                   .districts;
                               setState(() {
                                 _currentDistrict = null;
@@ -814,6 +854,72 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
                                   .requestFocus(_weekdayPriceFocusNode);
                             },
                           ),
+                          const VerticalHorizontalHalfSizedBox(),
+                          Text(
+                            Locales.string(context, "capacities"),
+                            style: TextStyles.display9(),
+                          ),
+                          VerticalHorizontalSizedBox(),
+                          Text("Mehmonlar soni: "),
+                          Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(0, 8, 8, 8),
+                                child: Icon(Icons.people),
+                              ),
+                              SizedBox(
+                                width: 40.w,
+                                child: CupertinoSpinBox(
+                                  min: 0,
+                                  max: 50,
+                                  value: _people.toDouble(),
+                                  onChanged: (value) {
+                                    _people = value.toInt();
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                          Text("Yotoqlar soni: "),
+                          Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(0, 8, 8, 8),
+                                child: Icon(Icons.bed),
+                              ),
+                              SizedBox(
+                                width: 40.w,
+                                child: CupertinoSpinBox(
+                                  min: 0,
+                                  max: 50,
+                                  value: _beds.toDouble(),
+                                  onChanged: (value) {
+                                    _beds = value.toInt();
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                          Text("Basseynlar soni: "),
+                          Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(0, 8, 8, 8),
+                                child: Icon(Icons.pool),
+                              ),
+                              SizedBox(
+                                width: 40.w,
+                                child: CupertinoSpinBox(
+                                  min: 0,
+                                  max: 50,
+                                  value: _pools.toDouble(),
+                                  onChanged: (value) {
+                                    _pools = value.toInt();
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
                           VerticalHorizontalSizedBox(),
                           Text(
                             Locales.string(context, "price"),
@@ -964,26 +1070,55 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
         ...List.generate(
           8,
           (index) {
-            Asset? asset = (images.length > index) ? images[index] : null;
-            return ImageBox(
-              onTap: loadAssets,
-              photo: asset,
-              size: (100.w - 3.5 * defaultPadding) / 4,
-              onDelete: () {
-                setState(() {
-                  _extraImagesLoading[index] = true;
-                });
-                Provider.of<CreateEstateProvider>(context, listen: false)
-                    .removePhoto(_extraImagesId[index])
-                    .then((value) {
+            if (_extraImages[index] == null) {
+              Asset? asset = (images.length > index) ? images[index] : null;
+              return ImageBox(
+                onTap: loadAssets,
+                photo: asset,
+                size: (100.w - 3.5 * defaultPadding) / 4,
+                onDelete: () {
                   setState(() {
-                    _extraImagesId[index] = 0;
-                    _extraImagesLoading[index] = false;
-                    images.removeAt(index);
+                    _extraImagesLoading[index] = true;
                   });
-                });
-              },
-            );
+                  Provider.of<CreateEstateProvider>(context, listen: false)
+                      .removePhoto(_extraImagesId[index])
+                      .then((value) {
+                    _extraImages.removeAt(index);
+                    _extraImages.add(null);
+                    images.removeAt(index);
+                    _extraImagesId.removeAt(index);
+                    _extraImagesId.add(0);
+                    setState(() {
+                      _extraImagesLoading[index] = false;
+                      _currentExtraImageIndex -= 1;
+                    });
+                  });
+                },
+              );
+            } else {
+              return ImageBox(
+                onTap: loadAssets,
+                image: _extraImages[index],
+                size: (100.w - 3.5 * defaultPadding) / 4,
+                onDelete: () {
+                  setState(() {
+                    _extraImagesLoading[index] = true;
+                  });
+                  Provider.of<CreateEstateProvider>(context, listen: false)
+                      .removePhoto(_extraImagesId[index])
+                      .then((value) {
+                    _extraImages.removeAt(index);
+                    _extraImages.add(null);
+                    _extraImagesId.removeAt(index);
+                    _extraImagesId.add(0);
+                    setState(() {
+                      _extraImagesLoading[index] = false;
+                      _currentExtraImageIndex -= 1;
+                    });
+                  });
+                },
+              );
+            }
           },
         ),
       ],
@@ -1015,25 +1150,25 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
         ),
       ),
     );
+    if (data["street"] != "") {
+      _locationName += data["street"];
+      _locationName += ", ";
+    }
+    if (data["subAdministrativeArea"] != "") {
+      _locationName += data["subAdministrativeArea"];
+      _locationName += ", ";
+    }
+    if (data["administrativeArea"] != "") {
+      _locationName += data["administrativeArea"];
+      _locationName += ", ";
+    }
+    if (data["country"] != "") {
+      _locationName += data["country"];
+    }
+    _longtitude = data["position"].longitude;
+    _latitute = data["position"].latitude;
     setState(() {
-      _longtitude = data["position"].longitude;
-      _latitute = data["position"].latitude;
-      if (data["street"] != "" &&
-          data["subAdministrativeArea"] != "" &&
-          data["administrativeArea"] != "" &&
-          data["country"] != "") {
-        _locationName = data["street"] +
-            ", " +
-            data["subAdministrativeArea"] +
-            ", " +
-            data["administrativeArea"] +
-            ", " +
-            data["country"];
-        _addressController.text = _locationName;
-      } else {
-        _locationName = "";
-        _addressController.text = "";
-      }
+      _addressController.text = _locationName;
     });
   }
 
@@ -1147,12 +1282,16 @@ class _EstateCreationPageScreenState extends State<EstateCreationPageScreen> {
               selectedDecoration: BoxDecoration(
                 color: normalOrange,
                 borderRadius: BorderRadius.circular(5),
+                shape: BoxShape.rectangle,
               ),
-              defaultDecoration:
-                  BoxDecoration(borderRadius: BorderRadius.circular(5)),
+              defaultDecoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                shape: BoxShape.rectangle,
+              ),
               todayDecoration: BoxDecoration(
                 color: lightPurple,
                 borderRadius: BorderRadius.circular(5),
+                shape: BoxShape.rectangle,
               ),
               todayTextStyle: TextStyle(
                 color: Colors.white,
@@ -1249,6 +1388,7 @@ class VerticalHorizontalSizedBox extends StatelessWidget {
 class ImageBox extends StatefulWidget {
   final void Function()? onTap;
   final Asset? photo;
+  final String? image;
   final double size;
   final bool isUpdating;
   final void Function()? onDelete;
@@ -1257,6 +1397,7 @@ class ImageBox extends StatefulWidget {
     Key? key,
     this.onTap,
     this.photo,
+    this.image,
     required this.size,
     this.isUpdating = false,
     this.onDelete,
@@ -1267,8 +1408,8 @@ class ImageBox extends StatefulWidget {
 }
 
 class _ImageBoxState extends State<ImageBox> {
-  getContent(Asset? photo) {
-    if (photo == null) {
+  getContent(Asset? photo, String? image) {
+    if (photo == null && image == null) {
       return Center(
         child: Image.asset(
           "assets/images/fi-rr-camera.png",
@@ -1278,11 +1419,17 @@ class _ImageBoxState extends State<ImageBox> {
     }
     return Stack(
       children: [
-        AssetThumb(
-          asset: photo,
-          width: widget.size.toInt(),
-          height: widget.size.toInt(),
-        ),
+        photo == null
+            ? CachedNetworkImage(
+                imageUrl: image.toString(),
+                height: widget.size.toDouble(),
+                width: widget.size.toDouble(),
+              )
+            : AssetThumb(
+                asset: photo,
+                width: widget.size.toInt(),
+                height: widget.size.toInt(),
+              ),
         Positioned(
           right: 8,
           top: 8,
@@ -1320,7 +1467,7 @@ class _ImageBoxState extends State<ImageBox> {
           child: Container(
             width: widget.size,
             height: widget.size,
-            child: getContent(widget.photo),
+            child: getContent(widget.photo, widget.image),
           ),
         ),
       ),
